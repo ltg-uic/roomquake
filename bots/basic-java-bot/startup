@@ -1,0 +1,2 @@
+# This script takes care of actually starting the bot
+java -jar target/basic-java-bot-0.1.0.jar $1 $2
