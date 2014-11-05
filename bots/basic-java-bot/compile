@@ -1,2 +1,0 @@
-# This script takes care of building/compiling the bot
-mvn package
