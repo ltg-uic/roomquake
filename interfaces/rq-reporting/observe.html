@@ -1,0 +1,94 @@
+<html>
+<body>
+
+<script>
+
+//find out who this is
+
+var d = document.URL;
+var section = d.substring(d.length-12, d.length-9);
+var name = d.substring(d.length-3, d.length);
+document.write("<H1>Section: " + section + "   Student: " + name + "</H1>");
+
+const NS = 4; //number of seismographs
+
+function registerSelection () {
+
+//	all fields must be filled
+
+	if (document.forms[0].seismograph.value == 0) alert ("You must designate the seismograph that this readings is associated with");
+	else if (document.forms[0].P_arrival.value == "") alert ("You must enter the arrival time for the P wave");
+	else if (document.forms[0].S_arrival.value == "") alert ("You must enter the arrival time for the S wave");
+	else if (document.forms[0].amplitude.value == "") alert ("You must enter the maximum amplitude of the S wave");
+	else if (document.forms[0].difference.value == "") alert ("You must enter the difference between the arrival times of the P and S waves");
+	else if (document.forms[0].distance.value == "") alert ("You must enter the estimated distance of the event from this seismograph");
+	else if (document.forms[0].magnitude.value == "") alert ("You must enter the estimated magnitude of this event");
+	else if (document.forms[0].time.value == "") alert ("You must enter the estimated time of this event");
+	else {
+		
+	/* send the following information to Nutella:
+		
+		section
+		name
+     	document.forms[0].seismograph.value	
+		document.forms[0].P_arrival.value
+		document.forms[0].S_arrival.value
+		document.forms[0].amplitude.value
+		document.forms[0].difference.value
+		document.forms[0].distance.value
+		document.forms[0].magnitude.value
+		document.forms[0].time.value
+		
+	*/
+
+		document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
+		
+		document.forms[0].reset();
+	}
+}
+
+
+</script>
+
+
+
+<form action="">
+
+Seismograph: 
+<select name="seismograph">
+  <option value="0" disabled></option>
+
+<script>
+
+	for (var i=1; i <= NS; i++) {
+		document.writeln('<option value="' + i + '">' + i + '</option>');
+	}
+</script>
+
+</select>
+
+<br><br>
+
+Readings:<br><br>
+
+P wave arrival time <input type=text required name="P_arrival"> (should be date/time picker)<br>
+S wave arrival time <input type=text name="S_arrival"> (should be date/time picker)<br>
+Maximum S amplitude <input type=text name="amplitude"><br>
+
+<br><br>
+Calculations: <br><br>
+
+Difference in arrival times (S-P) <input type=text name
+="difference"> (seconds) <br>
+Distance <input type=text name="distance"><br>
+Magnitude <input type=text name="magnitude"><br>
+Time of event <input type=text name="time"> (should be date/time picker)<br>
+
+<br><br><br>
+
+<button type=button onClick='registerSelection();'>Submit</button>
+<button type=reset onClick='document.forms[0].reset();'>Reset</button>
+
+</form>
+</body>
+</html>

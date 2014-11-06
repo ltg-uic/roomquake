@@ -1,0 +1,24 @@
+<html>
+<body>
+<H1> Please select your name: </H1>
+<script>
+
+var sections = ["6LM","6BS","6MV"];
+
+var names = [
+["TUR","ROP","POR","WOM","BOW"],
+["ABC","DEF","GHI"],
+["ARF","ORM"]];
+
+
+var d = document.URL;
+var section = d.substring(d.length-3, d.length);
+for (i=0; i<sections.length; i++) if (section == sections[i]) index=i;
+for (j=0; j<names[index].length; j++) {
+	document.write("<button type=button onClick='location.assign(\"observe.html?section=" + section + 
+	"&name=" + names[index][j] + "\");'>" + names[index][j] + "</button><br>");	
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<html>
+<head>
+
+	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
+	<script src="bower_components/Processing.js/processing.js"></script>
+
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen"
+          title="no title" charset="utf-8">
+
+</head>
+<body  onresize="location.reload();"> <!-- my solution to the resize problem :-) -->
+
+<h2>
+<p>
+    <canvas id="canvas1"></canvas>
+</p>
+<script>
+
+
+	const SEISMO_RADIUS = 30;
+	var SEISMOGRAPHS = [{x:150,y:450},{x:300,y:600},{x:700,y:500}];
+	var OBSERVATIONS = [
+	[5,5.6,5.6,4.8,5.1,5.6,6.1],
+	[7,7.6,7.6,7.5,7.3,7.5,8.1,6.4,6.4,7.3],
+	[26.6,27.3,27.5,27.8,27.3,27.1,27.1,27.4]];
+
+/*	MQTT.connect("ltg.evl.uic.edu", "roomquake", function () {
+		var channel = "observations";
+
+
+	blah blah blah
+	
+*/
+
+	// this is called when a "new observation" message is received
+
+	function new_observation (s, d, t) {
+		OBSERVATIONS[s][OBSERVATIONS[s].length] = d;
+	}
+
+
+	// for testing
+
+	function ooch() {
+		
+		var seismograph = Math.floor(Math.random()*SEISMOGRAPHS.length);
+		var distance = Math.random()*30;
+		var time = Math.random();
+		new_observation (seismograph, distance, time);
+		setTimeout(ooch, 5000);
+	}
+
+
+	function init () {
+
+
+
+	} 
+
+// Assuming six seismographs maximum
+
+	var R = [Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255];
+	var G = [Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255];
+	var B = [Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255, Math.random()*255];
+
+	const WINDOW_WIDTH = window.innerWidth;
+	const WINDOW_HEIGHT = window.innerHeight-40;
+
+
+	function sketchProc(processing) {
+        // Override draw function, by default it will be called 60 times per second
+
+		processing.setup = function () {
+			processing.size(WINDOW_WIDTH,WINDOW_HEIGHT);
+			processing.fill(255);
+			processing.smooth(8);
+			processing.stroke(1);
+			processing.strokeWeight(1);
+  			myFont = processing.createFont("sans-serif",12);
+		};
+
+		processing.draw = function () {			
+			processing.background(255);
+
+		// draw the seismographs   
+
+				processing.stroke(processing.color(30,143,208));
+
+
+			for (var i=0; i<SEISMOGRAPHS.length; i++) {
+				processing.fill(processing.color(R[i], G[i], B[i]));
+				processing.stroke(processing.color(R[i], G[i], B[i]));
+				processing.ellipse(SEISMOGRAPHS[i].x, SEISMOGRAPHS[i].y, SEISMO_RADIUS, SEISMO_RADIUS);
+				// and for each seismograph, draw its associated rings
+				processing.noFill();
+				for (var j=0; j<OBSERVATIONS[i].length; j++) {
+					processing.ellipse(SEISMOGRAPHS[i].x, SEISMOGRAPHS[i].y, 40*OBSERVATIONS[i][j], 40*OBSERVATIONS[i][j]);
+				}
+			}
+
+		}  //end anonymous function definition
+
+	} // end function sketchProc
+
+    var canvas = document.getElementById("canvas1");
+
+    // attaching the sketchProc function to the canvas
+    var p = new Processing(canvas, sketchProc);
+	ooch();
+	
+// dummy call to event message handler
+	
+    // p.exit(); to detach it
+
+
+
+</script>
+</body>
+</html>
