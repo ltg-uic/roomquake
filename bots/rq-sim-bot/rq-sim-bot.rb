@@ -218,18 +218,18 @@ require 'nutella_lib'
 nutella.init ARGV
 
 # handle quakes schedule request
-# n.handle_requests("quakes_schedule") do |req|
-#   JSON.parse( IO.read( "db/quakes_schedule.json" ) )
-# end
+nutella.net.handle_requests("quakes_schedule") do |req|
+  JSON.parse( IO.read( "db/quakes_schedule.json" ) )
+end
 
 # handle room configuration request
-# n.handle_requests("room_configuration") do |req|
-#   JSON.parse( IO.read( "db/quakes_schedule.json" ) )
-# end
+nutella.net.handle_requests("room_configuration") do |req|
+   JSON.parse( IO.read( "db/room_config.json" ) )
+end
 
-# n.subscribe("schedule_update", lambda do |message|
-#   p message
-# end)
+nutella.net.subscribe("schedule_update", lambda do |message|
+   p message
+ end)
 
 begin
   while true
