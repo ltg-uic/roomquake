@@ -1,10 +1,9 @@
 require 'nutella_lib'
-require_relative 'json_store/json_store'
 
 # Initialize storage
-obs_store = JSONStore.new("db/observations.json")
-room_store = JSONStore.new("db/room_config.json")
-quakes_store = JSONStore.new("db/quakes_schedule.json")
+obs_store = nutella.persist.getJsonStore("db/observations.json")
+room_store = nutella.persist.getJsonStore("db/room_config.json")
+quakes_store = nutella.persist.getJsonStore("db/quakes_schedule.json")
 
 # Initialize nutella
 nutella.init ARGV
@@ -46,10 +45,4 @@ end);
 
 
 # Just sit there waiting for messages to come
-begin
-  while true
-    sleep(5)
-  end
-rescue Interrupt
-  # terminates
-end
+nutella.net.listen
