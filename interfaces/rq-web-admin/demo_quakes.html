@@ -7,6 +7,8 @@
 		<link rel="stylesheet" href="css/main.css" type="text/css" charset="utf-8">
   </head>
   <body>
+		
+<!--Nav Bar -->
 		<nav class="top-bar" data-topbar role="navigation">
 		  <ul class="title-area"><li class="name"><h1><a href="index.html">RoomQuake Admin</a></h1></li></ul>
 			<section class="top-bar-section">
@@ -19,6 +21,70 @@
 		</nav>
 		
 <!-- My body here -->
+		
+		
+		<!--Demo controls -->
+				<div id="demo_controls" class="row">
+					<div class="large-2 columns">
+						<label for="right-label" class="right inline">Magnitude</label>
+					</div>
+		      <div class="large-1 columns">
+							<select id="demo_magnitude" >
+							</select>
+					</div>
+					<div class="large-8 columns">
+			    	<a id="cancel" class="tiny button">Cancel</a>
+						<a id="quake" data-reveal-id="quakeConfirm" class="tiny button">Generate quake</a>
+		    	</div>
+				</div>
+		<!--Demo controls -->
+		
+				<div id="quakeConfirm" class="reveal-modal" data-reveal>
+				  <h2>Confirm Quake!</h2>
+				  <p>Are you sure you want to generate a quake?</p>
+		    	<a id="killQuake" class="tiny button">No, take me back</a>
+					<a id="confirmQuake" class="tiny button" >YES!</a>
+				  <a class="close-reveal-modal">&#215;</a>
+				</div>
+		
+		
+		
+		<!-- Canvas and table -->
+		    <div class="row">
+		      <div class="large-7 columns" id="map" >
+						<canvas id="sketch" width="570" height="356" ></canvas>
+		      </div>     
+
+		      <div class="large-5 columns">
+						<div class="row">
+							<div class="large-9 columns">
+								<span id="modeSelectLabel">Toggle the switch for "demo mode"</span>
+							</div>
+							<div class="large-3 columns">
+								<div class="switch round">
+								  <input id="modeSelect" type="checkbox">
+								  <label for="modeSelect"></label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+						</div>
+						<table id="quakes_schedule">
+						  <thead>
+						    <tr>
+						      <th>#</th>
+									<th width="125">Date</th>
+						      <th width="90">Time</th>
+									<th>Magnitude</th>
+						    </tr>
+						  </thead>
+						  <tbody>
+						  </tbody>
+						</table>
+		    	</div>
+				</div>
+
+		<!-- END Canvas and table -->
 		
 		<script src="bower_components/Processing.js/processing.js" type="text/javascript" charset="utf-8"></script>
 		<script src="bower_components/modernizr/modernizr.js" type="text/javascript" charset="utf-8"></script>
