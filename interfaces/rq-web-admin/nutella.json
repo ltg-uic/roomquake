@@ -1,6 +1,0 @@
-{
-  "name": "rq-web-admin",
-  "version": "0.1.0",
-	"type": "interface",
-	"description": "Configuration interface for RoomQuake"
-}

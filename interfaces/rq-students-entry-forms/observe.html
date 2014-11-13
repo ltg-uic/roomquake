@@ -1,0 +1,189 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoomQuake Observations Entry</title>
+
+
+	<!-- Make sure you have the foundation base, and icons (v3) CSS -->
+	<link rel="stylesheet" type="text/css" href="_css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="_foundation-icon-fonts-3/foundation-icons.css" />
+	
+	<!-- Add the foundation calendar CSS -->
+	<link rel="stylesheet" type="text/css" href="_css/foundation_calendar.css" />
+  <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="_css/app.css" /> 
+		
+    
+	
+	<!-- Make sure you have jQuery, date.js loading properly -->
+	<!-- Add the foundation calendar Javascript -->
+	<script type="text/javascript" src="_scripts/modernizr.js" charset="utf-8"></script>
+	<script type="text/javascript" src="_scripts/jquery.js" ></script>
+	<script type="text/javascript" src="_scripts/foundation_calendar.js" ></script>
+	<script type="text/javascript" src="_scripts/date.js" ></script>
+	<script type="text/javascript" src="_helpers/date-helpers.js" ></script>
+	<script type="text/javascript" src="_helpers/string-helpers.js" ></script>
+	
+	
+	<style type="text/css">
+	label {
+		margin-top: 20px;
+	}
+	code {
+		font-size: 14px;
+	}
+	
+	.row {
+		margin-bottom: 20px;
+	}
+	
+	.header {
+		border-bottom: 1px solid #333;
+	}
+	
+	dl dt {
+		display: inline-block;
+		width: 18%;
+		margin-right: 1%;
+		vertical-align: top;
+	}
+	
+	dl dd {
+		display: inline-block;
+		width: 79%;
+		vertical-align: top;
+	}
+	</style>
+  </head>
+  <body>
+		
+<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+
+// Initialize nutella
+var query_params = nutella.init(location.search);
+
+
+//find out who this is
+
+var d = document.URL;
+var section = query_params.section;
+var stud_name = query_params.stud_name;
+document.write("<H1>Section: " + section + "   Student: " + stud_name + "</H1>");
+//document.write('<div class="row"><div class="large-6 columns"><H1>Section: " + section + "   Student: " + name + "</H1>"'>);
+
+const NS = 4; //number of seismographs
+</script>
+
+
+
+  <form>
+  <div class="row">
+    <div class="large-6 columns">
+    <fieldset>
+      <label>Seismograph:
+      	<select name="seismograph" required>
+      		<option value="0" disabled /> </option>
+			<script>
+				for (var i=1; i <= NS; i++) {
+					document.writeln('<option value="' + i + '">' + i + '</option>');
+				}
+			</script>
+      	</select>
+      	</label>
+	</fieldset>    
+  </div>
+  </div>
+
+<div class="row">
+    <div class="large-6 columns">
+    <fieldset>
+      <legend>Readings:</legend>
+		P wave arrival time <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		S wave arrival time <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		<!--<input type="text" name="S_arrival"  placeholder="should be date/time picker"> -->
+		Maximum S amplitude <input type="text" name="amplitude"><br>
+	</fieldset>    
+  </div>
+  <div class="large-6 columns">
+    <fieldset>
+      <legend>Calculations:</legend>
+		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
+		Distance <input type="text" name="distance"  placeholder="">
+		Magnitude <input type="text" name="magnitude"><br>
+		Time of event <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		
+	</fieldset>    
+  </div>
+</div>
+<div class="row">
+ <div class="large-6 columns">
+    <button id="quake_observation" type="submit" class="button postfix">Submit</button>
+  </div>
+ <div class="large-6 columns">
+    <button class="button postfix" onClick='document.forms[0].reset();'>Reset</button>
+  </div>
+</div>
+
+</form>
+
+<script>
+
+// Utility function used below
+function checkField(f) {
+	return f==undefined || f.value == ""
+}
+
+$( document ).ready(function() {
+
+	$("#quake_observation").click(function() {
+		//	all fields must be filled
+		try {
+			if (document.forms[0].seismograph.value == 0) alert ("You must designate the seismograph that this readings is associated with");
+			else if (checkField(document.forms[0].distance)) alert ("You must enter the estimated distance of the event from this seismograph");
+			else if (checkField(document.forms[0].magnitude)) alert ("You must enter the estimated magnitude of this event");
+// other checks momentarily commented out
+//		  else if (checkField(document.forms[0].P_arrival)) alert ("You must enter the arrival time for the P wave");
+// 			else if (checkField(document.forms[0].S_arrival)) alert ("You must enter the arrival time for the S wave");
+// 			else if (checkField(document.forms[0].amplitude)) alert ("You must enter the maximum amplitude of the S wave");
+// 			else if (checkField(document.forms[0].difference)) alert ("You must enter the difference between the arrival times of the P and S waves");
+// 			else if (checkField(document.forms[0].time)) alert ("You must enter the estimated time of this event");
+			else {
+				// publish info
+				var message = {
+					section: section, 
+					stud_name: stud_name, 
+// Values not set, temporarily commented out
+					// P_arrival: document.forms[0].P_arrival.value,
+					// S_arrival: document.forms[0].S_arrival.value,
+					// amplitude: document.forms[0].amplitude.value,
+					// difference: document.forms[0].difference.value,
+					// time: document.forms[0].time.value,
+					seismograph: parseInt(document.forms[0].seismograph.value),
+					distance: parseFloat(document.forms[0].distance.value),
+					magnitude: parseInt(document.forms[0].magnitude.value)
+				};
+				nutella.publish("quake_reports",message);
+				
+				// cleanup
+				document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
+				document.forms[0].reset();
+			}	
+		} catch(e) {
+			return false;
+		}	
+		// prevent event from bubbling up and reloading
+		return false;
+	});
+});
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>RoomQuake student login</title>
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="_css/foundation.css" />
+	<link rel="stylesheet" href="_css/app.css" />
+	<script src="_scripts/modernizr.js"></script>
+</head>
+<body>
+	<div class="row">
+		<fieldset>
+			<legend>Please select your name: </legend>
+			<div class="large-12 columns">
+				<script>
+				var sections = ["6LM","6BS","6MV"];
+				var names = [
+				["TUR","ROP","POR","WOM","BOW"],
+				["ABC","DEF","GHI"],
+				["ARF","ORM"]];
+
+				var d = document.URL;
+				var section = d.substring(d.length-3, d.length);
+
+				for (i=0; i<sections.length; i++) {
+					if (section == sections[i])
+					index=i;
+				}
+				for (j=0; j<names[index].length; j++) {
+					document.write("<button class='button' onClick='location.assign(\"observe.html?section=" + section + 
+					"&stud_name=" + names[index][j] + 
+					"&broker=ltg.evl.uic.edu" + 
+					"&run_id=rq_" + sections[index] + "\");'>" + names[index][j] + "</button>");
+
+					
+				}
+				</script>
+			</div>
+		</fieldset>
+	</div>
+
+</body>
+</html>

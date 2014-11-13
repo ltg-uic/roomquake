@@ -1,0 +1,165 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoomQuake Observations Entry</title>
+
+
+	<!-- Make sure you have the foundation base, and icons (v3) CSS -->
+	<link rel="stylesheet" type="text/css" href="_css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="_foundation-icon-fonts-3/foundation-icons.css" />
+	
+	<!-- Add the foundation calendar CSS -->
+	<link rel="stylesheet" type="text/css" href="_css/foundation_calendar.css" />
+
+    <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="_css/app.css" />
+    <script src="_scripts/modernizr.js"></script>
+	
+	<!-- Make sure you have jQuery, date.js loading properly -->
+	<!-- Add the foundation calendar Javascript -->
+	<script type="text/javascript" src="_scripts/jquery.js" ></script>
+	<script type="text/javascript" src="_scripts/foundation_calendar.js" ></script>
+	<script type="text/javascript" src="_scripts/date.js" ></script>
+	<script type="text/javascript" src="_helpers/date-helpers.js" ></script>
+	<script type="text/javascript" src="_helpers/string-helpers.js" ></script>
+	
+	
+	<style type="text/css">
+	label {
+		margin-top: 20px;
+	}
+	code {
+		font-size: 14px;
+	}
+	
+	.row {
+		margin-bottom: 20px;
+	}
+	
+	.header {
+		border-bottom: 1px solid #333;
+	}
+	
+	dl dt {
+		display: inline-block;
+		width: 18%;
+		margin-right: 1%;
+		vertical-align: top;
+	}
+	
+	dl dd {
+		display: inline-block;
+		width: 79%;
+		vertical-align: top;
+	}
+	</style>
+  </head>
+  <body>
+
+
+<script>
+
+//find out who this is
+
+var d = document.URL;
+var section = d.substring(d.length-12, d.length-9);
+var name = d.substring(d.length-3, d.length);
+document.write("<H1>Section: " + section + "   Student: " + name + "</H1>");
+//document.write('<div class="row"><div class="large-6 columns"><H1>Section: " + section + "   Student: " + name + "</H1>"'>);
+
+const NS = 4; //number of seismographs
+
+function registerSelection () {
+
+//	all fields must be filled
+
+	if (document.forms[0].seismograph.value == 0) alert ("You must designate the seismograph that this readings is associated with");
+	else if (document.forms[0].P_arrival.value == "") alert ("You must enter the arrival time for the P wave");
+	else if (document.forms[0].S_arrival.value == "") alert ("You must enter the arrival time for the S wave");
+	else if (document.forms[0].amplitude.value == "") alert ("You must enter the maximum amplitude of the S wave");
+	else if (document.forms[0].difference.value == "") alert ("You must enter the difference between the arrival times of the P and S waves");
+	else if (document.forms[0].distance.value == "") alert ("You must enter the estimated distance of the event from this seismograph");
+	else if (document.forms[0].magnitude.value == "") alert ("You must enter the estimated magnitude of this event");
+	else if (document.forms[0].time.value == "") alert ("You must enter the estimated time of this event");
+	else {
+		
+	/* send the following information to Nutella:
+		
+		section
+		name
+     	document.forms[0].seismograph.value	
+		document.forms[0].P_arrival.value
+		document.forms[0].S_arrival.value
+		document.forms[0].amplitude.value
+		document.forms[0].difference.value
+		document.forms[0].distance.value
+		document.forms[0].magnitude.value
+		document.forms[0].time.value
+		
+	*/
+
+		document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
+		
+		document.forms[0].reset();
+	}
+}
+
+
+</script>
+
+
+
+  <form>
+  <div class="row">
+    <div class="large-6 columns">
+    <fieldset>
+      <label>Seismograph:
+      	<select name="seismograph" required>
+      		<option value="0" disabled></option>
+			<script>
+				for (var i=1; i <= NS; i++) {
+					document.writeln('<option value="' + i + '">' + i + '</option>');
+				}
+			</script>
+      	</select>
+      	</label>
+	</fieldset>    
+  </div>
+  </div>
+
+<div class="row">
+    <div class="large-6 columns">
+    <fieldset>
+      <legend>Readings:</legend>
+		P wave arrival time <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		S wave arrival time <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		<!--<input type="text" name="S_arrival"  placeholder="should be date/time picker"> -->
+		Maximum S amplitude <input type="text" name="amplitude"><br>
+	</fieldset>    
+  </div>
+  <div class="large-6 columns">
+    <fieldset>
+      <legend>Calculations:</legend>
+		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
+		Distance <input type="text" name="distance"  placeholder="">
+		Magnitude <input type="text" name="magnitude"><br>
+		Time of event <input type="text" data-date-time data-time-format="%H:%M:%S"/>
+		
+	</fieldset>    
+  </div>
+</div>
+<div class="row">
+ <div class="large-6 columns">
+    <button class="button postfix" onClick='registerSelection();'>Submit</button>
+  </div>
+ <div class="large-6 columns">
+    <button class="button postfix" onClick='document.forms[0].reset();'>Reset</button>
+  </div>
+</div>
+
+</form>
+</body>
+</html>
