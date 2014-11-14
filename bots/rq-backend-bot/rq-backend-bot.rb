@@ -8,14 +8,16 @@ obs_store = nutella.persist.getJsonStore("db/observations.json")
 room_store = nutella.persist.getJsonStore("db/room_config.json")
 quakes_store = nutella.persist.getJsonStore("db/quakes_schedule.json")
 
-# handle quakes schedule request
-nutella.net.handle_requests("quakes_schedule") do |req|
-  quakes_store.transaction { quakes_store.to_h }
-end
+# Requests
 
 # handle room configuration request
 nutella.net.handle_requests("room_configuration") do |req|
   room_store.transaction { room_store.to_h }
+end
+
+# handle quakes schedule request
+nutella.net.handle_requests("quakes_schedule") do |req|
+  quakes_store.transaction { quakes_store.to_h }
 end
 
 # handle observations requests
@@ -24,6 +26,7 @@ nutella.net.handle_requests("observations") do |req|
 end
 
 
+# Updates / Subscriptions
 
 # handle room configuration updates
 nutella.net.subscribe("room_config_update", lambda do |m|
@@ -33,10 +36,11 @@ end)
 
 # handle quakes schedule updates
 nutella.net.subscribe("quakes_schedule_update", lambda do |m|
+  # TODO handle update better. Update is very generic. It could be addition, deletion and all sort of stuff
   m.delete "from"
-  # add quake to array of quakes
   quakes_store.transaction {
     quakes_store['quakes_schedule'] = Array.new if quakes_store['quakes_schedule'].nil?
+    # TODO gotta place the quake in the right spot based on date, iterate until we find the right date
     quakes_store['quakes_schedule'].push(m)
   }
 end)
