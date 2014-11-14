@@ -1,99 +1,102 @@
-<!doctype html>
-<html class="no-js" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>RoomQuake Admin</title>
-		<link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css" charset="utf-8">
-		<link rel="stylesheet" href="css/main.css" type="text/css" charset="utf-8">
-  </head>
-  <body>
-		
-<!--Nav Bar -->
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoomQuake Admin</title>
+	<!-- CSSs -->
+	<link rel="stylesheet" href="bower_components/foundation/css/normalize.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css" media="screen" charset="utf-8">
+	<link rel="stylesheet" href="css/main.css" type="text/css" charset="utf-8">
+	<!-- Modernizr -->
+	<script src="bower_components/foundation/js/vendor/modernizr.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+
+<!-- Nav bar -->
 		<nav class="top-bar" data-topbar role="navigation">
 		  <ul class="title-area"><li class="name"><h1><a href="index.html">RoomQuake Admin</a></h1></li></ul>
 			<section class="top-bar-section">
 				<ul class="left">
-				    <li><a href="room_config.html"><span>Configure room</span></a></li>
+				    <li><a href="room_config.html"><span>Configure classroom layout</span></a></li>
 						<li><a href="demo_quakes.html"><span>Generate quakes</span></a></li>
 						<li><a href="quakes_series.html"><span>Schedule quakes</span></a></li>
 			    </ul>
 			  </section>
 		</nav>
+	
 		
-<!-- My body here -->
-		
-		
-		<!--Demo controls -->
-				<div id="demo_controls" class="row">
-					<div class="large-2 columns">
-						<label for="right-label" class="right inline">Magnitude</label>
-					</div>
-		      <div class="large-1 columns">
-							<select id="demo_magnitude" >
-							</select>
-					</div>
-					<div class="large-8 columns">
-			    	<a id="cancel" class="tiny button">Cancel</a>
-						<a id="quake" data-reveal-id="quakeConfirm" class="tiny button">Generate quake</a>
-		    	</div>
-				</div>
-		<!--Demo controls -->
-		
-				<div id="quakeConfirm" class="reveal-modal" data-reveal>
-				  <h2>Confirm Quake!</h2>
-				  <p>Are you sure you want to generate a quake?</p>
-		    	<a id="killQuake" class="tiny button">No, take me back</a>
-					<a id="confirmQuake" class="tiny button" >YES!</a>
-				  <a class="close-reveal-modal">&#215;</a>
-				</div>
-		
-		
-		
-		<!-- Canvas and table -->
-		    <div class="row">
-		      <div class="large-7 columns" id="map" >
-						<canvas id="sketch" width="570" height="356" ></canvas>
-		      </div>     
+<!-- Room canvas anddemo_canvas demo quakes table -->
+		<div class="row">
+			<div class="large-12 column">
+				<h2>Generate individual quakes</h2>
+				<p>Click on the map below to select your quake location, choose the right magnitude and generate a quake!</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="large-7 columns" id="map" >
+				<canvas id="demo_canvas" width="570" height="356" ></canvas>
+			</div>     
+			<div class="large-5 columns">
+					<table id="demo_quakes_table">
+					  <thead>
+					    <tr>
+					      <th>#</th>
+								<th width="125">Date</th>
+					      <th width="90">Time</th>
+								<th>Magnitude</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  </tbody>
+					</table>
+			</div>
+		</div>
 
-		      <div class="large-5 columns">
-						<div class="row">
-							<div class="large-9 columns">
-								<span id="modeSelectLabel">Toggle the switch for "demo mode"</span>
-							</div>
-							<div class="large-3 columns">
-								<div class="switch round">
-								  <input id="modeSelect" type="checkbox">
-								  <label for="modeSelect"></label>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-						</div>
-						<table id="quakes_schedule">
-						  <thead>
-						    <tr>
-						      <th>#</th>
-									<th width="125">Date</th>
-						      <th width="90">Time</th>
-									<th>Magnitude</th>
-						    </tr>
-						  </thead>
-						  <tbody>
-						  </tbody>
-						</table>
-		    	</div>
-				</div>
 
-		<!-- END Canvas and table -->
+<!-- Magnitude, cancel and submit controls -->
+		<div id="demo_controls" class="row">
+			<div class="large-2 columns">
+				<label for="right-label" class="right inline">Magnitude</label>
+			</div>
+			<div class="large-1 columns">
+				<select id="demo_magnitude" disabled >
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
+			</div>
+			<div class="large-8 columns">
+				<a id="cancel" class="tiny button disabled" >Cancel</a>
+				<a id="quake" class="tiny button disabled" >Generate quake</a>
+			</div>
+		</div>
+
+<!-- Quake confirmation modal -->
+		<div id="quakeConfirm" class="reveal-modal" data-reveal>
+			<h2>Confirm Quake!</h2>
+			<p id="confirm_message"></p>
+			<a id="killQuake" class="tiny button">No, take me back</a>
+			<a id="confirmQuake" class="tiny button" >YES!</a>
+			<a class="close-reveal-modal">&#215;</a>
+		</div>
 		
+		<script src="bower_components/foundation/js/vendor/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/foundation/js/foundation.min.js" type="text/javascript" charset="utf-8"></script>
+	  <script>
+	    $(document).foundation();
+	  </script>		
+		<!-- nutella -->
+		<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+		<!-- processing -->
 		<script src="bower_components/Processing.js/processing.js" type="text/javascript" charset="utf-8"></script>
-		<script src="bower_components/modernizr/modernizr.js" type="text/javascript" charset="utf-8"></script>
-		<script src="bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
-		<script src="bower_components/foundation/js/foundation/foundation.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript">
-			// Foundations init
-      $(document).foundation();
-		</script>
-<!--my scripts here -->		
+		<!-- mine -->
+		<script src="js/demo_quakes_sketch.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/demo_quakes.js" type="text/javascript" charset="utf-8"></script>
   </body>
 </html>

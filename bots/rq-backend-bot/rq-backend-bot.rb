@@ -23,10 +23,22 @@ nutella.net.handle_requests("observations") do |req|
   obs_store.transaction { obs_store.to_h }
 end
 
+
+
 # handle room configuration updates
 nutella.net.subscribe("room_config_update", lambda do |m|
   m.delete "from"
   room_store.transaction { room_store.merge! m }
+end)
+
+# handle quakes schedule updates
+nutella.net.subscribe("quakes_schedule_update", lambda do |m|
+  m.delete "from"
+  # add quake to array of quakes
+  quakes_store.transaction {
+    quakes_store['quakes_schedule'] = Array.new if quakes_store['quakes_schedule'].nil?
+    quakes_store['quakes_schedule'].push(m)
+  }
 end)
 
 # handle students observations updates
