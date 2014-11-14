@@ -12,7 +12,10 @@ canvas {
 	border: 1px solid #dddddd;
 }
 
-
+/*.my_content {
+	margin-top: 45px;
+}
+*/
 table thead tr td, table tr td {
 	font-size: 12px;
 	font-weight: normal;

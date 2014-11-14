@@ -1,0 +1,105 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RoomQuake Admin</title>
+		<link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css" charset="utf-8">
+		<link rel="stylesheet" href="css/main.css" type="text/css" charset="utf-8">
+  </head>
+  <body>
+		
+<!--Nav Bar -->
+		<nav class="top-bar" data-topbar role="navigation">
+		  <ul class="title-area"><li class="name"><h1><a href="index.html">RoomQuake Admin</a></h1></li></ul>
+			<section class="top-bar-section">
+				<ul class="left">
+				    <li><a href="room_config.html"><span>Configure room</span></a></li>
+						<li><a href="demo_quakes.html"><span>Generate quakes</span></a></li>
+						<li><a href="quakes_series.html"><span>Schedule quakes</span></a></li>
+			    </ul>
+			  </section>
+		</nav>
+	
+		
+<!-- Quakes series generation modal -->
+		<div id="quakes_schedule_modal" class="reveal-modal" data-reveal>
+		  <h2>Schedule quakes</h2>
+		  <p>One last step! It's time to generate some quakes!</p>
+			<form data-abide id="quakes_schedule_form">
+		  	<div class="row">
+		    	<div class="large-4 columns">
+						<label>Which day would you like to start?
+							<input id="unit_start_date" type="date" required>
+						</label>
+					</div>
+		    	<div class="large-4 columns">
+						<label>Which day would you like to finish?
+							<input id="unit_end_date" type="date" required>
+						</label>
+					</div>
+	    		<div class="large-4 columns">
+						<label>How many quakes would you like?
+							<input id="total_quakes_input" type="text" pattern="integer">
+						</label>
+						<small class="error">This must be a valid number!</small>
+	    		</div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						<button type="submit">Generate quakes</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		
+		<!-- Canvas and table -->
+		    <div class="row">
+		      <div class="large-7 columns" id="map" >
+						<canvas id="sketch" width="570" height="356" ></canvas>
+		      </div>     
+
+		      <div class="large-5 columns">
+						<div class="row">
+							<div class="large-9 columns">
+								<span id="modeSelectLabel">Toggle the switch for "demo mode"</span>
+							</div>
+							<div class="large-3 columns">
+								<div class="switch round">
+								  <input id="modeSelect" type="checkbox">
+								  <label for="modeSelect"></label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+						</div>
+						<table id="quakes_schedule">
+						  <thead>
+						    <tr>
+						      <th>#</th>
+									<th width="125">Date</th>
+						      <th width="90">Time</th>
+									<th>Magnitude</th>
+						    </tr>
+						  </thead>
+						  <tbody>
+						  </tbody>
+						</table>
+		    	</div>
+				</div>
+
+		<!-- END Canvas and table -->
+		
+		
+		
+		<script src="bower_components/Processing.js/processing.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/modernizr/modernizr.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/foundation/js/foundation/foundation.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+			// Foundations init
+      $(document).foundation();
+		</script>
+<!--my scripts here -->		
+  </body>
+</html>

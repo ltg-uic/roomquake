@@ -1,12 +1,12 @@
 require 'nutella_lib'
 
+# Initialize nutella
+nutella.init ARGV
+
 # Initialize storage
 obs_store = nutella.persist.getJsonStore("db/observations.json")
 room_store = nutella.persist.getJsonStore("db/room_config.json")
 quakes_store = nutella.persist.getJsonStore("db/quakes_schedule.json")
-
-# Initialize nutella
-nutella.init ARGV
 
 # handle quakes schedule request
 nutella.net.handle_requests("quakes_schedule") do |req|
