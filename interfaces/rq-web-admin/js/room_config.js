@@ -1,12 +1,17 @@
-// Global variables (model). NOTE: all dimensions are specified in meters!
-var room_width =10;
-var room_height = 7;
+// Global variables 
+
+// Model 
+// NOTE: all dimensions are specified in meters!
+var room_width;
+var room_height;
 var seismographs;
+
 // Canvases/processing references
 var setup_canvas = document.getElementById("setup_canvas");
 var setup_p = new Processing(setup_canvas, SeismoMap);
 var edit_canvas = document.getElementById("edit_canvas");
 var edit_p = new Processing(edit_canvas, SeismoMap);
+
 
 // Initialize nutella and fetch data from backend
 var query_params = nutella.init(location.search, function() {
@@ -25,8 +30,15 @@ var query_params = nutella.init(location.search, function() {
 	});
 });
 
+// Update links to reflect nutella parameters
+$('a').each(function (index) {
+	var link = $(this).attr('href');
+	if (link!="" && link!="#")
+	$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+});
 
 
+// Attach event handlers to GUI components
 
 // Add double click handlers to seismographs_table cells
 $(".seismographs_table").on("dblclick", ".s_input_cell_x", function() {
@@ -86,7 +98,7 @@ $(".seismographs_table").on("input", ".s_input_x, .s_input_y", function() {
 });
 
 
-// Add handles for seismographs_table x and y input fields when people focus out of them (i.e. turn input into labels)
+// Add handlers for seismographs_table x and y input fields when people focus out of them (i.e. turn input into labels)
 $(".seismographs_table").on("focusout", ".s_input_x, .s_input_y", function() {
 	var v = $(this).val();
 	var td = $(this).parent();
@@ -114,6 +126,7 @@ $("#roomSetupForm").on('valid.fndtn.abide', function() {
 	return false;
 });
 
+
 // Dismiss seismographs setup modal once we click "setup seismographs" and ship all the information to the backend
 $("#seismographs_setup_btn").click(function() {
 	// Dismiss modal
@@ -126,21 +139,46 @@ $("#seismographs_setup_btn").click(function() {
 });
 
 
-
-// Utility function to update views
-function updateViews() {
-	// Update views (canvas)
+// Enable changes to room height
+$("#edit_height").focusout(function() {
+	room_height = parseFloat($(this).val());
+	// Update canvas
 	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
 	edit_p.size(edit_canvas.width, edit_canvas.height);
-	// Update views (table)
+});
+
+
+// Enable changes to room width
+$("#edit_width").focusout(function() {
+	room_width = parseFloat($(this).val());
+	// Update canvas
+	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
+	edit_p.size(edit_canvas.width, edit_canvas.height);
+	// Send to backend
+	shipToBackend()
+});
+
+
+// Utility functions
+
+// Updates views whenever a change in the model is made
+function updateViews() {
+	// Update canvas
+	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
+	edit_p.size(edit_canvas.width, edit_canvas.height);
+	// Update seismographs table
 	$(".seismographs_table tbody").empty();
 	seismographs.forEach(function(e) {
 		$(".seismographs_table tbody").append('<tr r_id="'+e.id+'"><td>'+e.id+'</td><td class="s_input_cell_x">'+e.x+'</td><td class="s_input_cell_y">'+e.y+'</td></tr>');
 	});
 	$(".seismographs_table tbody").append('<tr r_id="'+(seismographs.length+1)+'"><td>'+(seismographs.length+1)+'</td><td class="s_input_cell_x"> <input class="s_input_x" type="text" placeholder="meters" /> </td><td class="s_input_cell_y"> <input class="s_input_y" type="text" placeholder="meters" /> </td> </tr>'); 
+	// Update room sizes form
+	$("#edit_height").val(room_height);
+	$("#edit_width").val(room_width);
 }
 
-// Utility function to ship stuff to backend whenever the model is modified
+
+// Updates the backend model by shipping everything over the net
 function shipToBackend() {
 	var m = {}
 	m.room_width_meters = room_width;

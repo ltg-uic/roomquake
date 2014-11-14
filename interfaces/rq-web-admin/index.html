@@ -46,7 +46,16 @@
 	  <script>
 	    $(document).foundation();
 	  </script>		
-		<!-- My scripts here-->
+	  <script>
+			var run_id = "roomquake";
+			var broker = "ltg.evl.uic.edu";
+			$('a').each(function (index) {
+				var link = $(this).attr('href');
+				if (link!="" && link!="#")
+					$(this).attr('href', link + "?run_id=" + run_id + "&broker=" + broker);
+			});
+	  </script>
 		
   </body>
 </html>
+<!--http://localhost:57883/room_config.html?run_id=roomquake&broker=ltg.evl.uic.edu -->
