@@ -127,7 +127,7 @@ $("#seismographs_setup_btn").click(function() {
 	m.room_width_meters = room_width;
 	m.room_height_meters = room_height;
 	m.seismographs = seismographs;
-	// TODO publish to MQTT
+	nutella.publish("room_config_update", m);
 	// Dismiss modal
 	$("#seismographsSetup").foundation("reveal", "close");
 	// Update view

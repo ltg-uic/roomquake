@@ -23,6 +23,12 @@ nutella.net.handle_requests("observations") do |req|
   obs_store.transaction { obs_store.to_h }
 end
 
+# handle room configuration updates
+nutella.net.subscribe("room_config_update", lambda do |m|
+  m.delete "from"
+  room_store.transaction { room_store.merge! m }
+end)
+
 # handle students observations updates
 nutella.net.subscribe("quake_reports", lambda do |m|
   obs_store.transaction do
