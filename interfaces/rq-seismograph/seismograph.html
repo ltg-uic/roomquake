@@ -1,21 +1,24 @@
-<!DOCTYPE html>
-<html class="no-js" lang="en" >
 
+
+
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>RoomQuake Seismograph</title>
-	
-	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
-	<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
-	
+
 	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
+	
 	<script src="bower_components/Processing.js/processing.js"></script>
+
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen"
+          title="no title" charset="utf-8">
+
+<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
 
 </head>
 
 <style>
+
 body {background-color:black;
 }
 
@@ -63,7 +66,7 @@ a:active {
 <body onresize="location.reload();"> <!-- my solution to the resize problem :-) -->
 
 <script>
-// Constants
+
 const WINDOW_WIDTH = window.innerWidth;
 const WINDOW_HEIGHT = window.innerHeight-20;
 
@@ -73,10 +76,14 @@ const RIGHT_PANEL_WIDTH = 50;
 const BOTTOM_PANEL_HEIGHT = 50;
 const SEISMOGRAM_WIDTH = WINDOW_WIDTH - LEFT_PANEL_WIDTH - RIGHT_PANEL_WIDTH; 
 const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT;
+
+
 </script>
 
 
+
 <style>
+
 #top {
 	background-color:black;
 	color:white;
@@ -117,10 +124,8 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
     height: auto;
     width: auto\9; /* ie8 */}
 .resize {z-index:1; position:absolute; width:100%; height:100%;}
+
 </style>
-
-
-
 
 <div class="wrapper">
   <img class="resize" src="_images/frame.png" />
@@ -137,23 +142,24 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 </div>
 
 <div id="left">
-	<script>
-		document.getElementById("left").style.height = SEISMOGRAM_HEIGHT + "px";
-		document.getElementById("left").style.width = LEFT_PANEL_WIDTH + "px";
-	</script>
+<script>
+document.getElementById("left").style.height = SEISMOGRAM_HEIGHT + "px";
+document.getElementById("left").style.width = LEFT_PANEL_WIDTH + "px";
+</script>
 </div>
 
 
 <div id="seismogram">
-	<p>
-		<canvas id="canvas1" style='position:absolute; z-index:0;'></canvas>
-	</p>
 
-	<script>
-	document.getElementById("seismogram").style.height = SEISMOGRAM_HEIGHT + "px";
-	document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
-	
-	
+<p>
+    <canvas id="canvas1" style='position:absolute; z-index:0;'></canvas>
+</p>
+<script>
+
+document.getElementById("seismogram").style.height = SEISMOGRAM_HEIGHT + "px";
+document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
+
+
 	// constants
 
 	const VIEWING_PERIOD = 20;  						// number of seconds represented by the seismogram
@@ -172,6 +178,8 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 	var event_buffer = [];							// the next event buffer	
 	var last_event_time;								// timestamp of most recent event
 	
+	var room_width_x_meters;
+	var room_height_y_meters;
 	var seismograph_loc = {};				// stores seismograph location, initialized by nutella when room configuration is fetched
 	var quakes;									// stores the array of quakes, initialized at reload and updated by nutella when new quake is received
 	
@@ -185,6 +193,8 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 		
 		// 1. Fetch room configuration and store coordinates of current seismograph
 		nutella.request("room_configuration", function(response) { 
+			room_width_x_meters = response.room_width_meters;
+			room_height_y_meters = response.room_height_meters;
 			response.seismographs.forEach(function(e) {
 				if (e.id==query_params.seismograph_id) {
 					seismograph_loc.x = e.x;
