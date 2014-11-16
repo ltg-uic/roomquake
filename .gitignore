@@ -1,2 +1,4 @@
 # Nutella
 .botsconfig.json
+
+bots/rq-backend-bot/db/
