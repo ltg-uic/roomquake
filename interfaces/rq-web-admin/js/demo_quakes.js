@@ -23,16 +23,18 @@ var query_params = nutella.init(location.search, function() {
 		// TODO If there's no data, it's a problem, we shouldn't be here... 
 		updateCanvasSize();
 	});
+	// We are not storing demo quakes anymore, so we simply initialize the model to empty every time we reload
+	// quakes = new Array();
 	//Fetch quakes
-	nutella.request("quakes_schedule", function(response) {
-		// Update model
-		quakes = response.quakes_schedule;
-		// If there's no data initialize the model 
-		if (quakes===undefined)
-			quakes = new Array();
-		// Update the quakes table view (only demo quakes)
-		updateQuakesTableView('demo_quakes_table', true);
-	});
+	// nutella.request("quakes_schedule", function(response) {
+// 		// Update model
+// 		quakes = response.quakes_schedule;
+// 		// If there's no data initialize the model
+// 		if (quakes===undefined)
+// 			quakes = new Array();
+// 		// Update the quakes table view (only demo quakes)
+// 		updateQuakesTableView('demo_quakes_table', true);
+// 	});
 });
 
 // Update links to reflect nutella parameters
@@ -44,6 +46,15 @@ $('a').each(function (index) {
 
 
 // Attach event handlers to GUI components
+
+// Click on quakes table row to show coordinates for that quake in the map
+$('#demo_quakes_table').on('click', 'tbody tr', function() {
+	var r_id = $(this).attr('r_id');
+	if (demo_p.highlight===undefined)
+		demo_p.highlight = r_id;
+	else
+		demo_p.highlight = undefined;
+});
 
 // Click the cancel button
 $("#cancel").click(function() {

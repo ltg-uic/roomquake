@@ -30,6 +30,7 @@ function DemoQuakesMap(p) {
 		p.drawSeismographs();
 		p.drawMouseQuake();
 		p.drawDemoQuakes();
+		p.drawHighlightedQuake();
 	}
 	
 	// Draw functions
@@ -74,6 +75,24 @@ function DemoQuakesMap(p) {
 		}).forEach(function(el) {
 			p.ellipse(p.toCanvasX(el.location.x), p.toCanvasY(el.location.y), 10, 10);
 		});
+	}
+	
+	p.drawHighlightedQuake = function() {
+		if (p.highlight===undefined)
+			return;
+		var demo_quakes = quakes.filter(function(el) {
+			return el.demo;
+		});
+		var hltd = demo_quakes[p.highlight];
+		// Filled dot
+		p.stroke(255, 0, 0);
+		p.fill(255, 0, 0);
+		p.ellipse(p.toCanvasX(hltd.location.x), p.toCanvasY(hltd.location.y), 10, 10);
+		// Coordinates
+		p.stroke(0);
+		p.fill(0);
+		p.textAlign(p.CENTER, p.CENTER);
+		p.text('(' + Number((hltd.location.x).toFixed(2)) + ', ' + Number((hltd.location.x).toFixed(2)) + ')', p.toCanvasX(hltd.location.x), p.toCanvasY(hltd.location.y) - 15);
 	}
 		
 		
