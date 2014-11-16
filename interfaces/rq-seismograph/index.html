@@ -13,10 +13,27 @@
 <body>
 	<h1>Choose your seismograph</h1>
 	<ul>
-	  <li><a href="seismograph.html?seismograph_id=1&run_id=roomquake&broker=ltg.evl.uic.edu"><span>Seismograph 1</span></a></li>
-		<li><a href="seismograph.html?seismograph_id=2&run_id=roomquake&broker=ltg.evl.uic.edu"><span>Seismograph 2</span></a></li>
-		<li><a href="seismograph.html?seismograph_id=3&run_id=roomquake&broker=ltg.evl.uic.edu"><span>Seismograph 3</span></a></li>
-		<li><a href="seismograph.html?seismograph_id=4&run_id=roomquake&broker=ltg.evl.uic.edu"><span>Seismograph 4</span></a></li>
+	  <li><a href="seismograph.html?seismograph_id=1"><span>Seismograph 1</span></a></li>
+		<li><a href="seismograph.html?seismograph_id=2"><span>Seismograph 2</span></a></li>
+		<li><a href="seismograph.html?seismograph_id=3"><span>Seismograph 3</span></a></li>
+		<li><a href="seismograph.html?seismograph_id=4"><span>Seismograph 4</span></a></li>
 	</ul>
+	
+	<script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+		// Production
+		// var run_id = "roomquake";
+		// var broker = "ltg.evl.uic.edu";
+		// Dev
+		var run_id = "roomquake_rq_demo";
+		var broker = "localhost";
+		///////////////////////////
+		$('a').each(function (index) {
+			var link = $(this).attr('href');
+			if (link!="" && link!="#")
+				$(this).attr('href', link + "&run_id=" + run_id + "&broker=" + broker);
+		});
+  </script>
+		
 </body>
 </html>
