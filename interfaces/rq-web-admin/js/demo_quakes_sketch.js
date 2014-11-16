@@ -22,6 +22,7 @@ function DemoQuakesMap(p) {
 		p.size(p.externals.canvas.width, p.externals.canvas.height);
 		p.manualQuakeX = -100;
 		p.manualQuakeY = -100;
+		p.frameRate(10);
 	}
 	
 	p.draw = function() {

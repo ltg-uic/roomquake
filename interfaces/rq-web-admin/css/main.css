@@ -33,3 +33,8 @@ a.disabled {
    pointer-events: none;
    cursor: default;
 }
+
+#countdown_message {
+	text-align: center;
+	color: rgb(255,0,0);
+}

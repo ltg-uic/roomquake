@@ -6,6 +6,7 @@ var room_width;
 var room_height;
 var seismographs;
 var quakes;
+var countdown_interval_id;
 
 // Canvases/processing references
 var demo_canvas = document.getElementById("demo_canvas");
@@ -59,8 +60,8 @@ $("#cancel").click(function() {
 // Click the "Generate quake" button
 $('#quake').click(function() {
 	// Update confirmation message
-	var c_m = 'Are you sure you want to generate a quake of magnitude ' + $("#demo_magnitude").val() +  ' ? The quake will be generated as soon as you click the "YES!" button below.'
-	$('#confirm_message').text(c_m)
+	var c_m = 'Are you sure you want to generate a quake of magnitude ' + $("#demo_magnitude").val() + ' at (' + Number(demo_p.manualQuakeXroom).toFixed(2) + ', ' + Number(demo_p.manualQuakeYroom).toFixed(2) + ') ? Once you click the "YES!" button below a ten seconds count-down will start (you\'ll still be able to cancel the quake)';
+	$('#confirm_message').text(c_m);
 	// Display modal
 	$("#quakeConfirm").foundation("reveal", "open")
 	return false;
@@ -74,32 +75,41 @@ $("#killQuake").click(function() {
 
 // Click on confirm quake in modal
 $("#confirmQuake").click(function() {
-	// Gather data
-	var mq = {};
-	mq.magnitude = parseInt($("#demo_magnitude").val());
-	mq.location = {};
-	mq.demo = true;
-	mq.location.x = demo_p.manualQuakeXroom;
-	mq.location.y = demo_p.manualQuakeYroom;
-	mq.time = new Date();
-	// Update model
-	quakes.push(mq);
-	// Update table view
-	updateQuakesTableView('demo_quakes_table', true);
-	// Ship to backend
-	nutella.publish("quakes_schedule_update", mq);
-	// Hide mouse quake dot
-	demo_p.manualQuakeX = -100;
-	demo_p.manualQuakeY = -100;
-	// Update GUI
-	$("#cancel").addClass("disabled");
-	$("#quake").addClass("disabled");
-	$("#demo_magnitude").attr("disabled", true);
-	$("#quakeConfirm").foundation("reveal", "close");
+	$("#countdown").foundation("reveal", "open");
 	return false;
 });
 
+// Click cancel button in countdown modal
+$("#countdown_kill_quake").click(function() {
+	$("#countdown").foundation("reveal", "close");
+	return false;
+});
 
+// Update countdown message in countdown modal
+$(document).on('open.fndtn.reveal', '#countdown', function (e) {
+  // ignore non-namespaced event (i.e. work-around for bug in Foundation framework https://github.com/zurb/foundation/issues/5482)
+  if (e.namespace != 'fndtn.reveal') return false;
+	// Set countdown
+	var cd_seconds = 10;
+	$('#countdown_message').text(cd_seconds);
+	countdown_interval_id = setInterval(function() {
+		cd_seconds--;
+		$('#countdown_message').text(cd_seconds);
+		if (cd_seconds == 0) {
+			countDownOver();
+			$("#countdown").foundation("reveal", "close");
+		}
+	}, 1000);
+});
+
+// Cancel countdown whenever we dismiss the modal
+// It could be dismissed by clicking cancel, tapping outside of the modal or by waiting for countdown completion
+$(document).on('close.fndtn.reveal', '#countdown', function (e) {
+	// ignore non-namespaced event (i.e. work-around for bug in Foundation framework https://github.com/zurb/foundation/issues/5482)
+	if (e.namespace != 'fndtn.reveal') return false;
+	clearInterval(countdown_interval_id);
+	countdown_interval_id = undefined;
+});
 
 
 // Utility functions
@@ -128,5 +138,30 @@ function updateQuakesTableView(table_name, demo_flag) {
 			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
 		}
 	});
+}
+
+// Function fired whenever the schedule quake countdown is over
+function countDownOver() {
+	// Gather data
+	var mq = {};
+	mq.magnitude = parseInt($("#demo_magnitude").val());
+	mq.location = {};
+	mq.demo = true;
+	mq.location.x = demo_p.manualQuakeXroom;
+	mq.location.y = demo_p.manualQuakeYroom;
+	mq.time = new Date();
+	// Update model
+	quakes.push(mq);
+	// Update table view
+	updateQuakesTableView('demo_quakes_table', true);
+	// Ship to backend
+	nutella.publish("quakes_schedule_update", mq);
+	// Hide mouse quake dot
+	demo_p.manualQuakeX = -100;
+	demo_p.manualQuakeY = -100;
+	// Update GUI
+	$("#cancel").addClass("disabled");
+	$("#quake").addClass("disabled");
+	$("#demo_magnitude").attr("disabled", true);
 }
 
