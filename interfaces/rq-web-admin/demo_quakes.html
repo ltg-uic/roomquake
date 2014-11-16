@@ -30,16 +30,16 @@
 		
 <!-- Room canvas anddemo_canvas demo quakes table -->
 		<div class="row">
-			<div class="large-12 column">
+			<div class="large-12 medium-12 column">
 				<h2>Generate individual quakes</h2>
 				<p>Click on the map below to select your quake location, choose the right magnitude and generate a quake!</p>
 			</div>
 		</div>
 		<div class="row">
-			<div class="large-7 columns" id="map" >
+			<div class="large-7 medium-7 columns" id="map" >
 				<canvas id="demo_canvas" width="570" height="356" ></canvas>
 			</div>     
-			<div class="large-5 columns">
+			<div class="large-5 medium-5 columns">
 					<table id="demo_quakes_table">
 					  <thead>
 					    <tr>
@@ -58,10 +58,10 @@
 
 <!-- Magnitude, cancel and submit controls -->
 		<div id="demo_controls" class="row">
-			<div class="large-2 columns">
+			<div class="large-2 medium-2 columns">
 				<label for="right-label" class="right inline">Magnitude</label>
 			</div>
-			<div class="large-1 columns">
+			<div class="large-1 medium-1 columns">
 				<select id="demo_magnitude" disabled >
 					<option value="2">2</option>
 					<option value="3">3</option>
@@ -69,7 +69,7 @@
 					<option value="5">5</option>
 				</select>
 			</div>
-			<div class="large-8 columns">
+			<div class="large-8 medium-8 columns">
 				<a id="cancel" class="tiny button disabled" >Cancel</a>
 				<a id="quake" class="tiny button disabled" >Generate quake</a>
 			</div>
@@ -77,6 +77,15 @@
 
 <!-- Quake confirmation modal -->
 		<div id="quakeConfirm" class="reveal-modal" data-reveal>
+			<h2>Confirm Quake!</h2>
+			<p id="confirm_message"></p>
+			<a id="killQuake" class="tiny button">No, take me back</a>
+			<a id="confirmQuake" class="tiny button" >YES!</a>
+			<a class="close-reveal-modal">&#215;</a>
+		</div>
+
+<!-- Countdown modal -->
+		<div id="countdown" class="reveal-modal" data-reveal>
 			<h2>Confirm Quake!</h2>
 			<p id="confirm_message"></p>
 			<a id="killQuake" class="tiny button">No, take me back</a>
