@@ -145,6 +145,8 @@ $("#edit_height").on('focusout change', function() {
 	// Update canvas
 	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
 	edit_p.size(edit_canvas.width, edit_canvas.height);
+	// Send to backend
+	shipToBackend()
 });
 
 

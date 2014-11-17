@@ -24,7 +24,7 @@ var query_params = nutella.init(location.search, function() {
 		updateCanvasSize();
 	});
 	// We are not storing demo quakes anymore, so we simply initialize the model to empty every time we reload
-	// quakes = new Array();
+	quakes = new Array();
 	//Fetch quakes
 	// nutella.request("quakes_schedule", function(response) {
 // 		// Update model
