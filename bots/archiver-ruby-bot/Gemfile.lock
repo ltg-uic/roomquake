@@ -1,0 +1,21 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    bson (1.11.1)
+    bson_ext (1.11.1)
+      bson (~> 1.11.1)
+    mongo (1.11.1)
+      bson (= 1.11.1)
+    mqtt (0.3.1)
+    nutella_lib (0.2.2)
+      simple_ruby_mqtt_client (~> 0.3.1, >= 0.3.1)
+    simple_ruby_mqtt_client (0.3.1)
+      mqtt (~> 0.3, >= 0.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bson_ext (~> 1.11.1, >= 1.11.0)
+  mongo (~> 1.11.1, >= 1.11.0)
+  nutella_lib (~> 0.2.2, >= 0.2.2)
