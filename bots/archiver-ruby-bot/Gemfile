@@ -1,0 +1,5 @@
+source 'http://rubygems.org'
+
+gem 'nutella_lib', '~> 0.2.2', '>= 0.2.2'
+gem 'mongo', '~> 1.11.1', '>= 1.11.0'
+gem 'bson_ext', '~> 1.11.1', '>= 1.11.0'

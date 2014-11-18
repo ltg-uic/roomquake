@@ -140,16 +140,18 @@ $("#seismographs_setup_btn").click(function() {
 
 
 // Enable changes to room height
-$("#edit_height").focusout(function() {
+$("#edit_height").on('focusout change', function() {
 	room_height = parseFloat($(this).val());
 	// Update canvas
 	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
 	edit_p.size(edit_canvas.width, edit_canvas.height);
+	// Send to backend
+	shipToBackend()
 });
 
 
 // Enable changes to room width
-$("#edit_width").focusout(function() {
+$("#edit_width").on('focusout change', function() {
 	room_width = parseFloat($(this).val());
 	// Update canvas
 	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
