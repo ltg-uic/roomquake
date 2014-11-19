@@ -184,7 +184,8 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 	var room_width_x_meters;
 	var room_height_y_meters;
 	var seismograph_loc = {x:0,y:0};				// stores seismograph location, initialized by nutella when room configuration is fetched
-	var quakes;									// stores the array of quakes, initialized at reload and updated by nutella when new quake is received
+	var quakes;								// stores the array of quakes, initialized at reload and updated by nutella when new quake is received
+	var whichSEISMOGRAPH;									
 	
 	///////////////////
 	// NUTELLA STUFF //
@@ -201,7 +202,7 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 			room_width_x_meters = response.room_width_meters;
 			room_height_y_meters = response.room_height_meters;
 			response.seismographs.forEach(function(e) {
-				if (e.id==query_params.seismograph_id) {		
+				if (e.id==query_params.seismograph_id) {	whichSEISMOGRAPH = e.id;	
 					seismograph_loc.x = e.x; ;
 					seismograph_loc.y = e.y; 
 				}
@@ -504,7 +505,9 @@ function ooch() {
 				processing.endShape();
 			}		
 
-
+			processing.textAlign(processing.LEFT);
+			processing.textSize(24);
+			processing.text("Seismograph "+whichSEISMOGRAPH,70,80);
 			
 		}  //end anonymous function definition
 
