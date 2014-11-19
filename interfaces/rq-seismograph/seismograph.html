@@ -156,6 +156,7 @@ document.getElementById("left").style.width = LEFT_PANEL_WIDTH + "px";
     <canvas id="canvas1" style='position:absolute; z-index:0;'></canvas>
 </p>
 <script>
+	var sound = new Audio('earthquake.wav');
 
 document.getElementById("seismogram").style.height = SEISMOGRAM_HEIGHT + "px";
 document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
@@ -217,10 +218,9 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 		});
 
 		// 3. Subscribe to quakes schedule updates
-		nutella.subscribe("quakes_schedule_update", function(message) {
-			console.debug(message);
+		nutella.subscribe("quakes_schedule_update", function(message) {
 			var Devent_loc =  { x: message.location.x, y: message.location.y };
-			var Dtime = new Date(message.time);
+			var Dtime = new Date(message.time).getTime();
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
 		});
 	});
@@ -297,7 +297,6 @@ function ooch() {
 		var LU = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters))/10;
 
 		var distance = Math.sqrt(Math.pow(seismograph_location.x - event_location.x,2) + Math.pow(seismograph_location.y - event_location.y,2))/LU;
-
 	//	so the arrival times for the p and s waves are just the event time plus the 
 	//	distance divided by the speeds the waves travel at (p_speed and s_speed) * 1000
 
@@ -307,7 +306,7 @@ function ooch() {
 	
 	//	determine  S-wave magnitude-
 
-		var s_amplitude = Math.abs(((3*(magnitude*.85/10+.1) - Math.log10(distance))/2) * 4); //4 because our scale goes to 4
+		var s_amplitude = Math.abs(((3*(magnitude/10+.2) - Math.log10(distance))/2) * 4); //4 because our scale goes to 4
 		var p_amplitude = s_amplitude * .3; //p wave amplitude. totally arbitrary 
 
 	//	so at this point we have normalized displacements (0..1) in the displacement array and normalized amplitudes (0..1) for the p and s waves
@@ -357,18 +356,17 @@ function ooch() {
 		while (i < n_displacements) event_buffer[i++] = signedRandom() * NOISE;
 
 		var this_time = new Date().getTime();
-		setTimeout(start_quake, p_arrivalUPC - this_time - 1000);
-		
+		setTimeout(start_quake, p_arrivalUPC - this_time - 1000);
+		setTimeout(rumble, p_arrivalUPC - this_time);
  
-
 	}
-	
-/*
+	
+
+	function rumble () {sound.play();sound.play();} 
 
-	function generate_earthquake_waveform (event_time, event_location
 
 
-*/
+
 
 	function start_quake() {
 		last_event_time = new Date().getTime();
@@ -410,9 +408,9 @@ function ooch() {
 			processing.strokeWeight(1);
 			processing.stroke(processing.color(30,143,208));
 			
-			var left_edge = SEISMOGRAM_WIDTH-60;
+			var left_edge = SEISMOGRAM_WIDTH-30;
 			var right_edge = SEISMOGRAM_WIDTH;
-			var middle = SEISMOGRAM_HEIGHT/2 + displacement[n_displacements-1]*(SEISMOGRAM_HEIGHT/2);
+			var middle = SEISMOGRAM_HEIGHT/2 - displacement[n_displacements-1]*(SEISMOGRAM_HEIGHT/2)/4;
 			var top = middle - 25;
 			var bottom = middle + 25;
 
