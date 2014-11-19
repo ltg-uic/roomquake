@@ -165,7 +165,7 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 
 	const VIEWING_PERIOD = 20;  						// number of seconds represented by the seismogram
 	const SAMPLING_FREQUENCY = 40; 						// how many data points to be computed per second
-	const MAX_NOISE = .01;								// maximum amplitude of bg noise...percentage of maximum displacement
+	const NOISE = .03;								// maximum amplitude of bg noise...percentage of maximum displacement. seems to be disfunctional.
 	
 
 	// globals
@@ -182,14 +182,13 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 	
 	var room_width_x_meters;
 	var room_height_y_meters;
-	var seismograph_loc = {};				// stores seismograph location, initialized by nutella when room configuration is fetched
+	var seismograph_loc = {x:0,y:0};				// stores seismograph location, initialized by nutella when room configuration is fetched
 	var quakes;									// stores the array of quakes, initialized at reload and updated by nutella when new quake is received
 	
 	///////////////////
 	// NUTELLA STUFF //
 	///////////////////
 	
-	var unitSize = 0;	//critical computed constant
 
 
 	// Initialize nutella
@@ -201,9 +200,9 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 			room_width_x_meters = response.room_width_meters;
 			room_height_y_meters = response.room_height_meters;
 			response.seismographs.forEach(function(e) {
-				if (e.id==query_params.seismograph_id) {		// how the hell does this work??
-					seismograph_loc.x = e.x;
-					seismograph_loc.y = e.y;
+				if (e.id==query_params.seismograph_id) {		
+					seismograph_loc.x = e.x; ;
+					seismograph_loc.y = e.y; 
 				}
 			unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
 			});
@@ -221,10 +220,7 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 		nutella.subscribe("quakes_schedule_update", function(message) {
 			console.debug(message);
 			var Devent_loc =  { x: message.location.x, y: message.location.y };
-			var Dtime = new Date(message.time)
-			// Update model
-			// TODO gotta place the quake in the right spot based on date
-			// Trigger quake drawing
+			var Dtime = new Date(message.time);
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
 		});
 	});
@@ -235,15 +231,14 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 	///////////////////////
 
 
-function ooch() {
- 	var Devent_loc =  {x:1+Math.floor(Math.random()*7), y:1+Math.floor(Math.random()*7)};
-	var Dgraph_loc =  {x:1+Math.floor(Math.random()*7), y:1+Math.floor(Math.random()*7)};
- 	var Dmagnitude = 2 + Math.floor(Math.random()*4);
+function ooch() {
+	var Devent_loc = {x:5, y:7}
+ 	var Dmagnitude = 3;
  	var Dtime = new Date().getTime();
- 	event_message (Devent_loc, Dtime+10000, Dmagnitude, Dgraph_loc);
+ 	event_message (Devent_loc, Dtime+2000, Dmagnitude, seismograph_loc);
  }
 
-setTimeout(ooch, 20000);
+//setTimeout(ooch, 2000);
 
 	// basic loop for updating displacements array; left shift
 
@@ -253,7 +248,7 @@ setTimeout(ooch, 20000);
 	// utility functions
 
 	function signedRandom () {
-		return (Math.random() - 0.5)/2;
+		return (Math.random() - 0.5)*2;
 	}
 
 
@@ -270,7 +265,7 @@ setTimeout(ooch, 20000);
 			if (in_event) {
 				displacement[n_displacements-1] = event_buffer[event_index++];
 				if (event_index == n_displacements) in_event = false;
- 			} else {displacement[n_displacements-1] = signedRandom() * 5;}  // should be processing.randomGaussian();
+ 			} else {displacement[n_displacements-1] = signedRandom()*NOISE}  // should be processing.randomGaussian();
 	
 			// reschedule myself for the next multiple of time_interval
 
@@ -294,9 +289,14 @@ setTimeout(ooch, 20000);
 		const P_SPEED =  1;  	//length units (LUs) per second. a LU is about a meter
 		const S_SPEED = .5;		//LUs per second
 
-	//	how far away from here is the event?
+	//	how far away from here is the event?
+
+			// room_width_x_meters 
+			// room_height_y_meters 
+
+		var LU = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters))/10;
 
-		var distance = Math.sqrt(Math.pow(seismograph_location.x - event_location.x,2) + Math.pow(seismograph_location.y - event_location.y,2));
+		var distance = Math.sqrt(Math.pow(seismograph_location.x - event_location.x,2) + Math.pow(seismograph_location.y - event_location.y,2))/LU;
 
 	//	so the arrival times for the p and s waves are just the event time plus the 
 	//	distance divided by the speeds the waves travel at (p_speed and s_speed) * 1000
@@ -305,11 +305,10 @@ setTimeout(ooch, 20000);
 		var s_arrivalUPC = time + distance/S_SPEED * 1000;
 		var s_minus_p = s_arrivalUPC - p_arrivalUPC;			//S-P in milliseconds, for convenience
 	
-	//	determine  S-wave magnitude (normalized to maximum amplitude
-		var d = 1 * Math.log(8 * s_minus_p / 1000) - 2.92;  // d is like 4 or something (sorry i can't be more specific)
-		var s_amplitude = 2 * Math.log(Math.pow(10,magnitude - d)); 
-	 
-		var p_amplitude = s_amplitude * (.1 + Math.random() * .2); //p wave amplitude is random height within 20-50% of s_amplitude. totally arbitrary 
+	//	determine  S-wave magnitude-
+
+		var s_amplitude = Math.abs(((3*(magnitude*.85/10+.1) - Math.log10(distance))/2) * 4); //4 because our scale goes to 4
+		var p_amplitude = s_amplitude * .3; //p wave amplitude. totally arbitrary 
 
 	//	so at this point we have normalized displacements (0..1) in the displacement array and normalized amplitudes (0..1) for the p and s waves
 
@@ -319,7 +318,7 @@ setTimeout(ooch, 20000);
 		
 	//	fill the first second (the first 5% of the graph) with noise
 		
-		while (i < n_displacements*t) event_buffer[i++] = (Math.random() - 0.5) * 2;
+		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * NOISE;
 
 
 	//	then the p-wave
@@ -327,7 +326,7 @@ setTimeout(ooch, 20000);
 
 		t += ((s_arrivalUPC - p_arrivalUPC) / 1000) / 20;
 			
-		while (i < n_displacements*t) event_buffer[i++] = (Math.random() - 0.5) * 5 * p_amplitude;
+		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * p_amplitude;
 
 
 	//	then the s-wave
@@ -336,26 +335,26 @@ setTimeout(ooch, 20000);
 
 
 		var t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[i++] = (Math.random() - 0.5) * 5 * s_amplitude * (.8 + .2 * t_counter/(1*SAMPLING_FREQUENCY)); t_counter++;}
+		while (i < n_displacements*t) {event_buffer[i++] = signedRandom() * s_amplitude ;}
 		
 
 		t = (t+.80)/3 ;
 		t = t + Math.random() * (.80 - t);
 		
 			
-		while (i < n_displacements*t) event_buffer[i++] = (Math.random() - 0.5) * 5 * s_amplitude;
+		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * s_amplitude;
 
 
 		t += .15;
 
 		t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[i++] = (Math.random() - 0.5) * 5 * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
+		while (i < n_displacements*t) {event_buffer[i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
 
 
 				
 	//	and finish it off with random values
 		
-		while (i < n_displacements) event_buffer[i++] = (Math.random() - 0.5) * 2;
+		while (i < n_displacements) event_buffer[i++] = signedRandom() * NOISE;
 
 		var this_time = new Date().getTime();
 		setTimeout(start_quake, p_arrivalUPC - this_time - 1000);
@@ -398,8 +397,9 @@ setTimeout(ooch, 20000);
 			for (var i = 0; i < n_displacements; i++) {
 				processing.stroke(1);
 				processing.strokeWeight(2);
-				processing.stroke(processing.color(30,143,208));
-				processing.vertex(Math.floor(i / n_displacements * available_width), SEISMOGRAM_HEIGHT/2 - displacement[i]*4);
+				processing.stroke(processing.color(30,143,208));
+				var middle = SEISMOGRAM_HEIGHT/2;
+				processing.vertex(Math.floor(i / n_displacements * available_width), middle - displacement[i]*(SEISMOGRAM_HEIGHT/2)/4);
 			}
 			processing.endShape();
 
@@ -412,7 +412,7 @@ setTimeout(ooch, 20000);
 			
 			var left_edge = SEISMOGRAM_WIDTH-60;
 			var right_edge = SEISMOGRAM_WIDTH;
-			var middle = SEISMOGRAM_HEIGHT/2 + displacement[n_displacements-1]*4;
+			var middle = SEISMOGRAM_HEIGHT/2 + displacement[n_displacements-1]*(SEISMOGRAM_HEIGHT/2);
 			var top = middle - 25;
 			var bottom = middle + 25;
 
