@@ -78,6 +78,7 @@ const SEISMOGRAM_WIDTH = WINDOW_WIDTH - LEFT_PANEL_WIDTH - RIGHT_PANEL_WIDTH;
 const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
 	var LIVE = true; //There are two operational modes: LIVE and HISTORY
+	var JUST_LIVE = true;
 
 </script>
 
@@ -138,7 +139,7 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 	</script>
 	<a id="back" href="javascript:void(0);" onClick="if (p_arrivalUPC != 0) LIVE=false;" style="z-index:1;">Last</a>
 	<script> document.getElementById("back").style.left = 80; </script>
-	<a id="forward" href="javascript:void(0);" onCLick="if (!LIVE) {location.reload();}" style="z-index:1;">Live</a>
+	<a id="forward" href="javascript:void(0);" onCLick="if (!LIVE) {LIVE=true; JUST_LIVE=true;}" style="z-index:1;">Live</a>
 	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-280; </script>
 </div>
 
@@ -256,7 +257,11 @@ function ooch() {
 	// interval_timer is called every time_interval seconds. it updates the seismograph.
 
 	function interval_timer() {
-		if (LIVE) {
+		if (LIVE) {
+			if (JUST_LIVE) { 
+				for (var i=0; i < n_displacements; i++) {displacement[i] = 0;}
+				JUST_LIVE = false;
+			}
 			// shuffle all the data points (except the last) over to the left
 
 			for (var i=0; i < n_displacements - 1; i++) {displacement[i] = displacement[i+1];}
@@ -266,14 +271,15 @@ function ooch() {
 			if (in_event) {
 				displacement[n_displacements-1] = event_buffer[event_index++];
 				if (event_index == n_displacements) in_event = false;
- 			} else {displacement[n_displacements-1] = signedRandom()*NOISE}  // should be processing.randomGaussian();
+ 			} else {displacement[n_displacements-1] = signedRandom()*NOISE;}  // should be processing.randomGaussian();
 	
 			// reschedule myself for the next multiple of time_interval
 
-			setTimeout(interval_timer, launch_time + ++synch_index * time_interval - new Date().getTime());
 		} else {
 			for (var i=0; i < n_displacements; i++) {displacement[i] = event_buffer[i];}
-		}
+		}
+		setTimeout(interval_timer, launch_time + ++synch_index * time_interval - new Date().getTime());
+
 	}
 
 
@@ -409,7 +415,7 @@ function ooch() {
 			processing.strokeWeight(1);
 			processing.stroke(processing.color(30,143,208));
 			
-			var left_edge = SEISMOGRAM_WIDTH-30;
+			var left_edge = SEISMOGRAM_WIDTH-50;
 			var right_edge = SEISMOGRAM_WIDTH;
 			var middle = SEISMOGRAM_HEIGHT/2 - displacement[n_displacements-1]*(SEISMOGRAM_HEIGHT/2)/4;
 			var top = middle - 25;
