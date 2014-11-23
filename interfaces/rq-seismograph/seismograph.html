@@ -4,8 +4,6 @@
 <html>
 <head>
 
-	<!-- Hey tom! -->
-	<!--It's gonna complain!!! -->
 	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
 	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
@@ -81,6 +79,8 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 
 	var LIVE = true; //There are two operational modes: LIVE and HISTORY
 	var JUST_LIVE = true;
+	var JUST_BACK = false;
+
 
 </script>
 
@@ -139,9 +139,27 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 	<script>
 	document.getElementById("top").style.height = TOP_PANEL_HEIGHT + "px";
 	</script>
-	<a id="back" href="javascript:void(0);" onClick="if (p_arrivalUPC != 0) LIVE=false;" style="z-index:1;">Last</a>
-	<script> document.getElementById("back").style.left = 80; </script>
-	<a id="forward" href="javascript:void(0);" onCLick="if (!LIVE) {LIVE=true; JUST_LIVE=true;}" style="z-index:1;">Live</a>
+	<a id="back" href="javascript:void(0);" on mouseover=";" 
+		onClick="
+
+			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
+			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; 
+
+		" style="z-index:1;">Back</a>
+	<script> document.getElementById("back").style.left = 80; </script>
+
+	<a id="print" href="javascript:void(0);" on mouseover=";" 
+		onClick="window.print();" style="z-index:1;">Print</a>
+	<script> document.getElementById("print").style.left = WINDOW_WIDTH-500; </script>
+
+
+	<a id="forward" href="javascript:void(0);" on mouseover=";" 
+		onClick="
+
+			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};	
+
+		" style="z-index:1;">Forward</a>
+
 	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-280; </script>
 </div>
 
@@ -165,7 +183,8 @@ document.getElementById("seismogram").style.height = SEISMOGRAM_HEIGHT + "px";
 document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 
 
-	// constants
+	// constants
+	const AUDIO_LATENCY = 600; //time it takes for the rumble audio to load up
 
 	const VIEWING_PERIOD = 20;  						// number of seconds represented by the seismogram
 	const SAMPLING_FREQUENCY = 40; 						// how many data points to be computed per second
@@ -181,7 +200,10 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 	var displacement = [];							// this array holds the normalized displacements (ground motion)
 	var in_event = false;								// are we currently drawing the seismogram of a simulated event?
 	var event_index;									// what's the next index in the event_buffer array to draw from?
-	var event_buffer = [];							// the next event buffer	
+	var event_buffer = [100];							// the next event buffer	
+	for (i=0; i<100; i++) event_buffer[i] = new Array(n_displacements);
+	
+
 	var last_event_time;								// timestamp of most recent event
 	
 	var room_width_x_meters;
@@ -218,17 +240,28 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 		// 2. Fetch quakes schedule
 		nutella.request("quakes_schedule", function(response) {
 			// Update model
-			quakes = response.quakes_schedule;
-		});
+			quakes = response.quakes_schedule;
+//
+// 	gugo, can you do this plumbing? basically, for each item in the schedule, i need
+//	you to call event message, as in 4. below. just walk through them in the right time order and
+//	everything should work fine.
+//
+
 
-		// 3. Subscribe to quakes schedule updates
+		});
+
+		// 3. Subscribe to clear events
+		nutella.request("clear",function() {location.reload();});
+
+		// 4. Subscribe to quakes schedule updates
 		nutella.subscribe("quakes_schedule_update", function(message) {
 			var Devent_loc =  { x: message.location.x, y: message.location.y };
 			var Dtime = new Date(message.time).getTime();
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
 		});
 	});
-	
+	
+
 	
 	///////////////////////
 	// END NUTELLA STUFF //
@@ -254,6 +287,7 @@ function ooch() {
 	function signedRandom () {
 		return (Math.random() - 0.5)*2;
 	}
+
 
 
 	// interval_timer is called every time_interval seconds. it updates the seismograph.
@@ -261,7 +295,7 @@ function ooch() {
 	function interval_timer() {
 		if (LIVE) {
 			if (JUST_LIVE) { 
-				for (var i=0; i < n_displacements; i++) {displacement[i] = 0;}
+				for (var i=0; i < n_displacements; i++) {displacement[i] = signedRandom()*NOISE;}
 				JUST_LIVE = false;
 			}
 			// shuffle all the data points (except the last) over to the left
@@ -271,23 +305,28 @@ function ooch() {
 			// insert a new "last" point, either from the event buffer or random
 
 			if (in_event) {
-				displacement[n_displacements-1] = event_buffer[event_index++];
-				if (event_index == n_displacements) in_event = false;
+				displacement[n_displacements-1] = event_buffer[LAST_QUAKE+1][event_index++];
+				if (event_index == n_displacements) {in_event = false; LAST_QUAKE++;}
  			} else {displacement[n_displacements-1] = signedRandom()*NOISE;}  // should be processing.randomGaussian();
 	
 			// reschedule myself for the next multiple of time_interval
 
 		} else {
-			for (var i=0; i < n_displacements; i++) {displacement[i] = event_buffer[i];}
+			if (JUST_BACK) { 
+				for (var i=0; i < n_displacements; i++) {displacement[i] = event_buffer[LAST_QUAKE-STEPS_BACK][i];}
+				JUST_BACK = false;
+			} 
 		}
 		setTimeout(interval_timer, launch_time + ++synch_index * time_interval - new Date().getTime());
 
 	}
 
-
 	setTimeout(interval_timer, time_interval);  // clock ticks every time_interval ms to update displacement array
 
-	var p_arrivalUPC = 0;
+	var START = [];
+	var TOTAL_QUAKES = 0;
+	var LAST_QUAKE=0;
+	var STEPS_BACK=0;
 	
 	function event_message (event_location, time, magnitude, seismograph_location) {
 
@@ -296,7 +335,9 @@ function ooch() {
 	//	options
 
 		const P_SPEED =  1;  	//length units (LUs) per second. a LU is about a meter
-		const S_SPEED = .5;		//LUs per second
+		const S_SPEED = .5;		//LUs per second
+		TOTAL_QUAKES++;
+
 
 	//	how far away from here is the event?
 
@@ -309,7 +350,7 @@ function ooch() {
 	//	so the arrival times for the p and s waves are just the event time plus the 
 	//	distance divided by the speeds the waves travel at (p_speed and s_speed) * 1000
 
-		p_arrivalUPC = time + distance/P_SPEED * 1000; 		// milliseconds since 1/1/1970
+		var p_arrivalUPC = time + distance/P_SPEED * 1000; 		// milliseconds since 1/1/1970
 		var s_arrivalUPC = time + distance/S_SPEED * 1000;
 		var s_minus_p = s_arrivalUPC - p_arrivalUPC;			//S-P in milliseconds, for convenience
 	
@@ -326,7 +367,7 @@ function ooch() {
 		
 	//	fill the first second (the first 5% of the graph) with noise
 		
-		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * NOISE;
+		while (i < n_displacements*t) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * NOISE;
 
 
 	//	then the p-wave
@@ -334,7 +375,7 @@ function ooch() {
 
 		t += ((s_arrivalUPC - p_arrivalUPC) / 1000) / 20;
 			
-		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * p_amplitude;
+		while (i < n_displacements*t) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * p_amplitude;
 
 
 	//	then the s-wave
@@ -343,46 +384,51 @@ function ooch() {
 
 
 		var t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[i++] = signedRandom() * s_amplitude ;}
+		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude ;}
 		
 
 		t = (t+.80)/3 ;
 		t = t + Math.random() * (.80 - t);
 		
 			
-		while (i < n_displacements*t) event_buffer[i++] = signedRandom() * s_amplitude;
+		while (i < n_displacements*t) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude;
 
 
 		t += .15;
 
 		t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
+		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
 
 
 				
 	//	and finish it off with random values
 		
-		while (i < n_displacements) event_buffer[i++] = signedRandom() * NOISE;
-
+		while (i < n_displacements) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * NOISE;
+
 		var this_time = new Date().getTime();
-		setTimeout(start_quake, p_arrivalUPC - this_time - 1000);
-		setTimeout(rumble, p_arrivalUPC - this_time);
+		if (p_arrivalUPC-this_time - 1000 > 0) {
+			setTimeout(start_quake, p_arrivalUPC - this_time - 1000);
+		}
+		START [TOTAL_QUAKES] = p_arrivalUPC - 1000;
  
 	}
 	
 
-	function rumble () {sound.play();sound.play();} 
+	function rumble () {sound.play();} 
 
 
 
 
 
-	function start_quake() {
+	function start_quake() {
+		JUST_LIVE = true; LIVE = true; STEPS_BACK=0;  	// force return to live action if quake imminent
 		last_event_time = new Date().getTime();
-		event_index = 0;
+		event_index = 0;
+		setTimeout(rumble, 1000-AUDIO_LATENCY);  
 		in_event = true;
 	}
-		
+		
+	function sign (x) { return x > 0 ? 1 : x < 0 ? -1 : 0;}
 
 	function sketchProc(processing) {
         // Override draw function, by default it will be called 60 times per second
@@ -458,7 +504,7 @@ function ooch() {
 
 			var this_time;
 
-			if (LIVE) {this_time = new Date().getTime();} else {this_time = p_arrivalUPC + 19000;};
+			if (LIVE) {this_time = new Date().getTime();} else {this_time = START[LAST_QUAKE-STEPS_BACK]+20000;};
 			
 
 			// find nearest second prior to current time (lotta hard-wired crap in here)
@@ -471,15 +517,19 @@ function ooch() {
 			for (var i = 0; i< VIEWING_PERIOD+1; i++) {
 				t.setTime(vertical_bar_time - i * 1000);
 				processing.beginShape(); 
-				if (t.getSeconds() % 5 == 0) {
+				if (t.getSeconds() % 10 == 0) {
 					for (var j=-4; j<=4; j++){
 						processing.strokeWeight(1);
 						processing.textFont(processing.createFont("sans-serif",20));
 						processing.fill(0);
 						processing.stroke(processing.color(255,0,0));
-						processing.pushMatrix();
-						processing.translate(available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD) +10,SEISMOGRAM_HEIGHT/2 + j*SEISMOGRAM_HEIGHT/8-10);
-						processing.text(-j,0,0);
+						processing.pushMatrix();
+						var hack = sign(j); if (hack == 0) hack = 1;
+						processing.translate(available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD) +10,SEISMOGRAM_HEIGHT/2 + j*SEISMOGRAM_HEIGHT/8 + 6  - hack*15);
+						if (j !=0 ) {
+							if (Math.abs(j) == 4) {processing.text(-j*25 + "mm",0,0);}
+							else {processing.text(-j*25,0,0);}
+						}
 						processing.popMatrix();
 						processing.noFill();
 					}
@@ -489,9 +539,9 @@ function ooch() {
 				processing.vertex(available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD),0);
 				processing.vertex(available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD),SEISMOGRAM_HEIGHT);
 				processing.endShape();
-				var x = available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD) - 5;
-				var y = SEISMOGRAM_HEIGHT-60;
-				processing.textFont(processing.createFont("sans-serif",28));
+				var x = available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD) - 10;
+				var y = SEISMOGRAM_HEIGHT-25;
+				processing.textFont(processing.createFont("sans-serif",20));
 				processing.fill(0);
 				processing.stroke(processing.color(30,143,208));
 				processing.pushMatrix();
@@ -514,8 +564,8 @@ function ooch() {
 			}		
 
 			processing.textAlign(processing.LEFT);
-			processing.textSize(24);
-			processing.text("Seismograph "+whichSEISMOGRAPH,70,80);
+			processing.textSize(28);
+			processing.text("Seismograph "+whichSEISMOGRAPH,50,90);
 			
 		}  //end anonymous function definition
 
@@ -546,7 +596,6 @@ document.getElementById("right").style.width = RIGHT_PANEL_WIDTH + "px";
 <div id="bottom">
 <script>
 document.getElementById("bottom").style.height = BOTTOM_PANEL_HEIGHT + "px";
-document.writeln("UIC Learning Technologies Group");
 </script>
 </div>
 
