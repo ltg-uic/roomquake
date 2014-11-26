@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RoomQuake Admin</title>
+	<meta name="description" content="Administration interface for roomquake">
 	<!-- CSSs -->
 	<link rel="stylesheet" href="bower_components/foundation/css/normalize.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css" media="screen" charset="utf-8">
@@ -45,21 +46,21 @@
 		<script src="bower_components/foundation/js/foundation.min.js" type="text/javascript" charset="utf-8"></script>
 	  <script>
 	    $(document).foundation();
-	  </script>		
-	  <script>
-			// Production
-			// var run_id = "roomquake";
-			// var broker = "ltg.evl.uic.edu";
-			// Dev
-			var run_id = "roomquake_rq_demo";
-			var broker = "localhost";
-			///////////////////////////
-			$('a').each(function (index) {
-				var link = $(this).attr('href');
-				if (link!="" && link!="#")
-					$(this).attr('href', link + "?run_id=" + run_id + "&broker=" + broker);
-			});
 	  </script>
+		<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var query_params = nutella.init(location.search, function() {
+				// Your code executing when nutella is initialized here
+				$('a').each(function (index) {
+					var link = $(this).attr('href');
+					if (link!="" && link!="#")
+						$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+				
+				});
+			});
+		</script>		
 		
   </body>
 </html>

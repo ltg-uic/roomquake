@@ -1,0 +1,7 @@
+{
+  "name": "roomquake",
+  "version": "0.1.0",
+  "nutella_version": "0.2.0",
+  "type": "project",
+  "description": "A classroom simulation of earthquakes"
+}
