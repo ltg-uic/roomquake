@@ -4,12 +4,5 @@ RoomQuake is a nutella application that transforms the classroom into a seismic 
 ## Running
 Like all nutella applications simply
 ```
-nutella start 
+nutella start <section_id>
 ```
-
-THis is a change!!!!
-
-
-
-Another comment 2
-
