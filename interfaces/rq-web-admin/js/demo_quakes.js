@@ -12,8 +12,10 @@ var countdown_interval_id;
 var demo_canvas = document.getElementById("demo_canvas");
 var demo_p = new Processing(demo_canvas, DemoQuakesMap);
 
-// Initialize nutella and fetch data from backend
+// Initialize nutella
 var query_params = nutella.init(location.search, function() {
+	// Send mode update
+	nutella.publish( 'mode_update', {rq_mode : 'demo'} )
 	//Fetch room configuration
 	nutella.request("room_configuration", function(response) {
 		// Update model
@@ -23,18 +25,17 @@ var query_params = nutella.init(location.search, function() {
 		// TODO If there's no data, it's a problem, we shouldn't be here... 
 		updateCanvasSize();
 	});
-	// We are not storing demo quakes anymore, so we simply initialize the model to empty every time we reload
 	quakes = new Array();
 	//Fetch quakes
-	// nutella.request("quakes_schedule", function(response) {
-// 		// Update model
-// 		quakes = response.quakes_schedule;
-// 		// If there's no data initialize the model
-// 		if (quakes===undefined)
-// 			quakes = new Array();
-// 		// Update the quakes table view (only demo quakes)
-// 		updateQuakesTableView('demo_quakes_table', true);
-// 	});
+	nutella.request("quakes_schedule", function(response) {
+		// Update model
+		quakes = response.quakes_schedule;
+		// If there's no data initialize the model
+		if (quakes===undefined)
+			quakes = new Array();
+		// Update the quakes table view (only demo quakes)
+		updateQuakesTableView('demo_quakes_table', true);
+	});
 });
 
 // Update links to reflect nutella parameters
@@ -122,6 +123,15 @@ $(document).on('close.fndtn.reveal', '#countdown', function (e) {
 	countdown_interval_id = undefined;
 });
 
+// Click the "Clear generated quakes" button
+$('#clear_demo_quakes').click(function() {
+	// Send message and reload
+	nutella.publish("demo_quakes_clean", {});
+	location.reload();
+	return false;
+});
+
+
 
 // Utility functions
 
@@ -166,7 +176,7 @@ function countDownOver() {
 	// Update table view
 	updateQuakesTableView('demo_quakes_table', true);
 	// Ship to backend
-	nutella.publish("quakes_schedule_update", mq);
+	nutella.publish("new_demo_quake", mq);
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;

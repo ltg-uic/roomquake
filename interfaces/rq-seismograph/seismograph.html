@@ -236,26 +236,27 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 			});
 			if (seismograph_loc.x===undefined || seismograph_loc.y===undefined)
 					console.error("Impossible to set seismograph location. The id you provided doens't seem to match any of the know IDs.");
-		});
-		
-		// 2. Fetch quakes schedule
-		nutella.request("quakes_schedule", function(response) {
-			// Update model
-			quakes = response.quakes_schedule;
-//
-// 	gugo, can you do this plumbing? basically, for each item in the schedule, i need
-//	you to call event message, as in 4. below. just walk through them in the right time order and
-//	everything should work fine.
-//
-
-
+            
+            // 2. Fetch quakes schedule
+            nutella.request("quakes_schedule", function(response) {
+                // Update model
+                quakes = response.quakes_schedule;
+                quakes.forEach(function(el, i) {
+                    var Devent_loc =  { x: el.location.x, y: el.location.y };
+                    var Dtime = new Date(el.time).getTime();
+                    event_message (Devent_loc, Dtime, el.magnitude, seismograph_loc);
+                });
+            });
 		});
 
 		// 3. Subscribe to clear events
-		nutella.request("clear",function() {location.reload();});
+		nutella.subscribe("demo_quakes_clean", function() {location.reload();});
 
-		// 4. Subscribe to quakes schedule updates
-		nutella.subscribe("quakes_schedule_update", function(message) {
+        // 4. Subscribe to schedule change events
+        nutella.subscribe("quakes_schedule_update", function() {location.reload();});
+
+		// 5. Subscribe to quakes schedule updates
+		nutella.subscribe("new_demo_quake", function(message) {
 			var Devent_loc =  { x: message.location.x, y: message.location.y };
 			var Dtime = new Date(message.time).getTime();
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
