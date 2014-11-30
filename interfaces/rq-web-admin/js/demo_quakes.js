@@ -14,6 +14,8 @@ var demo_p = new Processing(demo_canvas, DemoQuakesMap);
 
 // Initialize nutella
 var query_params = nutella.init(location.search, function() {
+	// Send mode update
+	nutella.publish( 'mode_update', {rq_mode : 'demo'} )
 	//Fetch room configuration
 	nutella.request("room_configuration", function(response) {
 		// Update model
@@ -34,8 +36,6 @@ var query_params = nutella.init(location.search, function() {
 		// Update the quakes table view (only demo quakes)
 		updateQuakesTableView('demo_quakes_table', true);
 	});
-	// Send mode update
-	nutella.publish( 'mode_update', {rq_mode : 'demo'} )
 });
 
 // Update links to reflect nutella parameters
