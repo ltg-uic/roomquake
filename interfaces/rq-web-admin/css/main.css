@@ -21,14 +21,6 @@ table thead tr th {
 	font-size: 12px;
 }
 
-/*
-
-Re-enable this only for quake schedule
-
-.uneditable td {
-	color: gray;
-}
-*/
 a.disabled {
    pointer-events: none;
    cursor: default;

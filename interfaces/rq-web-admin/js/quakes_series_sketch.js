@@ -65,10 +65,7 @@ function ScheduledQuakesMap(p) {
 	p.drawHighlightedQuake = function() {
 		if (p.highlight===undefined)
 			return;
-		var demo_quakes = quakes.filter(function(el) {
-			return el.demo;
-		});
-		var hltd = demo_quakes[p.highlight];
+		var hltd = quakes[p.highlight];
 		// Filled dot
 		p.stroke(255, 0, 0);
 		p.fill(255, 0, 0);

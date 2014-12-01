@@ -44,7 +44,8 @@ var room_width;
 var room_height;
 var seismographs;
 var quakes;
-var countdown_interval_id;
+var quakes_events;
+var current_edit_id;
 
 // Canvases/processing references
 var live_canvas = document.getElementById("live_canvas");
@@ -72,7 +73,7 @@ var query_params = nutella.init(location.search, function() {
 		if (quakes===undefined)
 			$('#quakes_schedule_modal').foundation("reveal", "open");
 		// Update the quakes table view
-		updateQuakesTableView('quakes_schedule', false);
+		updateQuakesTableAndCalendarView('quakes_schedule');
 	});
 });
 
@@ -101,7 +102,7 @@ $("#quakes_schedule_form").on('valid.fndtn.abide submit', function(e) {
 		var end = parseD($("#unit_end_date").val());
 		var quakes_n = parseInt($("#total_quakes_input").val());
 		quakes = suggestQuakesSchedule(start, end, MIN_MAG, MAX_MAG, quakes_n);
-		updateQuakesTableView('quakes_schedule', false);
+		updateQuakesTableAndCalendarView('quakes_schedule');
 		$("#quakes_schedule_modal").foundation("reveal", "close");
 		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 	}
@@ -109,23 +110,71 @@ $("#quakes_schedule_form").on('valid.fndtn.abide submit', function(e) {
 });
 
 // Click on quakes table row to show coordinates for that quake in the map
-$('#demo_quakes_table').on('click', 'tbody tr', function() {
+$('#quakes_schedule').on('click', 'tbody tr', function() {
 	var r_id = $(this).attr('r_id');
-	if (demo_p.highlight===undefined)
-		demo_p.highlight = r_id;
+	if (live_p.highlight===undefined)
+		live_p.highlight = r_id;
 	else
-		demo_p.highlight = undefined;
+		live_p.highlight = undefined;
 });
 
-
-// Cancel countdown whenever we dismiss the modal
-// It could be dismissed by clicking cancel, tapping outside of the modal or by waiting for countdown completion
-$(document).on('close.fndtn.reveal', '#countdown', function (e) {
-	// ignore non-namespaced event (i.e. work-around for bug in Foundation framework https://github.com/zurb/foundation/issues/5482)
-	if (e.namespace != 'fndtn.reveal') return false;
-	clearInterval(countdown_interval_id);
-	countdown_interval_id = undefined;
+// Quakes calendar configuration
+$('#quakes_calendar').fullCalendar({
+	defaultView: 'agendaWeek',
+	timezone: 'local',
+	editable: true,
+	eventLimit: true,
+	events: quakes_events,
+	// Edit event
+	eventDrop: function(event) {
+		quakes[event.id].time = event.start.format();
+		sortQuakesByDate();
+		updateQuakesTableAndCalendarView('quakes_schedule');
+		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+	},
+	// Add event
+	dayClick: function(date, jsEvent, view) {
+		$('#quake_edit_date').val(date.format('YYYY-MM-DD'));
+		$('#quake_edit_time').val(date.format('HH:mm:ss'));
+		$('#quake_edit_modal').foundation("reveal", "open");
+	},
+	// Edit event
+	eventClick: function(event) {
+		$('#quake_edit_date').val(event.start.format('YYYY-MM-DD'));
+		$('#quake_edit_time').val(event.start.format('HH:mm:ss'));
+		current_edit_id = event.id;
+		$('#quake_edit_modal').foundation("reveal", "open");
+	},
 });
+
+// Quake add / edit modal 
+$("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
+	// if(e.type === "valid") {
+		var quake_date = parseD($("#quake_edit_date").val());
+		var quake_time = parseT($("#quake_edit_time").val(), quake_date);
+		var q = {};
+		q.magnitude = parseInt($("#quake_edit_magnitude").val());
+		q.time = quake_time.toISOString();
+		var xy = Math.random() * room_height;
+		q.location = {};
+		q.location.x = xy;
+		q.location.y = xy;
+		q.demo = false;
+		if (current_edit_id === undefined) {
+			quakes.push(q);
+		} else {
+			quakes[current_edit_id].time = quake_time.toISOString();
+			quakes[current_edit_id].magnitude = parseInt($("#quake_edit_magnitude").val());
+			current_edit_id = undefined;
+		}
+		sortQuakesByDate();
+		updateQuakesTableAndCalendarView('quakes_schedule');
+		$("#quake_edit_modal").foundation("reveal", "close");
+		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		// }
+		return false;
+	});
+
 
 
 // Utility functions
@@ -138,11 +187,9 @@ function updateCanvasSize() {
 
 // Updates the quakes table
 // if demo_flag is set to true, only demo quakes are visualized
-function updateQuakesTableView(table_name, demo_flag) {
+function updateQuakesTableAndCalendarView(table_name) {
 	$("#"+table_name+" tbody").empty();
-	quakes.filter(function(el) {
-		return el.demo==demo_flag;
-	}).forEach(function(el, i) {
+	quakes.forEach(function(el, i) {
 		var date = new Date(el.time);
 		var date_options = {weekday: "short", year: "numeric", month: "short", day: "numeric"};
 		var time_options = {hour: "numeric", minute: "numeric", second: "numeric"};
@@ -154,11 +201,35 @@ function updateQuakesTableView(table_name, demo_flag) {
 			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
 		}
 	});
+	// Update calendar view
+	getQuakesEvents();
+	$('#quakes_calendar').fullCalendar( 'removeEvents' );
+	$('#quakes_calendar').fullCalendar( 'addEventSource', quakes_events );
 }
 
+// Sorts quakes by date
+function sortQuakesByDate() {
+	quakes.sort(function(a, b) {
+		return new Date(a.time ) - new Date(b.time);
+	});
+}
 
-
-// Utility functions
+// Converts the array of quakes into an array of calendar events 
+function getQuakesEvents() {
+	var events = [];
+	quakes.forEach(function(q, i) {
+		var e = {};
+		e.id = i;
+		e.addDay = false;
+		e.eventStartEditable = true;
+		e.eventDurationEditable = false;
+		e.title = "Magnitude " + q.magnitude ;
+		e.start = q.time;
+		e.end = new Date(q.time).setMinutes(new Date(q.time).getMinutes() + 50);
+		events.push(e);	
+	});
+	quakes_events = events;
+}
 
 // Perturbates a value with a random percentage
 function perturbate(v, percent) {
@@ -192,17 +263,13 @@ function parseD(str) {
 // Parses a time from time input box
 function parseT(str, date) {
 	var hms = str.split(":");
-	var s2 = hms[2].split(" ");
-	hms[2] = s2[0];
-	var ampm = s2[1];
-	var time = {};
-	if (ampm=="PM") {
-		time.hour = hms[0]+12;
-	} else {
-		time.hour = hms[0];
-	}
+	var time = {}
+	time.hour = hms[0];
 	time.min = hms[1];
-	time.sec = hms[2];
+	if (hms.length == 2)
+		time.sec = 0;
+	else
+		time.sec = hms[2];
 	if (date === undefined) {
 		return time;
 	} else {
