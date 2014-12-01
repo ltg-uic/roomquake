@@ -8,7 +8,13 @@
 	<!-- CSSs -->
 	<link rel="stylesheet" href="bower_components/foundation/css/normalize.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css" media="screen" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/fullcalendar/dist/fullcalendar.css" type="text/css" media="screen" charset="utf-8">
 	<link rel="stylesheet" href="css/main.css" type="text/css" charset="utf-8">
+	<style type="text/css" media="screen">
+	.uneditable td {
+		color: gray;
+	}
+	</style>
 	<!-- Modernizr -->
 	<script src="bower_components/foundation/js/vendor/modernizr.js" type="text/javascript" charset="utf-8"></script>
 </head>
@@ -32,7 +38,7 @@
 		<div class="row">
 			<div class="large-12 medium-12 column">
 				<h2>Quakes schedule</h2>
-				<p>Tap on the table to highlight row and double tap to edit.</p>
+				<p>Tap/click on a quake in the table to highlight it in the map. Click on quakes in calendar to edit them.</p>
 			</div>
 		</div>
 		<div class="row">
@@ -52,6 +58,11 @@
 					  <tbody>
 					  </tbody>
 					</table>
+			</div>
+		</div>
+		<div class="row">
+			<div class="large-12 medium-12 column">
+				<div id='quakes_calendar'></div>
 			</div>
 		</div>
 
@@ -85,10 +96,43 @@
 				</div>
 			</form>
 		</div>
-		
+
+<!-- Add / edit quakes -->
+		<div id="quake_edit_modal" class="reveal-modal" data-reveal>
+		  <h2>Add/Edit quake</h2>
+			<form id="quake_edit_form">
+		  	<div class="row">
+		    	<div class="large-4 columns">
+						<label>What day do you want your quake at?
+							<input id="quake_edit_date" type="date" required>
+						</label>
+					</div>
+		    	<div class="large-4 columns">
+						<label>What time do you want your quake at?
+							<input id="quake_edit_time" type="time">
+						</label>
+					</div>
+	    		<div class="large-4 columns">
+						<label>What magnitude do you want your quake to have?
+							<select id="quake_edit_magnitude" required >
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+							</select>
+						</label>
+	    		</div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						<button type="submit">Add / Edit quake</button>
+					</div>
+				</div>
+			</form>
+		</div>
 		
 <!-- SCRIPTS -->
-		<script src="bower_components/foundation/js/vendor/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
 		<script src="bower_components/foundation/js/foundation.min.js" type="text/javascript" charset="utf-8"></script>
 	  <script>
 	    $(document).foundation();
@@ -99,6 +143,9 @@
 		<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
 		<!-- processing -->
 		<script src="bower_components/Processing.js/processing.js" type="text/javascript" charset="utf-8"></script>
+		<!-- fullcalendar-->
+		<script src="bower_components/moment/moment.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/fullcalendar/dist/fullcalendar.js" type="text/javascript" charset="utf-8"></script>
 		<!-- mine -->
 		<script src="js/quakes_series_sketch.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/quakes_series.js" type="text/javascript" charset="utf-8"></script>
