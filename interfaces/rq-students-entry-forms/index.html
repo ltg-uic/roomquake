@@ -1,16 +1,43 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
 
 <head>
-	<meta charset="utf-8">
-	<title> Student entry forms</title>
-	<meta name="description" content="Tablet Knowledge buildinig tools for students">
+  <meta charset="utf-8">
+  <title>Knowledge Building tools</title>
+	<meta name="description" content="Knowledge Building tools">
+  <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="_css/foundation.css" />
+  <link rel="stylesheet" href="_css/app.css" />
+	
 </head>
 
 <body>
+	<div class="row">
+	  <div class="small-12 large-12 columns">
+			<h1>Are you a... </h1>
+			<ul>
+			  <li><a href="login.html"><span>Student</span></a></li>
+				<li><a href="show.html"><span>Teacher</span></a></li>
+			</ul>
+	  </div>
+	</div>
 	
-	<p>Hello world! </p>
-
+	
+	<script src="_scripts/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var query_params = nutella.init(location.search, function() {
+			// Your code executing when nutella is initialized here
+			$('a').each(function (index) {
+				var link = $(this).attr('href');
+				if (link!="" && link!="#")
+					$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+				
+			});
+		});
+	</script>
+		
 </body>
-
 </html>
