@@ -57,6 +57,17 @@ $('#demo_quakes_table').on('click', 'tbody tr', function() {
 		demo_p.highlight = undefined;
 });
 
+// Modify x,y quake coordinates
+$("#quake_x").on("input", function(){
+	demo_p.manualQuakeXroom = parseFloat($(this).val());
+	demo_p.manualQuakeX = demo_p.toCanvasX( demo_p.manualQuakeXroom );
+});
+$("#quake_y").on("input", function(){
+	demo_p.manualQuakeYroom = parseFloat($(this).val());
+	demo_p.manualQuakeY = demo_p.toCanvasY( demo_p.manualQuakeYroom );
+});
+
+
 // Click the cancel button
 $("#cancel").click(function() {
 	// Hide mouse quake dot
@@ -72,24 +83,13 @@ $("#cancel").click(function() {
 // Click the "Generate quake" button
 $('#quake').click(function() {
 	// Update confirmation message
-	var c_m = 'Are you sure you want to generate a quake of magnitude ' + $("#demo_magnitude").val() + ' at (' + Number(demo_p.manualQuakeXroom).toFixed(2) + ', ' + Number(demo_p.manualQuakeYroom).toFixed(2) + ') ? Once you click the "YES!" button below a ten seconds count-down will start (you\'ll still be able to cancel the quake)';
+	var c_m = 'You are generating a quake of magnitude ' + $("#demo_magnitude").val() + ' at (' + Number(demo_p.manualQuakeXroom).toFixed(2) + ', ' + Number(demo_p.manualQuakeYroom).toFixed(2) + '). Quake will be generated in:';
 	$('#confirm_message').text(c_m);
 	// Display modal
-	$("#quakeConfirm").foundation("reveal", "open")
+	$("#countdown").foundation("reveal", "open")
 	return false;
 });
 
-// Click cancel button in confirmation modal
-$("#killQuake").click(function() {
-	$("#quakeConfirm").foundation("reveal", "close")
-	return false;
-});
-
-// Click on confirm quake in modal
-$("#confirmQuake").click(function() {
-	$("#countdown").foundation("reveal", "open");
-	return false;
-});
 
 // Click cancel button in countdown modal
 $("#countdown_kill_quake").click(function() {

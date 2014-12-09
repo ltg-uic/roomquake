@@ -28,7 +28,7 @@
 		</nav>
 	
 		
-<!-- demo_canvas demo quakes table -->
+<!-- Main interface -->
 		<div class="row">
 			<div class="large-12 medium-12 column">
 				<h2>Generate individual quakes</h2>
@@ -38,6 +38,38 @@
 		<div class="row">
 			<div class="large-7 medium-7 columns" id="map" >
 				<canvas id="demo_canvas" width="570" height="356" ></canvas>
+				<div class="row"> <!-- First row of demo controls -->
+					<div class="large-6 columns">
+						<label>Quake X coordinate
+					  	<input id="quake_x" type="text" disabled />
+					  </label>
+					</div>
+					<div class="large-6 columns">
+						<label>Quake Y coordinate
+					  	<input id="quake_y" type="text" disabled />
+						</label>
+					</div>
+				</div>
+				<div class="row"> <!-- Second row of demo controls -->
+					<div class="large-4 medium-4 columns">
+						<label>Magnitude
+							<select id="demo_magnitude" disabled >
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+							</select>
+						</label>
+					</div>
+					<div class="large-4 medium-4 columns">
+						<br />
+						<a id="cancel" class="tiny button disabled right" >Cancel</a>
+					</div>
+					<div class="large-4 medium-4 columns">
+						<br />
+						<a id="quake" class="tiny button disabled right" >Generate quake</a>
+					</div>
+				</div>
 			</div>     
 			<div class="large-5 medium-5 columns">
 					<table id="demo_quakes_table">
@@ -56,38 +88,9 @@
 			</div>
 		</div>
 
-
-<!-- Magnitude, cancel and submit controls -->
-		<div id="demo_controls" class="row">
-			<div class="large-2 medium-2 columns">
-				<label for="right-label" class="right inline">Magnitude</label>
-			</div>
-			<div class="large-1 medium-1 columns">
-				<select id="demo_magnitude" disabled >
-					<option value="2">2</option>
-					<option value="3">3</option>
-					<option value="4">4</option>
-					<option value="5">5</option>
-				</select>
-			</div>
-			<div class="large-8 medium-8 columns">
-				<a id="cancel" class="tiny button disabled" >Cancel</a>
-				<a id="quake" class="tiny button disabled" >Generate quake</a>
-			</div>
-		</div>
-
-<!-- Quake confirmation modal -->
-		<div id="quakeConfirm" class="reveal-modal" data-reveal>
-			<h2>Confirm Quake!</h2>
-			<p id="confirm_message"></p>
-			<a id="killQuake" class="tiny button">No, take me back</a>
-			<a id="confirmQuake" class="tiny button" >YES!</a>
-			<a class="close-reveal-modal">&#215;</a>
-		</div>
-
 <!-- Countdown modal -->
 		<div id="countdown" class="reveal-modal" data-reveal>
-			<h3>Quake will be generated in:</h3>
+			<p id="confirm_message"></p>
 			<div><h1 id="countdown_message"></h1></div>
 			<a id="countdown_kill_quake" class="tiny button">Cancel</a>
 		</div>

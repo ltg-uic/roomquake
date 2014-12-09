@@ -105,6 +105,10 @@ function DemoQuakesMap(p) {
 		p.manualQuakeXroom = p.toRoomX(p.mouseX);
 		p.manualQuakeYroom = p.toRoomY(p.mouseY);
 		// Update GUI
+		$("#quake_x").attr("disabled", false);
+		$("#quake_y").attr("disabled", false);
+		$("#quake_x").val(p.manualQuakeXroom);
+		$("#quake_y").val(p.manualQuakeYroom);
 		$("#quake").removeClass("disabled");
 		$("#cancel").removeClass("disabled");
 		$("#demo_magnitude").attr("disabled", false)

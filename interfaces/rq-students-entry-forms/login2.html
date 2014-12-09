@@ -1,45 +1,60 @@
-<!doctype html>
-<html class="no-js" lang="en">
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>RoomQuake student login</title>
-	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="_css/foundation.css" />
-	<link rel="stylesheet" href="_css/app.css" />
+  <meta charset="utf-8">
+  <title>RoomQuake student login</title>
+	<meta name="description" content="Knowledge Building tools">
+  <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="_css/foundation.css" />
+  <link rel="stylesheet" href="_css/app.css" />
 	<script src="_scripts/modernizr.js"></script>
 </head>
+
 <body>
+
 	<div class="row">
 		<fieldset>
 			<legend>Please select your name: </legend>
-			<div class="large-12 columns">
-				<script>
-				var sections = ["6LM","6BS","6MV"];
-				var names = [
-				["TUR","ROP","POR","WOM","BOW"],
-				["ABC","DEF","GHI"],
-				["ARF","ORM"]];
-
-				var d = document.URL;
-				var section = d.substring(d.length-3, d.length);
-
-				for (i=0; i<sections.length; i++) {
-					if (section == sections[i])
-					index=i;
-				}
-				for (j=0; j<names[index].length; j++) {
-					document.write("<button class='button' onClick='location.assign(\"observe.html?section=" + section + 
-					"&stud_name=" + names[index][j] + 
-					"&broker=ltg.evl.uic.edu" + 
-					"&run_id=rq_" + sections[index] + "\");'>" + names[index][j] + "</button>");
-
-					
-				}
-				</script>
+			<div id="buttons" class="large-12 columns">
+				
 			</div>
 		</fieldset>
 	</div>
+	
+	
+	<script src="_scripts/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var query_params = nutella.init(location.search, function() {
+			// Pass the nutella parameters down
+			$('a').each(function (index) {
+				var link = $(this).attr('href');
+				if (link!="" && link!="#")
+					$(this).attr('href', link + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+			});
+		});
+		// Sections and names definitions
+		var sections = ["6LM","6BS","6MV"];
+		var names = [
+		["TUR","ROP","POR","WOM","BOW"],
+		["ABC","DEF","GHI"],
+		["ARF","ORM"]];
+		// Find section
+		for (i=0; i<sections.length; i++) {
+			if (query_params.section == sections[i])
+			index=i;
+		}
+		// Append buttons
+		for (j=0; j<names[index].length; j++) {
+			$('#buttons').append("<button class='button' onClick='location.assign(\"observe.html?section=" + query_params.section + 
+			"&stud_name=" + names[index][j] + 
+			"&broker=" + query_params.broker + 
+			"&run_id=" + query_params.run_id + "\");'>" + names[index][j] + "</button>");
+		}
+	</script>
 
 </body>
 </html>
