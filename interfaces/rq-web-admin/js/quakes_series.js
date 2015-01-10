@@ -61,7 +61,6 @@ var query_params = nutella.init(location.search, function() {
 		room_height = response.room_height_meters;
 		room_width = response.room_width_meters;
 		seismographs = response.seismographs;
-		// TODO If there's no data, it's a problem, we shouldn't be here... 
 		updateCanvasSize();
 	});
 	quakes = new Array();
@@ -101,7 +100,12 @@ $("#quakes_schedule_form").on('valid.fndtn.abide submit', function(e) {
 		var start = parseD($("#unit_start_date").val());
 		var end = parseD($("#unit_end_date").val());
 		var quakes_n = parseInt($("#total_quakes_input").val());
-		quakes = suggestQuakesSchedule(start, end, MIN_MAG, MAX_MAG, quakes_n);
+		quakes = suggestQuakesSchedule(start, end, MIN_MAG, MAX_MAG, quakes_n, function() {
+			var wrx = room_width * 0.05;
+			var x =  wrx + Math.random() * (room_width - 2*wrx);
+			var y = room_height -  room_height / room_width * x;
+			return [x, y];
+		});
 		updateQuakesTableAndCalendarView('quakes_schedule');
 		$("#quakes_schedule_modal").foundation("reveal", "close");
 		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
@@ -286,7 +290,8 @@ function parseT(str, date) {
 // magMin, minimum magnitude
 // magMax, maxiumum magnitude
 // tot_quakes, total number of quakes
-function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes) {
+// f, function that generates x and y coordinates for each quake
+function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes, f) {
 	// how often will we generate a quake?
 	var interval = (last - first) / (tot_quakes+2);
 	// how many quakes have magnitude x?
@@ -320,10 +325,10 @@ function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes) {
 			var q = {};
 			q.magnitude = magMin+index;
 			q.time = quakes_time[suggested_quakes.length];
-			var xy = Math.random() * room_height;
+			var xy = f();
 			q.location = {};
-			q.location.x = xy;
-			q.location.y = xy;
+			q.location.x = xy[0];
+			q.location.y = xy[1];
 			q.demo = false;
 			suggested_quakes.push(q);
 		}
