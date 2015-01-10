@@ -73,10 +73,10 @@ $("#cancel").click(function() {
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;
-	// Update GUI
-	$("#cancel").addClass("disabled");
-	$("#quake").addClass("disabled");
-	$("#demo_magnitude").attr("disabled", true)
+	// Clear input fields
+	$("#quake_x").val('');
+	$("#quake_y").val('');
+	$("#demo_magnitude").val(2)
 	return false;
 });
 
@@ -180,9 +180,5 @@ function countDownOver() {
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;
-	// Update GUI
-	$("#cancel").addClass("disabled");
-	$("#quake").addClass("disabled");
-	$("#demo_magnitude").attr("disabled", true);
 }
 

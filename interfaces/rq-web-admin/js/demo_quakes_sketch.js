@@ -54,7 +54,7 @@ function DemoQuakesMap(p) {
 	}
 	
 	p.drawMouseQuake = function() {
-		if (p.manualQuakeX >=0) {
+		if (p.manualQuakeX >=0 && p.manualQuakeY >=0 ) {
 			// Draw dot
 			p.fill(0);
 			p.stroke(0);
@@ -105,13 +105,8 @@ function DemoQuakesMap(p) {
 		p.manualQuakeXroom = p.toRoomX(p.mouseX);
 		p.manualQuakeYroom = p.toRoomY(p.mouseY);
 		// Update GUI
-		$("#quake_x").attr("disabled", false);
-		$("#quake_y").attr("disabled", false);
 		$("#quake_x").val(p.manualQuakeXroom);
 		$("#quake_y").val(p.manualQuakeYroom);
-		$("#quake").removeClass("disabled");
-		$("#cancel").removeClass("disabled");
-		$("#demo_magnitude").attr("disabled", false)
 	}
 		
 }
