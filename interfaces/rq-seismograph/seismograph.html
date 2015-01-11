@@ -77,6 +77,8 @@ const BOTTOM_PANEL_HEIGHT = 50;
 const SEISMOGRAM_WIDTH = WINDOW_WIDTH - LEFT_PANEL_WIDTH - RIGHT_PANEL_WIDTH; 
 const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
+	var TOTAL_QUAKES = 0;
+
 	var LIVE = true; //There are two operational modes: LIVE and HISTORY
 	var JUST_LIVE = true;
 	var JUST_BACK = false;
@@ -185,7 +187,6 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 
 
 	// constants
-	const AUDIO_LATENCY = 615; //time it takes for the rumble audio to load up
 
 	const VIEWING_PERIOD = 20;  						// number of seconds represented by the seismogram
 	const SAMPLING_FREQUENCY = 40; 						// how many data points to be computed per second
@@ -240,7 +241,8 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
             // 2. Fetch quakes schedule
             nutella.request("quakes_schedule", function(response) {
                 // Update model
-                quakes = response.quakes_schedule;
+                TOTAL_QUAKES=0;
+			quakes = response.quakes_schedule;
                 quakes.forEach(function(el, i) {
                     var Devent_loc =  { x: el.location.x, y: el.location.y };
                     var Dtime = new Date(el.time).getTime();
@@ -319,6 +321,7 @@ function ooch() {
 				JUST_BACK = false;
 			} 
 		}
+		if (event_index % 10 == 0) {sound.volume = Math.abs(displacement[n_displacements-1])/4;}
 		setTimeout(interval_timer, launch_time + ++synch_index * time_interval - new Date().getTime());
 
 	}
@@ -326,7 +329,6 @@ function ooch() {
 	setTimeout(interval_timer, time_interval);  // clock ticks every time_interval ms to update displacement array
 
 	var START = [];
-	var TOTAL_QUAKES = 0;
 	var LAST_QUAKE=0;
 	var STEPS_BACK=0;
 	
@@ -382,21 +384,18 @@ function ooch() {
 
 	//	then the s-wave
 
-		t+= .05;
-
 
 		var t_counter = 0;
 		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude ;}
 		
 
-		t = (t+.80)/3 ;
-		t = t + Math.random() * (.80 - t);
+		t = t + (1+magnitude) * .05;
 		
 			
 		while (i < n_displacements*t) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude;
 
 
-		t += .15;
+		t += .10;
 
 		t_counter = 0;
 		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
@@ -416,7 +415,8 @@ function ooch() {
 	}
 	
 
-	function rumble () {sound.play();} 
+
+	function rumble () {sound.volume=0.0; sound.play();} 
 
 
 
@@ -426,7 +426,7 @@ function ooch() {
 		JUST_LIVE = true; LIVE = true; STEPS_BACK=0;  	// force return to live action if quake imminent
 		last_event_time = new Date().getTime();
 		event_index = 0;
-		setTimeout(rumble, 1000-AUDIO_LATENCY);  
+		rumble();
 		in_event = true;
 	}
 		
@@ -472,9 +472,10 @@ function ooch() {
 			var top = middle - 25;
 			var bottom = middle + 25;
 
-			processing.vertex(left_edge,middle);
-			processing.vertex(right_edge,bottom);
-			processing.vertex(right_edge,top);
+			processing.vertex(left_edge,middle+10);
+			processing.vertex(right_edge,middle+10);
+			processing.vertex(right_edge,middle-10);
+			processing.vertex(left_edge,middle-10);
 			processing.endShape(processing.CLOSE);
 			processing.fill(0);
 
@@ -531,7 +532,7 @@ function ooch() {
 						processing.translate(available_width - vertical_bar_pixel_offset - i * (available_width/VIEWING_PERIOD) +10,SEISMOGRAM_HEIGHT/2 + j*SEISMOGRAM_HEIGHT/8 + 6  - hack*15);
 						processing.fill(0,0,200,80);
 						if (j !=0 ) {
-							if (Math.abs(j) == 4) {processing.text(-j*25 + "mm",0,0);}
+							if (Math.abs(j) == 4) {processing.text(-j*50 + "mm",0,0);}
 							else {processing.text(-j*50,0,0);}
 						}
 						processing.popMatrix();
