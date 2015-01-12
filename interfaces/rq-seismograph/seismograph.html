@@ -150,6 +150,8 @@ img.bolt-tr{
 
 <div class="wrapper">
   <img class="resize" id="seismoframe" src="_images/frame.png" />
+
+
 </div>
 
 <div id="top" style="z-index:1;">
@@ -160,15 +162,15 @@ img.bolt-tr{
 		onClick="
 			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
 			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; " style="z-index:1;">Back</a>
-	<script> document.getElementById("back").style.left = WINDOW_WIDTH-500; </script>
+	<script> document.getElementById("back").style.left = WINDOW_WIDTH-500; document.getElementById("back").style.top = WINDOW_HEIGHT - 80;</script>
 
 	<a id="print" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
-	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-290; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
+	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-790; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
 
 	<a id="forward" href="javascript:void(0);" on mouseover=";" onClick="
 			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};" style="z-index:1;">Forward</a>
 
-	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-290; </script>
+	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-290; document.getElementById("forward").style.top = WINDOW_HEIGHT - 80;</script>
 </div>
 
 <div id="left">
