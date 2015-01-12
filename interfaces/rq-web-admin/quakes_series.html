@@ -105,7 +105,7 @@
 			<form id="quake_edit_form">
 		  	<div class="row">
 		    	<div class="large-4 columns">
-						<label>What day do you want your quake at?
+						<label>What day do you want your quake to be?
 							<input id="quake_edit_date" type="date" required>
 						</label>
 					</div>
@@ -115,7 +115,7 @@
 						</label>
 					</div>
 	    		<div class="large-4 columns">
-						<label>What magnitude do you want your quake to have?
+						<label>What's the magnitude of your quake?
 							<select id="quake_edit_magnitude" required >
 								<option value="2">2</option>
 								<option value="3">3</option>
@@ -125,9 +125,23 @@
 						</label>
 	    		</div>
 				</div>
+		  	<div class="row">
+		    	<div class="large-4 columns">
+						<label>What's the X coordinate of your quake?
+							<input id="quake_edit_x" type="number" disabled>
+						</label>
+					</div>
+		    	<div class="large-4 columns">
+						<label>What's the Y coordinate of your quake?
+							<input id="quake_edit_y" type="number" disabled>
+						</label>
+					</div>
+					<div class="large-4 columns">
+					</div>
 				<div class="row">
 					<div class="large-12 columns">
 						<button type="submit">Add / Edit quake</button>
+						<button id="delete_quake" class="button alert">Delete quake</a>
 					</div>
 				</div>
 			</form>

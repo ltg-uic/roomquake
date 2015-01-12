@@ -74,7 +74,7 @@ function ScheduledQuakesMap(p) {
 		p.stroke(0);
 		p.fill(0);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.text('(' + Number((hltd.location.x).toFixed(2)) + ', ' + Number((hltd.location.x).toFixed(2)) + ')', p.toCanvasX(hltd.location.x), p.toCanvasY(hltd.location.y) - 15);
+		p.text('(' + Number((hltd.location.x).toFixed(2)) + ', ' + Number((hltd.location.y).toFixed(2)) + ')', p.toCanvasX(hltd.location.x), p.toCanvasY(hltd.location.y) - 15);
 	}
 		
 }

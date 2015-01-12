@@ -140,13 +140,21 @@ $('#quakes_calendar').fullCalendar({
 	dayClick: function(date, jsEvent, view) {
 		$('#quake_edit_date').val(date.format('YYYY-MM-DD'));
 		$('#quake_edit_time').val(date.format('HH:mm:ss'));
+		// Generate location for new quakes
+		var wrx = room_width * 0.05;
+		var x = wrx + Math.random() * (room_width - 2*wrx)
+		$('#quake_edit_x').val(x);
+		$('#quake_edit_y').val( room_height - room_height / room_width * x );
 		$('#quake_edit_modal').foundation("reveal", "open");
 	},
 	// Edit event
 	eventClick: function(event) {
+		current_edit_id = event.id;
 		$('#quake_edit_date').val(event.start.format('YYYY-MM-DD'));
 		$('#quake_edit_time').val(event.start.format('HH:mm:ss'));
-		current_edit_id = event.id;
+		$('#quake_edit_magnitude').val(quakes[current_edit_id].magnitude);
+		$('#quake_edit_x').val(quakes[current_edit_id].location.x);
+		$('#quake_edit_y').val(quakes[current_edit_id].location.y);
 		$('#quake_edit_modal').foundation("reveal", "open");
 	},
 });
@@ -159,10 +167,9 @@ $("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
 		var q = {};
 		q.magnitude = parseInt($("#quake_edit_magnitude").val());
 		q.time = quake_time.toISOString();
-		var xy = Math.random() * room_height;
 		q.location = {};
-		q.location.x = xy;
-		q.location.y = xy;
+		q.location.x = parseFloat($("#quake_edit_x").val());
+		q.location.y = parseFloat($("#quake_edit_y").val());
 		q.demo = false;
 		if (current_edit_id === undefined) {
 			quakes.push(q);
@@ -177,7 +184,20 @@ $("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
 		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 		// }
 		return false;
-	});
+});
+
+// Delete quake
+$("#delete_quake").click(function() {
+	if (current_edit_id !== undefined) {
+		quakes.splice(current_edit_id, 1);
+		sortQuakesByDate();
+		updateQuakesTableAndCalendarView('quakes_schedule');
+		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		current_edit_id = undefined;
+	}
+	$("#quake_edit_modal").foundation("reveal", "close");
+	return false;
+});
 
 
 
@@ -224,9 +244,8 @@ function getQuakesEvents() {
 		e.addDay = false;
 		e.eventStartEditable = true;
 		e.eventDurationEditable = false;
-		e.title = "Magnitude " + q.magnitude ;
 		e.start = q.time;
-		e.end = new Date(q.time).setMinutes(new Date(q.time).getMinutes() + 50);
+		e.end = new Date(q.time).setMinutes(new Date(q.time).getMinutes() + 48);
 		events.push(e);	
 	});
 	quakes_events = events;
