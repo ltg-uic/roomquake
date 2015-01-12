@@ -125,6 +125,20 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
     clear:both;
     text-align:center;
  }
+ img.bolt-tl{
+    position: fixed;
+	left: 3%;
+    top: 3%;
+	width: 3%;
+	height: auto;
+	z-index: 1;
+}
+img.bolt-tr{
+    position: fixed;
+	left: 97%;
+    top: 3%;
+	z-index: 1;
+}
 
 .wrapper {max-width: 100%;
     height: auto;
@@ -144,26 +158,17 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 	</script>
 	<a id="back" href="javascript:void(0);" on mouseover=";" 
 		onClick="
-
 			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
-			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; 
+			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; " style="z-index:1;">Back</a>
+	<script> document.getElementById("back").style.left = WINDOW_WIDTH-500; </script>
 
-		" style="z-index:1;">Back</a>
-	<script> document.getElementById("back").style.left = 80; </script>
+	<a id="print" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
+	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-290; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
 
-	<a id="print" href="javascript:void(0);" on mouseover=";" 
-		onClick="window.print();" style="z-index:1;">Print</a>
-	<script> document.getElementById("print").style.left = WINDOW_WIDTH-500; </script>
+	<a id="forward" href="javascript:void(0);" on mouseover=";" onClick="
+			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};" style="z-index:1;">Forward</a>
 
-
-	<a id="forward" href="javascript:void(0);" on mouseover=";" 
-		onClick="
-
-			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};	
-
-		" style="z-index:1;">Forward</a>
-
-	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-280; </script>
+	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-290; </script>
 </div>
 
 <div id="left">
@@ -415,8 +420,10 @@ function ooch() {
 	}
 	
 
-
-	function rumble () {sound.volume=0.0; sound.play();} 
+
+
+	function rumble () {sound.volume=0.0; sound.play();} 
+
 
 
 
