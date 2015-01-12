@@ -125,18 +125,36 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
     clear:both;
     text-align:center;
  }
- img.bolt-tl{
+ img.bolt-tl{/*top left bolt*/
     position: fixed;
 	left: 3%;
     top: 3%;
-	width: 3%;
+	width: 2%;
 	height: auto;
 	z-index: 1;
 }
-img.bolt-tr{
+img.bolt-tr{/*top right bolt*/
     position: fixed;
-	left: 97%;
+	left: 96%;
     top: 3%;
+	width: 2%;
+    height: auto;
+	z-index: 1;
+}
+ img.bolt-bl{/*bottom left bolt*/
+    position: fixed;
+	left: 3%;
+    top: 94%;
+	width: 2%;
+	height: auto;
+	z-index: 1;
+}
+img.bolt-br{/*bottom right bolt*/
+    position: fixed;
+	left: 96%;
+    top: 94%;
+	width: 2%;
+    height: auto;
 	z-index: 1;
 }
 
@@ -149,28 +167,31 @@ img.bolt-tr{
 
 
 <div class="wrapper">
-  <img class="resize" id="seismoframe" src="_images/frame.png" />
-
-
+  <img class="resize" id="seismoframe" src="_images/frame0.png" />
+  <img class="bolt-tl" src="_images/bolt.png">
+  <div style="max-width=10%;">
+  	<img class="bolt-tr" src="_images/bolt.png">
+  	<img class="bolt-bl" src="_images/bolt.png">
+  	<img class="bolt-br" src="_images/bolt.png">
+  </div>
 </div>
 
 <div id="top" style="z-index:1;">
 	<script>
 	document.getElementById("top").style.height = TOP_PANEL_HEIGHT + "px";
 	</script>
-	<a id="back" href="javascript:void(0);" on mouseover=";" 
-		onClick="
+	<a id="back" href="javascript:void(0);" on mouseover=";" onClick="
 			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
 			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; " style="z-index:1;">Back</a>
-	<script> document.getElementById("back").style.left = WINDOW_WIDTH-500; document.getElementById("back").style.top = WINDOW_HEIGHT - 80;</script>
+	<script> document.getElementById("back").style.left = WINDOW_WIDTH-540; document.getElementById("back").style.top = WINDOW_HEIGHT - 80;</script>
 
 	<a id="print" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
-	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-790; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
+	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-830; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
 
 	<a id="forward" href="javascript:void(0);" on mouseover=";" onClick="
 			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};" style="z-index:1;">Forward</a>
 
-	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-290; document.getElementById("forward").style.top = WINDOW_HEIGHT - 80;</script>
+	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-330; document.getElementById("forward").style.top = WINDOW_HEIGHT - 80;</script>
 </div>
 
 <div id="left">
