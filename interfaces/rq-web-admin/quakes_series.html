@@ -38,34 +38,34 @@
 		<div class="row">
 			<div class="small-12 column">
 				<h2>Quakes map and schedule</h2>
-				<p>Instructions</p>
+				<p>Click on a quake to edit it. Click anywhere on the calendar to add a quake. Drag quakes around to change their time.</p>
 			</div>
 		</div>
-		<div class="row">
-			<div class="small-12 columns" id="map" >
-				<canvas id="live_canvas" width="570" height="356" ></canvas>
-			</div> 
-		</div>
+<!-- Calendar -->
 		<div class="row">
 			<div class="large-12 medium-12 column">
 				<div id='quakes_calendar'></div>
 			</div>
 		</div>
-		<div class="row">    
-			<div class="small-12 columns">
+<!-- Map -->
+		<div class="row">
+			<div class="medium-7 columns" id="map" >
+				<canvas id="live_canvas" width="570" height="356" ></canvas>
+			</div>
+			<div class="small-5 columns">
 					<table id="quakes_schedule">
 					  <thead>
 					    <tr>
 					      <th>#</th>
-								<th width="125">Date</th>
-					      <th width="90">Time</th>
+								<th>Time</th>
 								<th>Magnitude</th>
+								<th>Coordinates</th>
 					    </tr>
 					  </thead>
 					  <tbody>
 					  </tbody>
 					</table>
-			</div>
+			</div> 
 		</div>
 
 

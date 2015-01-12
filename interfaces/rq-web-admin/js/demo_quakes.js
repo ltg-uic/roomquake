@@ -151,9 +151,9 @@ function updateQuakesTableView(table_name, demo_flag) {
 		var date = new Date(el.time);
 		var coord_s = + el.location.x.toFixed(2) + ', ' + el.location.y.toFixed(2);
 		if (date > new Date()) {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="time_cell">'+date+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		} else {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="time_cell">'+date+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		}
 	});
 }
