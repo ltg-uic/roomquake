@@ -51,14 +51,19 @@ a {
 	-o-transition: all .1s ease;
 	transition: all .1s ease;
 }
-
+/* BL added to remove undelined text */
 a:active {
     -webkit-box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
     -moz-box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
     box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
     position: absolute;
+    text-decoration: none;
     top: 60px;
 	left: 60px
+}
+
+a:hover, a:visited{
+	text-decoration: none;
 }
 
 </style>
@@ -141,7 +146,7 @@ img.bolt-tr{/*top right bolt*/
     height: auto;
 	z-index: 1;
 }
- img.bolt-bl{/*bottom left bolt*/
+img.bolt-bl{/*bottom left bolt*/
     position: fixed;
 	left: 3%;
     top: 94%;
@@ -157,7 +162,10 @@ img.bolt-br{/*bottom right bolt*/
     height: auto;
 	z-index: 1;
 }
-
+.button {
+  background-image: url(_images/button1.png);
+  padding:5px;  
+}
 .wrapper {max-width: 100%;
     height: auto;
     width: auto\9; /* ie8 */}
@@ -180,15 +188,16 @@ img.bolt-br{/*bottom right bolt*/
 	<script>
 	document.getElementById("top").style.height = TOP_PANEL_HEIGHT + "px";
 	</script>
-	<a id="back" href="javascript:void(0);" on mouseover=";" onClick="
+	<a id="back" class="button" href="javascript:void(0);" on mouseover=";" 
+		onClick="
 			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
 			else { if (LAST_QUAKE - STEPS_BACK > 1) STEPS_BACK++;JUST_BACK=true;}; " style="z-index:1;">Back</a>
 	<script> document.getElementById("back").style.left = WINDOW_WIDTH-540; document.getElementById("back").style.top = WINDOW_HEIGHT - 80;</script>
 
-	<a id="print" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
+	<a id="print" class="button" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
 	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-830; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
 
-	<a id="forward" href="javascript:void(0);" on mouseover=";" onClick="
+	<a id="forward" class="button" href="javascript:void(0);" on mouseover=";" onClick="
 			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};" style="z-index:1;">Forward</a>
 
 	<script> document.getElementById("forward").style.left = WINDOW_WIDTH-330; document.getElementById("forward").style.top = WINDOW_HEIGHT - 80;</script>
