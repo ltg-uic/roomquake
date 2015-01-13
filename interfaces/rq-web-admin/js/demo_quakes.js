@@ -73,10 +73,10 @@ $("#cancel").click(function() {
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;
-	// Update GUI
-	$("#cancel").addClass("disabled");
-	$("#quake").addClass("disabled");
-	$("#demo_magnitude").attr("disabled", true)
+	// Clear input fields
+	$("#quake_x").val('');
+	$("#quake_y").val('');
+	$("#demo_magnitude").val(2)
 	return false;
 });
 
@@ -149,14 +149,11 @@ function updateQuakesTableView(table_name, demo_flag) {
 		return el.demo==demo_flag;
 	}).forEach(function(el, i) {
 		var date = new Date(el.time);
-		var date_options = {weekday: "short", year: "numeric", month: "short", day: "numeric"};
-		var time_options = {hour: "numeric", minute: "numeric", second: "numeric"};
-		var s_date = date.toLocaleString("en-US", date_options);
-		var s_time = date.toLocaleString("en-US", time_options);
+		var coord_s = + el.location.x.toFixed(2) + ', ' + el.location.y.toFixed(2);
 		if (date > new Date()) {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		} else {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		}
 	});
 }
@@ -180,9 +177,5 @@ function countDownOver() {
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;
-	// Update GUI
-	$("#cancel").addClass("disabled");
-	$("#quake").addClass("disabled");
-	$("#demo_magnitude").attr("disabled", true);
 }
 

@@ -36,34 +36,36 @@
 
 <!-- live_canvas and quakes_schedule table -->
 		<div class="row">
-			<div class="large-12 medium-12 column">
-				<h2>Quakes schedule</h2>
-				<p>Tap/click on a quake in the table to highlight it in the map. Click on quakes in calendar to edit them.</p>
+			<div class="small-12 column">
+				<h2>Quakes map and schedule</h2>
+				<p>Click on a quake to edit it. Click anywhere on the calendar to add a quake. Drag quakes around to change their time.</p>
 			</div>
 		</div>
+<!-- Calendar -->
 		<div class="row">
-			<div class="large-7 medium-7 columns" id="map" >
+			<div class="large-12 medium-12 column">
+				<div id='quakes_calendar'></div>
+			</div>
+		</div>
+<!-- Map -->
+		<div class="row">
+			<div class="medium-7 columns" id="map" >
 				<canvas id="live_canvas" width="570" height="356" ></canvas>
-			</div>     
-			<div class="large-5 medium-5 columns">
+			</div>
+			<div class="small-5 columns">
 					<table id="quakes_schedule">
 					  <thead>
 					    <tr>
 					      <th>#</th>
-								<th width="125">Date</th>
-					      <th width="90">Time</th>
+								<th>Time</th>
 								<th>Magnitude</th>
+								<th>Coordinates</th>
 					    </tr>
 					  </thead>
 					  <tbody>
 					  </tbody>
 					</table>
-			</div>
-		</div>
-		<div class="row">
-			<div class="large-12 medium-12 column">
-				<div id='quakes_calendar'></div>
-			</div>
+			</div> 
 		</div>
 
 
@@ -103,7 +105,7 @@
 			<form id="quake_edit_form">
 		  	<div class="row">
 		    	<div class="large-4 columns">
-						<label>What day do you want your quake at?
+						<label>What day do you want your quake to be?
 							<input id="quake_edit_date" type="date" required>
 						</label>
 					</div>
@@ -113,7 +115,7 @@
 						</label>
 					</div>
 	    		<div class="large-4 columns">
-						<label>What magnitude do you want your quake to have?
+						<label>What's the magnitude of your quake?
 							<select id="quake_edit_magnitude" required >
 								<option value="2">2</option>
 								<option value="3">3</option>
@@ -123,9 +125,23 @@
 						</label>
 	    		</div>
 				</div>
+		  	<div class="row">
+		    	<div class="large-4 columns">
+						<label>What's the X coordinate of your quake?
+							<input id="quake_edit_x" type="number" disabled>
+						</label>
+					</div>
+		    	<div class="large-4 columns">
+						<label>What's the Y coordinate of your quake?
+							<input id="quake_edit_y" type="number" disabled>
+						</label>
+					</div>
+					<div class="large-4 columns">
+					</div>
 				<div class="row">
 					<div class="large-12 columns">
 						<button type="submit">Add / Edit quake</button>
+						<button id="delete_quake" class="button alert">Delete quake</a>
 					</div>
 				</div>
 			</form>

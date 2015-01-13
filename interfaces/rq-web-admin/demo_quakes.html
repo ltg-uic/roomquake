@@ -41,19 +41,19 @@
 				<div class="row"> <!-- First row of demo controls -->
 					<div class="large-6 columns">
 						<label>Quake X coordinate
-					  	<input id="quake_x" type="text" disabled />
+					  	<input id="quake_x" type="text" />
 					  </label>
 					</div>
 					<div class="large-6 columns">
 						<label>Quake Y coordinate
-					  	<input id="quake_y" type="text" disabled />
+					  	<input id="quake_y" type="text" />
 						</label>
 					</div>
 				</div>
 				<div class="row"> <!-- Second row of demo controls -->
 					<div class="large-4 medium-4 columns">
 						<label>Magnitude
-							<select id="demo_magnitude" disabled >
+							<select id="demo_magnitude" >
 								<option value="2">2</option>
 								<option value="3">3</option>
 								<option value="4">4</option>
@@ -63,11 +63,11 @@
 					</div>
 					<div class="large-4 medium-4 columns">
 						<br />
-						<a id="cancel" class="tiny button disabled right" >Cancel</a>
+						<a id="cancel" class="tiny button right" >Cancel</a>
 					</div>
 					<div class="large-4 medium-4 columns">
 						<br />
-						<a id="quake" class="tiny button disabled right" >Generate quake</a>
+						<a id="quake" class="tiny button right" >Generate quake</a>
 					</div>
 				</div>
 			</div>     
@@ -76,9 +76,9 @@
 					  <thead>
 					    <tr>
 					      <th>#</th>
-								<th width="125">Date</th>
-					      <th width="90">Time</th>
+								<th>Time</th>
 								<th>Magnitude</th>
+								<th>Coordinates</th>
 					    </tr>
 					  </thead>
 					  <tbody>

@@ -61,7 +61,6 @@ var query_params = nutella.init(location.search, function() {
 		room_height = response.room_height_meters;
 		room_width = response.room_width_meters;
 		seismographs = response.seismographs;
-		// TODO If there's no data, it's a problem, we shouldn't be here... 
 		updateCanvasSize();
 	});
 	quakes = new Array();
@@ -101,7 +100,12 @@ $("#quakes_schedule_form").on('valid.fndtn.abide submit', function(e) {
 		var start = parseD($("#unit_start_date").val());
 		var end = parseD($("#unit_end_date").val());
 		var quakes_n = parseInt($("#total_quakes_input").val());
-		quakes = suggestQuakesSchedule(start, end, MIN_MAG, MAX_MAG, quakes_n);
+		quakes = suggestQuakesSchedule(start, end, MIN_MAG, MAX_MAG, quakes_n, function() {
+			var wrx = room_width * 0.05;
+			var x =  wrx + Math.random() * (room_width - 2*wrx);
+			var y = room_height -  room_height / room_width * x;
+			return [x, y];
+		});
 		updateQuakesTableAndCalendarView('quakes_schedule');
 		$("#quakes_schedule_modal").foundation("reveal", "close");
 		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
@@ -136,13 +140,21 @@ $('#quakes_calendar').fullCalendar({
 	dayClick: function(date, jsEvent, view) {
 		$('#quake_edit_date').val(date.format('YYYY-MM-DD'));
 		$('#quake_edit_time').val(date.format('HH:mm:ss'));
+		// Generate location for new quakes
+		var wrx = room_width * 0.05;
+		var x = wrx + Math.random() * (room_width - 2*wrx)
+		$('#quake_edit_x').val(x);
+		$('#quake_edit_y').val( room_height - room_height / room_width * x );
 		$('#quake_edit_modal').foundation("reveal", "open");
 	},
 	// Edit event
 	eventClick: function(event) {
+		current_edit_id = event.id;
 		$('#quake_edit_date').val(event.start.format('YYYY-MM-DD'));
 		$('#quake_edit_time').val(event.start.format('HH:mm:ss'));
-		current_edit_id = event.id;
+		$('#quake_edit_magnitude').val(quakes[current_edit_id].magnitude);
+		$('#quake_edit_x').val(quakes[current_edit_id].location.x);
+		$('#quake_edit_y').val(quakes[current_edit_id].location.y);
 		$('#quake_edit_modal').foundation("reveal", "open");
 	},
 });
@@ -155,10 +167,9 @@ $("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
 		var q = {};
 		q.magnitude = parseInt($("#quake_edit_magnitude").val());
 		q.time = quake_time.toISOString();
-		var xy = Math.random() * room_height;
 		q.location = {};
-		q.location.x = xy;
-		q.location.y = xy;
+		q.location.x = parseFloat($("#quake_edit_x").val());
+		q.location.y = parseFloat($("#quake_edit_y").val());
 		q.demo = false;
 		if (current_edit_id === undefined) {
 			quakes.push(q);
@@ -173,7 +184,20 @@ $("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
 		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 		// }
 		return false;
-	});
+});
+
+// Delete quake
+$("#delete_quake").click(function() {
+	if (current_edit_id !== undefined) {
+		quakes.splice(current_edit_id, 1);
+		sortQuakesByDate();
+		updateQuakesTableAndCalendarView('quakes_schedule');
+		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		current_edit_id = undefined;
+	}
+	$("#quake_edit_modal").foundation("reveal", "close");
+	return false;
+});
 
 
 
@@ -191,14 +215,11 @@ function updateQuakesTableAndCalendarView(table_name) {
 	$("#"+table_name+" tbody").empty();
 	quakes.forEach(function(el, i) {
 		var date = new Date(el.time);
-		var date_options = {weekday: "short", year: "numeric", month: "short", day: "numeric"};
-		var time_options = {hour: "numeric", minute: "numeric", second: "numeric"};
-		var s_date = date.toLocaleString("en-US", date_options);
-		var s_time = date.toLocaleString("en-US", time_options);
+		var coord_s = + el.location.x.toFixed(2) + ', ' + el.location.y.toFixed(2);
 		if (date > new Date()) {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		} else {
-			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="date_cell">'+s_date+'</td><td class="time_cell">'+s_time+'</td><td class="magnitude_cell">'+el.magnitude+'</td></tr>');
+			$("#"+table_name+" tbody").append('<tr r_id="'+i+'" class="uneditable"><td>'+(i+1)+'</td><td class="time_cell">'+date.toLocaleString()+'</td><td class="magnitude_cell">'+el.magnitude+'</td><td class="coord_cell">'+coord_s+'</td></tr>');
 		}
 	});
 	// Update calendar view
@@ -223,9 +244,8 @@ function getQuakesEvents() {
 		e.addDay = false;
 		e.eventStartEditable = true;
 		e.eventDurationEditable = false;
-		e.title = "Magnitude " + q.magnitude ;
 		e.start = q.time;
-		e.end = new Date(q.time).setMinutes(new Date(q.time).getMinutes() + 50);
+		e.end = new Date(q.time).setMinutes(new Date(q.time).getMinutes() + 48);
 		events.push(e);	
 	});
 	quakes_events = events;
@@ -286,7 +306,8 @@ function parseT(str, date) {
 // magMin, minimum magnitude
 // magMax, maxiumum magnitude
 // tot_quakes, total number of quakes
-function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes) {
+// f, function that generates x and y coordinates for each quake
+function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes, f) {
 	// how often will we generate a quake?
 	var interval = (last - first) / (tot_quakes+2);
 	// how many quakes have magnitude x?
@@ -320,10 +341,10 @@ function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes) {
 			var q = {};
 			q.magnitude = magMin+index;
 			q.time = quakes_time[suggested_quakes.length];
-			var xy = Math.random() * room_height;
+			var xy = f();
 			q.location = {};
-			q.location.x = xy;
-			q.location.y = xy;
+			q.location.x = xy[0];
+			q.location.y = xy[1];
 			q.demo = false;
 			suggested_quakes.push(q);
 		}
