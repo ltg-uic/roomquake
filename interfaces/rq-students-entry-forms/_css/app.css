@@ -1,12 +1,17 @@
 /* custom CSS styles */
 
+body {
+  background: #C5BFB6;
+  color: #C5BFB6;
+  }
+
 .button {
-	background-color: #5F2D8C;
-	border-color: #462065;
+	background-color: #724F2D;
+	border-color: #600B00;
 	color: white;
 }
 .button:hover, .button:focus {
-	background-color: #462065;
+	background-color: #796945;
 }
 header h2 {
 	font-weight: normal;
@@ -25,7 +30,7 @@ header h2 {
 	margin-bottom: 2em;
 }
 h1, h2, h3, h4, h5, h6 {
-	color: #5F2D8C;
+	color: #752004;
 	font-family: 'Alegreya Sans', sans-serif;
 }
 
@@ -36,7 +41,7 @@ h1, h2, h3, h4, h5, h6 {
 	line-height: 45px;
 	position: relative;
 	margin-bottom: 0;
-	background-color: #00AE80;
+	background-color: #60708D;
 }
 .tab-bar {
 	-webkit-backface-visibility: hidden;
@@ -79,26 +84,7 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #00AE80;
 	color: white;
 }
-  
-/* chapter 3 styling challenge */
-article {
-	padding-bottom: 2em;
-}
-article .left {
-	padding: 0 1em 1em 0;
-}
-article .right {
-	padding: 0 0 1em 1em;
-}
-.topspace {
-	padding-top: 3em;
-}
-.topspace p {
-	font-size: 0.8em;
-	color: #999;
-	font-family: Georgia, serif;
-	font-style: italic;
-}
+
 footer p {
 	font-size: 0.8em;
 }
