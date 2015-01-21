@@ -91,7 +91,7 @@
   <div class="row">
     <div class="large-6 columns">
     <fieldset>
-      <label>Seismograph:
+      <legend>Seismograph:</legend>
       	<select name="seismograph" required>
       		<option value="0" disabled /> </option>
 			<script>
@@ -109,8 +109,9 @@
     <div class="large-6 columns" >
     <fieldset>
       <legend>Readings:</legend>
-		P wave arrival time <input type="text" data-date-time data-time-format-="%H:%M:%S:%N"/></br>
-		S wave arrival time <input type="text" data-date-time data-time-format="%k:%M:%S:%l"/></br>
+		P wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%I:%M:%S:%l"/></br>
+
+		S wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%H:%M:%S:%l"/></br>
 		<!--<input type="text" name="S_arrival"  placeholder="should be date/time picker"> -->
 		Maximum S amplitude <input type="text" name="amplitude"><br>
 	</fieldset>    
@@ -121,8 +122,7 @@
 		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
 		Distance <input type="text" name="distance"  placeholder="">
 		Magnitude <input type="text" name="magnitude"><br>
-		Time of event <input type="text" data-date-time data-time-format="%H:%M:%S"/>
-		
+		Time of event <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%k:%M:%S:%l"/>
 	</fieldset>    
   </div>
 </div>
