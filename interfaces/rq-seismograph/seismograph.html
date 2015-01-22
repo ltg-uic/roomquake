@@ -190,12 +190,14 @@ img.bolt-br{/*bottom right bolt*/
 	</script>
 	<a id="back" class="button" href="javascript:void(0);" on mouseover=";" 
 		onClick="
-			if (LIVE) { if (LAST_QUAKE > 0) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
+			if (LIVE) { if ((LAST_QUAKE > 0) && (!in_event)) {STEPS_BACK=0; LIVE=false; JUST_BACK=true;};}
 			else { if (LAST_QUAKE - STEPS_BACK > 1) {STEPS_BACK++;JUST_BACK=true;}} " style="z-index:1;">Back</a>
 	<script> document.getElementById("back").style.left = WINDOW_WIDTH-540; document.getElementById("back").style.top = WINDOW_HEIGHT - 80;</script>
 
+<!--	
 	<a id="print" class="button" href="javascript:void(0);" on mouseover=";" onClick="window.print();" style="z-index:1;">Print</a>
 	<script> document.getElementById("print").style.left =  WINDOW_WIDTH-830; document.getElementById("print").style.top = WINDOW_HEIGHT - 80; </script>
+-->
 
 	<a id="forward" class="button" href="javascript:void(0);" on mouseover=";" onClick="
 			if (!LIVE) {if (STEPS_BACK==0) {LIVE=true; JUST_LIVE=true;} else {STEPS_BACK--;JUST_BACK=true;}};" style="z-index:1;">Forward</a>
