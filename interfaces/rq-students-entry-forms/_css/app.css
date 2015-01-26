@@ -114,3 +114,53 @@ fieldset {
     padding: 0.2rem 0.1875rem;
     margin: 0;
     margin-left: -0.1875rem; }
+
+ /* We add the star shapes for login pages */
+	.star0 {
+	    position: absolute;
+	    display:block;
+		left: 6%;
+	    top: 24%;
+		width: 200px;
+	    height: 200px;
+		z-index: 1;
+		background:transparent url('../_images/bang0.png')  no-repeat;
+		padding: 80px 70px;
+		font-size:34px;
+		}
+	.star0:hover{
+		background:transparent url('../_images/bang0_h.png')  no-repeat;
+	}
+	.star1 {
+	    position: absolute;
+	    display:block;
+		left: 400px;
+	    top: 322px;
+		width: 200px;
+	    height: 200px;		
+		z-index: 2;
+		background-position: center top;
+		background:transparent url('../_images/bang1.png')  no-repeat;
+		padding: 80px 70px;
+		font-size:36px;
+		}
+	.star1:hover{
+		background:transparent url('../_images/bang1_h.png')  no-repeat;
+	}
+	.star2 {
+	    position: absolute;
+	    display:block;
+		left: 660px;
+	    top: 140px;
+		width: 200px;
+	    height: 200px;		
+		z-index: 3;
+		background-position: center top;
+		background:transparent url('../_images/bang2.png')  no-repeat;
+		padding: 80px 70px;
+		font-size:36px;
+		}
+	.star2:hover{
+		background:transparent url('../_images/bang2_h.png')  no-repeat;
+	}
+

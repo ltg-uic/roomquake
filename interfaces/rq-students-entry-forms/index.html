@@ -8,13 +8,23 @@
   <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="_css/foundation.css" />
   <link rel="stylesheet" href="_css/app.css" />
-	
+  <script src="_scripts/modernizr.js"></script>
 </head>
 
 <body>
+  <div class="row">
+  	<div class="small-12 large-12 columns">
+  		<img data-interchange="[_images/RoomQuakeHeader.png, (default)], [_images/RoomQuakeHeader_L.png, (large)], [_images/RoomQuakeHeader.png, (small)]">
+		<noscript><img src="_images/RoomQuakeHeader.png"></noscript>
+  	</div>
+  </div>
+
 	<div class="row">
 	  <div class="small-12 large-12 columns">
 			<h1>Are you a... </h1>
+
+    	<a class="star0" href="login.html">Student</a>
+    	<a class="star2" href="show.html">Teacher</a>
 			<ul>
 			  <li><a href="login.html"><span>Student</span></a></li>
 				<li><a href="show.html"><span>Teacher</span></a></li>
@@ -23,7 +33,6 @@
 	</div>
 	
 	
-	<script src="_scripts/jquery.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
@@ -38,6 +47,16 @@
 			});
 		});
 	</script>
+
+	<!-- Foundation plugins included here -->
+	<script src="_scripts/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="_scripts/foundation/foundation.js"></script>
+	<script src="_scripts/foundation/foundation.interchange.js"></script>
+  
+  	<script>
+  		$(document).foundation();
+  	</script>
+
 		
 </body>
 </html>
