@@ -84,9 +84,13 @@ const SEISMOGRAM_HEIGHT = WINDOW_HEIGHT - TOP_PANEL_HEIGHT - BOTTOM_PANEL_HEIGHT
 
 	var TOTAL_QUAKES = 0;
 
-	var LIVE = true; //There are two operational modes: LIVE and HISTORY
+	var LIVE = true; //There are two operational modes: LIVE and HISTORY (= LIVE==false)
 	var JUST_LIVE = true;
 	var JUST_BACK = false;
+
+	var START = [];
+	var LAST_QUAKE=0;
+	var STEPS_BACK=0;
 
 
 </script>
@@ -175,7 +179,7 @@ img.bolt-br{/*bottom right bolt*/
 
 
 <div class="wrapper">
-  <img class="resize" id="seismoframe" src="_images/frame1.png" />
+  <img class="resize" id="seismoframe" src="_images/frame0.png" />
   <img class="bolt-tl" src="_images/bolt.png">
   <div style="max-width=10%;">
   	<img class="bolt-tr" src="_images/bolt.png">
@@ -280,12 +284,13 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
             // 2. Fetch quakes schedule
             nutella.request("quakes_schedule", function(response) {
                 // Update model
-                TOTAL_QUAKES=0;
+                TOTAL_QUAKES=0; LAST_QUAKE=0;
 			quakes = response.quakes_schedule;
-                quakes.forEach(function(el, i) {
-                    var Devent_loc =  { x: el.location.x, y: el.location.y };
-                    var Dtime = new Date(el.time).getTime();
-                    event_message (Devent_loc, Dtime, el.magnitude, seismograph_loc);
+                quakes.forEach(function(el,i) { 
+                    	var Devent_loc =  { x: el.location.x, y: el.location.y };
+                    	var Dtime = new Date(el.time).getTime(); 
+                  	event_message (Devent_loc, Dtime, el.magnitude, seismograph_loc);
+				var dd = new Date().getTime(); if (Dtime < dd) LAST_QUAKE=TOTAL_QUAKES;
                 });
             });
 		});
@@ -367,9 +372,6 @@ function ooch() {
 
 	setTimeout(interval_timer, time_interval);  // clock ticks every time_interval ms to update displacement array
 
-	var START = [];
-	var LAST_QUAKE=0;
-	var STEPS_BACK=0;
 	
 	function event_message (event_location, time, magnitude, seismograph_location) {
 
