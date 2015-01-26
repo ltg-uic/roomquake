@@ -307,6 +307,9 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 			var Dtime = new Date(message.time).getTime();
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
 		});
+
+		// 6. Subscribe to "mode_changes"
+		nutella.subscribe("mode_update", function() {location.reload();});
 	});
 	
 
