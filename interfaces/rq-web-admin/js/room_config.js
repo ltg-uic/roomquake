@@ -5,6 +5,7 @@
 var room_width;
 var room_height;
 var seismographs;
+var mode;
 
 // Canvases/processing references
 var setup_canvas = document.getElementById("setup_canvas");
@@ -21,6 +22,7 @@ var query_params = nutella.init(location.search, function() {
 		room_height = response.room_height_meters;
 		room_width = response.room_width_meters;
 		seismographs = response.seismographs;
+		mode = response.rq_mode;
 		// If there are data, update the views, otherwise show the setup modal
 		if (seismographs===undefined) {
 			seismographs = new Array();
@@ -129,12 +131,15 @@ $("#roomSetupForm").on('valid.fndtn.abide', function() {
 
 // Dismiss seismographs setup modal once we click "setup seismographs" and ship all the information to the backend
 $("#seismographs_setup_btn").click(function() {
+	// Set demo mode
+	mode = "demo";
 	// Dismiss modal
 	$("#seismographsSetup").foundation("reveal", "close");
 	// Update view
 	updateViews();
 	// Ship to backend
 	shipToBackend();
+	nutella.publish( 'mode_update', {rq_mode : mode} );
 	return false;
 });
 
@@ -157,9 +162,21 @@ $("#edit_width").on('focusout change', function() {
 	edit_canvas.setAttribute("height", edit_canvas.width * room_height / room_width)
 	edit_p.size(edit_canvas.width, edit_canvas.height);
 	// Send to backend
-	shipToBackend()
+	shipToBackend();
 });
 
+
+// Listen for mode changes. Checked = demo mode, uncheked = schedule mode
+$("#mode_switch").change(function() {
+	if (this.checked) {
+		mode = "demo"
+	} else {
+		mode = "schedule"
+	}
+	$("#mode_span").text(mode + " mode");
+	// Send mode update
+	nutella.publish( 'mode_update', {rq_mode : mode} );
+});
 
 // Utility functions
 
@@ -177,6 +194,13 @@ function updateViews() {
 	// Update room sizes form
 	$("#edit_height").val(room_height);
 	$("#edit_width").val(room_width);
+	// Update mode switch
+	if (mode=="demo") {
+		$("#mode_switch").prop("checked", true);
+	} else {
+		$("#mode_switch").prop("checked", false);
+	}
+	$("#mode_span").text(mode + " mode");
 }
 
 
