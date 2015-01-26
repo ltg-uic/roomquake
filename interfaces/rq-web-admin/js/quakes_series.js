@@ -53,8 +53,6 @@ var live_p = new Processing(live_canvas, ScheduledQuakesMap);
 
 // Initialize nutella
 var query_params = nutella.init(location.search, function() {
-	// Send mode update
-	nutella.publish( 'mode_update', {rq_mode : 'schedule'} )
 	//Fetch room configuration
 	nutella.request("room_configuration", function(response) {
 		// Update model

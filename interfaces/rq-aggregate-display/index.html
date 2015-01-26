@@ -1,139 +1,337 @@
-
-
-
 <html>
 <head>
-<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css' />
-<link rel="stylesheet" href="_css/foundation.css" />
-<link rel="stylesheet" href="_css/app.css" />
+	
+	<title>Aggregate view</title>
+	<meta name="description" content="Students observations aggregate view">
 
- 
+	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
+	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
+	
+	<script src="bower_components/Processing.js/processing.js"></script>
+
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen"
+          title="no title" charset="utf-8">
+
+<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
 
 </head>
 
+
 <style>
 
+
+
 body {
+
     background-color: #E3E6D9;
+
 }
+
+
+
+
 
 
 
 a {
+
 	position: absolute;
+
 	left: 60px;
+
 	top: 50px;
+
     color: rgba(255,255,255,1);
+
     text-decoration: none;
+
     background-color: rgba(175,175,175,1);
+
     font-family: 'Yanone Kaffeesatz';
+
     font-weight: 700;
+
     font-size: 3em;
+
     display: block;
+
     padding: 4px;
+
     -webkit-border-radius: 8px;
+
     -moz-border-radius: 8px;
+
     border-radius: 8px;
+
     -webkit-box-shadow: 0px 9px 0px rgba(100,100,100,1), 0px 9px 25px rgba(0,0,0,.7);
+
     -moz-box-shadow: 0px 9px 0px rgba(100,100,100,1), 0px 9px 25px rgba(0,0,0,.7);
+
     box-shadow: 0px 9px 0px rgba(100,100,100,1), 0px 9px 25px rgba(0,0,0,.7);
+
     margin: 10px auto;
+
 	width: 200px;
+
 	text-align: center;
+
 	
+
 	-webkit-transition: all .1s ease;
+
 	-moz-transition: all .1s ease;
+
 	-ms-transition: all .1s ease;
+
 	-o-transition: all .1s ease;
+
 	transition: all .1s ease;
+
 }
+
+
 
 a:active {
+
     -webkit-box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
+
     -moz-box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
+
     box-shadow: 0px 0px 0px rgba(100,100,100,1), 0px 3px 6px rgba(0,0,0,.9);
+
     position: absolute;
+
     top: 60px;
+
 	left: 60px
+
 }
+
+
 
 #top {
-	background-color: #E3E6D9;
+
+	background-color: #611500;
+
 	height: 10px;
+
 	width: 10px;
-	text-align:left;
+
+	text-align:left; color: white;
+
 }
+
+
 
 #left {
-	background-color: #E3E6D9;
+
+	background-color: #611500;
+
 	height:10px;
+
     width:10px;
+
     float:left;
+
 }
+
+
 
 #right {
-	background-color: #E3E6D9;
+
+	background-color: #611500;
+
 	height:10px;
+
     width:10px;
+
     float:left;
 
+
+
 }
+
 #bottom {
-	background-color: #E3E6D9;
+
+	background-color: #611500;
+
 	height:10px;
+
     width:10px;
+
     clear:both;
+
  }
 
 
+
+
+
 </style>
+
+
 
 <body onresize="location.reload();"> <!-- my solution to the resize problem :-) -->
 
 
 
+
+
+
+
 <script>
+
+
+var room_height_y_meters;
+var room_width_x_meters;
+var unit_size_meters;
+
+var SEISMOGRAPHS = [{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}] ;
+var N_SEISMOGRAPHS = 4;
+
+
+	///////////////////
+	// NUTELLA STUFF //
+	///////////////////
+	
+var READY=true;
+
+// Initialize nutella
+var query_params = nutella.init(location.search, function() {
+	// Once initializaiton is complete:
+
+	//  Fetch room configuration and store the coordinates of the seismographs
+	nutella.request("room_configuration", function(response) { 
+
+		room_width_x_meters = response.room_width_meters;
+		room_height_y_meters = response.room_height_meters; 
+		unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
+		response.seismographs.forEach(function(e) { 
+			SEISMOGRAPHS[e.id].x=e.x; 
+			SEISMOGRAPHS[e.id].y=e.y; 
+			if (SEISMOGRAPHS[e.id].x===undefined || SEISMOGRAPHS[e.id].y===undefined) { 
+				alert ("whoa"); console.error("Impossible to set seismograph location. The id you provided does not match any of the know IDs.");
+			} 
+		}); 
+			
+		READY=true; 
+           
+
+        // Once we fetched configuration we fetch previous observations
+        nutella.request("observations", function(response) {
+        	response.observations.forEach(function(e) {
+        		console.log(e);
+        		// a student observation includes the following fields: 
+				//  seismograph: seismograph number 
+				//  p_arrival_time: P arrival time
+				// 	s_arrival_time: S arrival time
+				//	max_amplitude: maximum amplitude
+				//	sp_gap: S-P (the Gap)
+				//	distance: distance
+				//  magnitude: magnitude
+				//	quake_time: quake time
+				addObservation (e.seismograph, e.p_arrival_time, e.s_arrival_time, e.max_amplitude, e.sp_gap, e.distance, e.magnitude, e.quake_time);
+			});
+        }); // close previous observations request
+	}); // close room config request
+
+
+	// Subscribe to new observation 	
+	nutella.subscribe("new_observation", function(e) {
+		addObservation (e.seismograph, e.p_arrival_time, e.s_arrival_time, e.max_amplitude, e.sp_gap, e.distance, e.magnitude, e.quake_time);
+	});
+
+	
+	// Subscribe to wipe all observations
+    nutella.subscribe("wipe_observations", function() {
+    	location.reload();
+    });
+
+}); // close nutella init
+
+///////////////////////
+// END NUTELLA STUFF //
+///////////////////////
+
+
+
 
 function radius(area) {
+
 	return (10*Math.sqrt(area/3.14159));
+
 }
 
-const ROOM_X = 1000; //length of the room along its x axis -- get from server
-const ROOM_Y = 800; //length of the room along its x axis -- get from server
+
+
 const ACTUAL_EVENT_TIME = new Date().getTime()+10000; //get from server.
-var SEISMOGRAPHS = [{x:0,y:0},{x:20,y:20},{x:300,y:600},{x:700,y:500},{x:1000,y:800}]; //get from server
 
 
 
-const N_SEISMOGRAPHS = SEISMOGRAPHS.length-1;
+
+
+
 
 const SEISMO_RADIUS = 20; 
+
 var	S_U=0; //current selected seismogram, "all" at load
 
-const WINDOW_WIDTH = window.innerWidth-40;
-const WINDOW_HEIGHT = window.innerHeight-15;
 
-const TOP_PANEL_HEIGHT = 50;
+
+const WINDOW_WIDTH = window.innerWidth-0;
+
+const WINDOW_HEIGHT = window.innerHeight-0;
+
+
+
+const TOP_PANEL_HEIGHT = 100;
+
 const BOTTOM_PANEL_HEIGHT = WINDOW_HEIGHT-TOP_PANEL_HEIGHT;
 
+
+
 </script>
+
+
 
 <div id="top">
+
 <script>
+
 document.getElementById("top").style.height = TOP_PANEL_HEIGHT + "px";
+
 document.getElementById("top").style.width = WINDOW_WIDTH + "px";
+
 </script>
-<form action="">
-<input type="radio" name="seismograph" value="0" onClick="S_U=0;" checked>All&nbsp&nbsp
+<div align="right"><img align=left src="rq.png" width="468" height="100">
+<font size="+3">
+
+<form action="">Please choose your seismographs&nbsp&nbsp<br> 
+
+<input type="radio" name="seismograph" value="0" onClick="S_U=0;" checked>ALL&nbsp&nbsp
+
 <input type="radio" name="seismograph" value="1" onClick="S_U=1;">1&nbsp&nbsp
+
 <input type="radio" name="seismograph" value="2" onClick="S_U=2;">2&nbsp&nbsp
+
 <input type="radio" name="seismograph" value="3" onClick="S_U=3;">3&nbsp&nbsp
+
 <input type="radio" name="seismograph" value="4" onClick="S_U=4;">4&nbsp&nbsp
+
 </form> 
+</font>
 </div>
 
+</div>
+
+
+
 <div id="bottom">
+
     <canvas id="canvas1"></canvas>
+
+
 
 
 <script>
@@ -141,104 +339,207 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 const START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 
+
+
+
 //	prep arrays for individual histograms that contain sigma and N (so i can later figure out means)
 
+
+
 	var P_sum = [N_SEISMOGRAPHS+1];
+
 	var S_sum = [N_SEISMOGRAPHS+1];
+
 	var A_sum = [N_SEISMOGRAPHS+1];
+
 	var G_sum = [N_SEISMOGRAPHS+1];
+
 	var D_sum = [N_SEISMOGRAPHS+1];
+
 	var M_sum = [N_SEISMOGRAPHS+1];
+
 	var T_sum = [N_SEISMOGRAPHS+1];
 
+
+
 	var D = [N_SEISMOGRAPHS+1];
-	for (i=0; i<N_SEISMOGRAPHS+1; i++) {
-		D[i] = new Array();
-		for (var j=0; j<50; j++) D[i][j]=0;
-	}
+	var M = [N_SEISMOGRAPHS+1];
+
+	var T = [N_SEISMOGRAPHS+1];
 
 	var N = [N_SEISMOGRAPHS+1];
 
-	for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
-		P_sum[i]=0;
-		S_sum[i]=0;
-		A_sum[i]=0;
-		G_sum[i]=0;
-		D_sum[i]=0;
-		M_sum[i]=0;
-		T_sum[i]=0;
-		N[i]=0;
-	}
 
 
 
+	function init_display() {
 
-//	prep histograms for the whole-class magnitude and timeline
 
-	var M = [N_SEISMOGRAPHS+1];
-	for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
-		M[i] = new Array();
-		for (var j=0; j<50; j++) M[i][j]=0;
-	}
+		for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
+
+			D[i] = new Array();
+
+			for (var j=0; j<50; j++) D[i][j]=0;
+
+		}
+
+
+
+		for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
+
+			P_sum[i]=0;
+
+			S_sum[i]=0;
+
+			A_sum[i]=0;
+
+			G_sum[i]=0;
+
+			D_sum[i]=0;
+
+			M_sum[i]=0;
+
+			T_sum[i]=0;
+
+			N[i]=0;
+
+		}
+
 	
-	var T = [N_SEISMOGRAPHS+1];
-	for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
-		T[i] = new Array();
-		for (var j=0; j<200; j++) T[i][j]=0;
+
+
+
+
+
+
+
+	//	prep histograms for the whole-class magnitude and timeline
+
+
+
+		for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
+
+			M[i] = new Array();
+
+			for (var j=0; j<50; j++) M[i][j]=0;
+
+		}
+
+	
+
+		for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
+
+			T[i] = new Array();
+
+			for (var j=0; j<200; j++) T[i][j]=0;
+
+		}
+
+
+
 	}
+
+	
+
+	init_display();
+
+
+
+
+
 
 
 
 
 //	message handler for new observation
 
+
+
 	function addObservation (oU,oP,oS,oA,cG,cD,cM,cT) {
+
 		P_sum[oU] += oP;
+
 		S_sum[oU] += oS;
+
 		A_sum[oU] += oA;
+
 		G_sum[oU] += cG;
+
 		D_sum[oU] += cD;
+
 		M_sum[oU] += cM;
+
 		M_sum[0] += cM;
+
 		T_sum[oU] += cT;
+
 		T_sum[0] += cT;
+
 		++N[oU]; ++N[0];
+
 		D[oU][N[oU]] = cD;
 
+
+
 		var Mindex = Math.floor((cM-1)*10);
+
 		M[oU][Mindex]++;
+
 		M[0][Mindex]++;
 
+
+
 		var Tindex = Math.floor((cT-START)/20000 * 200);
+
 		T[oU][Tindex]++;
+
 		T[0][Tindex]++;
 
+
+
 	} //end function addObservation
+
 	
 
 
+
+
+
 	document.getElementById("bottom").style.height = BOTTOM_PANEL_HEIGHT + "px";
+
 	document.getElementById("bottom").style.width = WINDOW_WIDTH + "px";
 
-	function sketchProc(processing) {
+
+
+	function sketchProc(processing) { 
+
 
         // Override draw function, by default it will be called 60 times per second
 
 
 
+
+
 		processing.setup = function () {
+
 
 			processing.size(WINDOW_WIDTH,BOTTOM_PANEL_HEIGHT);
 
+
 			processing.fill(255);
+
 
 			processing.smooth(8);
 
+
 			processing.stroke(1);
+
 
 			processing.strokeWeight(1);
 
+
   			myFont = processing.createFont("sans-serif",12);
+
 
 		};
 
@@ -247,209 +548,405 @@ const START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 
 
 
-		processing.draw = function () {			
 
-			processing.background(227,230,217);
+
+
+
+
+		processing.draw = function () { if (READY) {		
+
+
+			processing.background(197,190,180);
+
 
 			processing.stroke(processing.color(30,143,208));
 
+
 			processing.fill(processing.color(0, 0, 0));
 
+
 			processing.stroke(processing.color(0, 0, 0));
+
+
+
+
 
 
 
 //	draw magnitude bar
 
+
+
 			processing.textSize(32);
+
+
 
 			processing.strokeWeight(1);
 
+
 			var top = BOTTOM_PANEL_HEIGHT/10; 
+
 			var bottom = 9*top; 
+
 			var interval = (bottom-top)/5;
 
+
+
 			processing.textAlign(processing.RIGHT);
+
 			processing.text("Magnitude",WINDOW_WIDTH-20,top-30);
+
 			processing.line(WINDOW_WIDTH-50,top,WINDOW_WIDTH-50,bottom);
+
 //	add the tick marks and labels
+
 			processing.strokeWeight(2);
 
+
 			for (var i=1; i<=6; i++) {
+
 				processing.line (WINDOW_WIDTH-55,bottom-(i-1)*interval,WINDOW_WIDTH-45,bottom-(i-1)*interval);
+
 				if (i>1) processing.text(i,WINDOW_WIDTH-90,bottom-(i-1)* interval+10);
+
 	
+
 			}
+
+
+
 
 
 //	draw observations (magnitude estimates)
 
-			for (var i=0; i<50;i++) {
-				if (M[S_U][i] != 0) {
-					processing.fill(processing.color(255, 0, 0));
 
-					processing.stroke(processing.color(255, 0, 0)); 
+
+			for (var i=0; i<50;i++) {
+
+				if (M[S_U][i] != 0) {
+
+					processing.fill(processing.color(130,0,0,100));
+
+
+					processing.stroke(processing.color(130,0,0,100)); 
+
 					processing.strokeWeight(2); 
 
-					processing.ellipse(WINDOW_WIDTH-50, bottom - i*interval/10, radius(M[S_U][i]), radius(M[S_U][i]));
+
+					processing.ellipse(WINDOW_WIDTH-50, bottom - i*interval/10, radius(M[S_U][i])*4, radius(M[S_U][i])*4);
+
 				}
+
 			}
+
+
+
 
 
 //	draw timeline. it always represents 20 seconds.
 
+
+
 			processing.textSize(32);
+
 			processing.fill(processing.color(0, 0, 0));
+
 
 			processing.stroke(processing.color(0, 0, 0));
 
+
+
 			processing.strokeWeight(1);
 
+
 			var left = .05 * WINDOW_WIDTH; 
+
 			var right = .85 * WINDOW_WIDTH;
+
 			var alignWithMagnitudesY = bottom+2-10;
+
 			var interval = (right-left)/20;
 
+
+
 			processing.textAlign(processing.LEFT);
+
 			processing.text("Event time",left,alignWithMagnitudesY-20);
+
 			processing.textSize(18);
+
 			var delta=10;
+
 			processing.line(left,alignWithMagnitudesY,right,alignWithMagnitudesY);
 
+
+
 //	add the tick marks and labels
+
 			for (var dt=0; dt<=20; dt++) {
+
 			if (dt % 5 == 0)
+
 				{processing.strokeWeight(2); 
+
 				var temp = new Date();
+
 				temp.setTime(START+dt*1000);
+
 				processing.text(temp.toUTCString().substr(0,16),left+dt*interval-60,alignWithMagnitudesY+40);
+
 				processing.text(temp.toUTCString().substr(17),left+dt*interval-45,alignWithMagnitudesY+55);
+
 				processing.line (left+dt*interval,alignWithMagnitudesY-10,left+dt*interval,alignWithMagnitudesY+15)
+
 			} else { processing.strokeWeight(2);}
+
 				processing.line (left+dt*interval,alignWithMagnitudesY-5,left+dt*interval,alignWithMagnitudesY+5);
+
 			}
+
+
 
 //	draw observations (event time estimates)
 
-			for (var i=0; i<200;i++) {
-				if (T[S_U][i] != 0) {
-					processing.fill(processing.color(255,0,0));
 
-					processing.stroke(processing.color(255,0,0));
+
+			for (var i=0; i<200;i++) {
+
+				if (T[S_U][i] != 0) {
+
+					processing.fill(processing.color(130,0,0,100));
+
+
+					processing.stroke(processing.color(130,0,0,100));
+
 					processing.strokeWeight(2);
 
-					processing.ellipse(left+i*interval/10, alignWithMagnitudesY, radius(T[S_U][i]), radius(T[S_U][i]));
+
+					processing.ellipse(left+i*interval/10, alignWithMagnitudesY, radius(T[S_U][i])*4, radius(T[S_U][i])*4);
+
 				}
+
 			}
+
+
 
 			
 
 
-// draw the seismographs   
+
+
+
+// draw the distances (circles)   
+
 
 			processing.textAlign(processing.LEFT);
+
 			processing.stroke(processing.color(0,0,0));
+
 			processing.fill(processing.color(0,0,0));
 
+
 			processing.textSize(32);
+
 			processing.text("Distance",left,top-30);
 
 
+
+
+
 			var LX = 20 + (WINDOW_WIDTH - 250) * .05 - 3;
+
 			var WD = (WINDOW_WIDTH - 250) *.6;
+
 			var TY = 20 + (BOTTOM_PANEL_HEIGHT - 250) *.10;
+
 			var HT = (BOTTOM_PANEL_HEIGHT - 150) * .85;
 
+
 			
-			processing.fill(processing.color(162, 207, 196));
+
+			processing.fill(processing.color(175,224,245));
+
 
 			processing.stroke(processing.color(0,0,0));
+
 					processing.strokeWeight(2);
+
 
 			processing.rect(LX,TY,WD,HT);
 
 
 
+
+
+
 			for (var i=1; i<=N_SEISMOGRAPHS; i++) {
+
 				if (S_U == 0 || S_U == i) {
+
 
 					processing.fill(processing.color(0,0,0));
 
+
 					processing.stroke(processing.color(0,0,0));
+
+					processing.strokeWeight(2);
+
+					var px = LX + (SEISMOGRAPHS[i].x/room_width_x_meters) * WD; 
+					var py = TY + HT - (SEISMOGRAPHS[i].y/room_height_y_meters) * HT;
+					var mx = LX + WD/2;
+					var my = TY + HT/2;
+					
+					processing.textSize (24);
+					processing.textAlign(processing.CENTER);
+					processing.text (i, (9 * px + 1 * mx)/10, (9 * py + 1 * my)/10);
+
+
+					processing.fill(processing.color(0,0,0));
+
+
+					processing.stroke(processing.color(0,0,0));
+
 					processing.strokeWeight(2);
 
 
-					processing.ellipse(LX + (SEISMOGRAPHS[i].x/ROOM_X) * WD , TY + (SEISMOGRAPHS[i].y/ROOM_Y) * HT, SEISMO_RADIUS, SEISMO_RADIUS);
+					processing.ellipse(px,py, SEISMO_RADIUS, SEISMO_RADIUS);
+
 
 				// and for each seismograph, draw its associated rings
 
-					processing.noFill(); processing.stroke(processing.color(255,0,0,50));
+
+					processing.noFill(); processing.stroke(processing.color(130,0,0,100));
+
 
 					for (var j=0; j<D[i].length; j++) {
 
-						processing.ellipse(LX + (SEISMOGRAPHS[i].x/ROOM_X) * WD  , TY + (SEISMOGRAPHS[i].y/ROOM_Y) * HT ,D[i][j],D[i][j]);
+
+						processing.ellipse(px,py,D[i][j]/room_width_x_meters * WD*2,D[i][j]/room_height_y_meters * HT*2);
+
 
 					}
+
 				}
 
+
 			}
+
+
 
 
 //	write out stats
 
-			var LE=155;
+
+
+			var LE=200;
+
 			var RO=15;
+
 			processing.textSize(32);
+
 			processing.textAlign(processing.CENTER);
+
 			processing.text("Averages ", LX + WD + LE, top-30);
+
 			processing.textAlign(processing.RIGHT);
-			processing.textSize(20);
+
+			processing.textSize(24);
+
 			processing.text("Seismograph: ", LX + WD + LE, TY+RO);
+
 			processing.textAlign(processing.LEFT); 
+
 			if (S_U == 0) {processing.text("All", LX + WD + LE, TY+RO);} 									else {processing.text(S_U, LX + WD + LE, TY+RO);} RO+=25;
+
 			if (S_U > 0) {
+
 				processing.textAlign(processing.RIGHT);
-				processing.textSize(20);
+
+				processing.textSize(24);
+
 				processing.text("P arrival time: ", LX + WD + LE, TY+RO);
+
 				processing.textAlign(processing.LEFT);
+
 				var temp = new Date();
+
 				temp.setTime(P_sum[S_U]/N[S_U]);
+
 				if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
+
 				processing.textAlign(processing.RIGHT);
+
 				processing.text("S arrival time: ", LX + WD + LE, TY+RO);
+
 				processing.textAlign(processing.LEFT); 
+
 				temp = new Date();
+
 				temp.setTime(S_sum[S_U]/N[S_U]);
+
 				if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
+
 				processing.textAlign(processing.RIGHT);
+
 				processing.text("Max amplitude: ", LX + WD + LE, TY+RO);
+
 				processing.textAlign(processing.LEFT); 
-				if (N[S_U] > 0) processing.text(A_sum[S_U]/N[S_U], LX + WD + LE, TY+RO); RO+=25;
+
+				if (N[S_U] > 0) processing.text(Math.round(A_sum[S_U]/N[S_U]).toString()+" millimeters", LX + WD + LE, TY+RO); RO+=25;
+
 				processing.textAlign(processing.RIGHT);
+
 				processing.text("S-P: ", LX + WD + LE, TY+RO);
+
 				processing.textAlign(processing.LEFT); 
-				if (N[S_U] > 0) processing.text(G_sum[S_U]/N[S_U]/1000, LX + WD + LE, TY+RO); RO+=25;
+
+				if (N[S_U] > 0) processing.text((Math.round(G_sum[S_U]/N[S_U]/1000*10)/10).toString()+" seconds", LX + WD + LE, TY+RO); RO+=25;
+
 				processing.textAlign(processing.RIGHT);
+
 				processing.text("Distance: ", LX + WD + LE, TY+RO);
+
 				processing.textAlign(processing.LEFT); 
-				if (N[S_U] > 0) processing.text(D_sum[S_U]/N[S_U], LX + WD + LE, TY+RO); RO+=25;
+
+				if (N[S_U] > 0) processing.text((Math.round(D_sum[S_U]/N[S_U]*100)/100).toString()+" meters", LX + WD + LE, TY+RO); RO+=25;
+
 			}
-			processing.textSize(20);
+
+			processing.textSize(24);
+
 			processing.textAlign(processing.RIGHT);
+
 			processing.text("Magnitude: ", LX + WD + LE, TY+RO);
+
 			processing.textAlign(processing.LEFT); 
-			if (N[S_U] > 0) processing.text(M_sum[S_U]/N[S_U], LX + WD + LE, TY+RO); RO+=25;
+
+			if (N[S_U] > 0) processing.text((Math.round(M_sum[S_U]/N[S_U]*10)/10).toString(), LX + WD + LE, TY+RO); RO+=25;
+
 			processing.textAlign(processing.RIGHT);
+
 			processing.text("Event time: ", LX + WD + LE, TY+RO);
+
 			processing.textAlign(processing.LEFT); 
+
 			temp = new Date();
+
 			temp.setTime(T_sum[S_U]/N[S_U] + 500);
+
 			if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
+
 			processing.textAlign(processing.RIGHT);
+
 			processing.text("Observations: ", LX + WD + LE, TY+RO);
+
 			processing.textAlign(processing.LEFT); 
+
 			if (N[S_U] > 0) processing.text(N[S_U], LX + WD + LE, TY+RO); RO+=25;
+
 			processing.textSize(16);
+
+
 
 		
 
@@ -457,34 +954,59 @@ const START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 
 
 
-		}  //end anonymous function definition
+
+
+
+
+
+		}  }
+
+
 
 
 
 	} // end function sketchProc
 
 
+
+
 	function ooch() {
 
-		
-		var fudge = [0,11.4,1.8,1,1.9];
 
-		var u = Math.floor(Math.random()*(SEISMOGRAPHS.length-1))+1;
+		
+
+		var fudge = [0,8.4,1.8,1,1.9];
+
+
+		var u = Math.floor(Math.random()*4)+1;
+
 
 		var p = ACTUAL_EVENT_TIME+ Math.random()*5000;
 
+
 		var s = p + Math.random()*10000; 
-		var a = Math.random() * 4;
+
+		var a = Math.random() * 200;
+
 		var g = s-p;
-		var d = u * 100 * fudge[u] + Math.random()*40;
+
+		var d = fudge[u] + Math.random();
+
 		var m = 4 + Math.random()*.4;
+
 		var t = ACTUAL_EVENT_TIME+Math.random()*600;
+
 
 		addObservation (u,p,s,a,g,d,m,t);
 
+
 		setTimeout(ooch, 5000);
 
+
 	}
+
+
+
 
 
 
@@ -493,19 +1015,32 @@ const START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 
 
 
+
+
     // attaching the sketchProc function to the canvas
 
+
     	var p = new Processing(canvas, sketchProc);
+
 	
 
 
-	ooch();
+
+
+	// ooch();
+
+
 
 
 
 </script>
 
+
+
 </div>
 
+
+
 </body>
+
 </html>

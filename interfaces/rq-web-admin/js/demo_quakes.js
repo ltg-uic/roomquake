@@ -14,8 +14,6 @@ var demo_p = new Processing(demo_canvas, DemoQuakesMap);
 
 // Initialize nutella
 var query_params = nutella.init(location.search, function() {
-	// Send mode update
-	nutella.publish( 'mode_update', {rq_mode : 'demo'} )
 	//Fetch room configuration
 	nutella.request("room_configuration", function(response) {
 		// Update model
@@ -102,7 +100,7 @@ $(document).on('open.fndtn.reveal', '#countdown', function (e) {
   // ignore non-namespaced event (i.e. work-around for bug in Foundation framework https://github.com/zurb/foundation/issues/5482)
   if (e.namespace != 'fndtn.reveal') return false;
 	// Set countdown
-	var cd_seconds = 10;
+	var cd_seconds = 5;
 	$('#countdown_message').text(cd_seconds);
 	countdown_interval_id = setInterval(function() {
 		cd_seconds--;
