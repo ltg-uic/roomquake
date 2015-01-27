@@ -75,11 +75,11 @@
 	</fieldset>
 	<fieldset>
       <legend>Readings:</legend>
-		P wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" 
-		data-time-format="%H:%M:%S"/></br>
+		P wave arrival time <input name="P_arrival" type="text" data-date-time data-date-format="%a, %d %b %Y" 
+		data-time-format="%H:%M:%S:%L"/> </br>
 
-		S wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" 
-		data-time-format="%H:%M:%S"/></br>
+		S wave arrival time <input name="S_arrival" type="text" data-date-time data-date-format="%a, %d %b %Y" 
+		data-time-format="%H:%M:%S:%L"/></br>
 
 		<!--<input type="text" name="S_arrival"  placeholder="should be date/time picker"> -->
 		Maximum S amplitude <input type="text" name="amplitude" placeholder="mm"><br>
@@ -92,7 +92,7 @@
 		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
 		Distance <input type="text" name="distance"  placeholder="meters">
 		Magnitude <input type="text" name="magnitude"><br>
-		Time of event <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%k:%M:%S"/>
+		Time of event <input name="est_time" type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%k:%M:%S:%L"/>
 	</fieldset>
 	</div>
 </div>
@@ -120,39 +120,31 @@ $( document ).ready(function() {
 		//	all fields must be filled
 		try {
 			if (document.forms[0].seismograph.value == 0) alert ("You must designate the seismograph that this readings is associated with");
-			// TODO Uncomment once picker is finished
-			// else if (checkField(document.forms[0].P_arrival)) alert ("You must enter the arrival time for the P wave");
-			// else if (checkField(document.forms[0].S_arrival)) alert ("You must enter the arrival time for the S wave");
+			else if (checkField(document.forms[0].P_arrival)) alert ("You must enter the arrival time for the P wave");
+			else if (checkField(document.forms[0].S_arrival)) alert ("You must enter the arrival time for the S wave");
 			else if (checkField(document.forms[0].amplitude)) alert ("You must enter the maximum amplitude of the S wave");
 			// second column
 			else if (checkField(document.forms[0].difference)) alert ("You must enter the difference between the arrival times of the P and S waves");
 			else if (checkField(document.forms[0].distance)) alert ("You must enter the estimated distance of the event from this seismograph");
 			else if (checkField(document.forms[0].magnitude)) alert ("You must enter the estimated magnitude of this event");
-			// TODO Uncomment once picker is finished
-			//else if (checkField(document.forms[0].time)) alert ("You must enter the estimated time of this event");
+			else if (checkField(document.forms[0].est_time)) alert ("You must enter the estimated time of this event");
+			// Validations go here!
 			else {
-
-				// Create fake values for p_arrival, s_arrival, time and sp_gap
-				// TODO store real values!!!!
-				var quake_time = new Date().getTime()+10000;
-				var p_arrival_time = quake_time+ Math.random()*5000;
-				var s_arrival_time = p_arrival_time + Math.random()*10000; 
-				var sp_gap = s_arrival_time - p_arrival_time;
-
-				// publish info
+				
+				// Assemble message
 				var message = {
-					p_arrival_time: p_arrival_time,
-					s_arrival_time: s_arrival_time,
-					quake_time: quake_time,
+					p_arrival_time: customDateWithMillisParse(document.forms[0].P_arrival.value).getTime(),
+					s_arrival_time: customDateWithMillisParse(document.forms[0].S_arrival.value).getTime(),
+					quake_time: customDateWithMillisParse(document.forms[0].est_time.value).getTime(),
 					section: section, 
 					stud_name: stud_name, 
 					max_amplitude: document.forms[0].amplitude.value,
-					sp_gap: sp_gap,
+					sp_gap: document.forms[0].difference.value,
 					seismograph: parseInt(document.forms[0].seismograph.value),
 					distance: parseFloat(document.forms[0].distance.value),
 					magnitude: parseInt(document.forms[0].magnitude.value)
 				};
-				console.debug( message );
+				// console.debug( message );
 				nutella.publish("new_observation",message);
 				
 				// cleanup
