@@ -38,10 +38,12 @@
 		});
 		// Sections and names definitions
 		var sections = ["6LM","6BS","6MV"];
+		// Choose from "ARG", "BAF", "BOZ", "DOB", "FOT", "GUB", "HAP", "JUR", "KEP", "MID", "NAR", "PAB", "PHA", "REN", "SOM", "SUG", "TUZ", "WAT", "WIR", "YIM"
 		var names = [
-		["TUR","ROP","POR","WOM","BOW"],
-		["ABC","DEF","GHI"],
-		["ARF","ORM"]];
+		["ARG", "BAF", "BOZ", "DOB", "FOT", "GUB", "HAP", "JUR", "KEP", "MID", "NAR", "PAB", "PHA", "REN", "SOM", "SUG", "TUZ"],
+		["ARG", "BAF", "BOZ", "DOB", "FOT", "GUB", "HAP", "JUR", "KEP", "MID", "NAR", "PAB", "PHA", "REN", "SOM", "SUG", "TUZ", "WAT", "WIR", "YIM"],
+		["ARG", "BAF", "BOZ", "DOB", "FOT", "GUB", "HAP", "JUR", "KEP", "MID", "NAR", "PAB", "PHA", "REN", "SOM", "SUG", "TUZ", "WAT", "WIR", "YIM"]
+		];
 		// Find section
 		for (i=0; i<sections.length; i++) {
 			if (query_params.section == sections[i])
