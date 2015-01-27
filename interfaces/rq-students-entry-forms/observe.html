@@ -143,8 +143,8 @@ $( document ).ready(function() {
 					distance: parseFloat(document.forms[0].distance.value),
 					magnitude: parseInt(document.forms[0].magnitude.value)
 				};
-				console.debug( message );
-				// nutella.publish("new_observation",message);
+				// console.debug( message );
+				nutella.publish("new_observation",message);
 				
 				// cleanup
 				document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
