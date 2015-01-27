@@ -114,6 +114,10 @@ function checkField(f) {
 	return f==undefined || f.value == ""
 }
 
+function isNumeric(f) {
+	return !isNaN(parseFloat(f.value)) && isFinite(f.value);
+}
+
 $( document ).ready(function() {
 
 	$("#quake_observation").click(function() {
@@ -123,12 +127,15 @@ $( document ).ready(function() {
 			else if (checkField(document.forms[0].P_arrival)) alert ("You must enter the arrival time for the P wave");
 			else if (checkField(document.forms[0].S_arrival)) alert ("You must enter the arrival time for the S wave");
 			else if (checkField(document.forms[0].amplitude)) alert ("You must enter the maximum amplitude of the S wave");
+			else if (!isNumeric(document.forms[0].amplitude)) alert ("Maximum amplitude of the S wave must be a number");
 			// second column
 			else if (checkField(document.forms[0].difference)) alert ("You must enter the difference between the arrival times of the P and S waves");
+			else if (!isNumeric(document.forms[0].difference)) alert ("The difference between the arrival times of the P and S waves must be a number");
 			else if (checkField(document.forms[0].distance)) alert ("You must enter the estimated distance of the event from this seismograph");
+			else if (!isNumeric(document.forms[0].distance)) alert ("The estimated distance of the event from this seismograph must be a number");
 			else if (checkField(document.forms[0].magnitude)) alert ("You must enter the estimated magnitude of this event");
+			else if (!isNumeric(document.forms[0].magnitude)) alert ("The estimated magnitude of this event must be a number");
 			else if (checkField(document.forms[0].est_time)) alert ("You must enter the estimated time of this event");
-			// Validations go here!
 			else {
 				
 				// Assemble message
@@ -144,8 +151,8 @@ $( document ).ready(function() {
 					distance: parseFloat(document.forms[0].distance.value),
 					magnitude: parseInt(document.forms[0].magnitude.value)
 				};
-				// console.debug( message );
-				nutella.publish("new_observation",message);
+				console.debug( message );
+				// nutella.publish("new_observation",message);
 				
 				// cleanup
 				document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
