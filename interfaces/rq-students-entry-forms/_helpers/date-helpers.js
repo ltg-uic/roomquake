@@ -155,3 +155,11 @@ function customDateWithMillisParse(str) {
 	date.setMilliseconds(str.slice(str.lastIndexOf(":")+1, str.length));
 	return date;
 };
+
+function customDateWithMillisParseUTC(str) {
+	d_str = str.slice(0, str.lastIndexOf(":"));
+	dt = str.split(" ");
+	ddd = dt[0].split("-");
+	tttt = dt[1].split(":");
+	return new Date( Date.UTC(ddd[0], ddd[1], ddd[2], tttt[0], tttt[1], tttt[2], tttt[3]) );
+};
