@@ -89,7 +89,7 @@
   </div>
   <form>
   <div class="row">
-    <div class="large-6 columns">
+    <div class="large-6 medium-6 columns">
     <fieldset>
       <legend>Seismograph:</legend>
       	<select name="seismograph"required>
@@ -101,13 +101,8 @@
 			</script>
       	</select>
       	</label>
-	</fieldset>    
-  </div>
-  </div>
-
-<div class="row">
-    <div class="large-6 columns" >
-    <fieldset>
+	</fieldset>
+	<fieldset>
       <legend>Readings:</legend>
 		P wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" 
 		data-time-format="%H:%M:%S"/></br>
@@ -119,7 +114,8 @@
 		Maximum S amplitude <input type="text" name="amplitude" placeholder="mm"><br>
 	</fieldset>    
   </div>
-  <div class="large-6 columns">
+  
+    <div class="large-6 medium-6 columns">
     <fieldset>
       <legend>Calculations:</legend>
 		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
@@ -128,12 +124,37 @@
 		Time of event <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%k:%M:%S"/>
 	</fieldset>    
   </div>
+  </div>
+
+<div class="row">
+    <div class="large-6 medium-6 columns" >
+    <!-- <fieldset>
+      <legend>Readings:</legend>
+		P wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" 
+		data-time-format="%H:%M:%S"/></br>
+
+		S wave arrival time <input type="text" data-date-time data-date-format="%a, %d %b %Y" 
+		data-time-format="%H:%M:%S"/></br>
+
+		<!--<input type="text" name="S_arrival"  placeholder="should be date/time picker">
+		Maximum S amplitude <input type="text" name="amplitude" placeholder="mm"><br> -->
+	</fieldset>     -->
+  </div>
+<!--   <div class="large-6 medium-6 columns">
+    <fieldset>
+      <legend>Calculations:</legend>
+		Difference in arrival times (S-P)<input type="text" required name="difference" placeholder="seconds">
+		Distance <input type="text" name="distance"  placeholder="meters">
+		Magnitude <input type="text" name="magnitude"><br>
+		Time of event <input type="text" data-date-time data-date-format="%a, %d %b %Y" data-time-format="%k:%M:%S"/>
+	</fieldset>    
+  </div> -->
 </div>
 <div class="row">
- <div class="large-6 columns">
+ <div class="large-6  medium-6 columns">
     <button id="quake_observation" type="submit" class="button postfix">Submit</button>
   </div>
- <div class="large-6 columns">
+ <div class="large-6  medium-6 columns">
     <button class="button postfix" onClick='document.forms[0].reset();'>Reset</button>
   </div>
 </div>
