@@ -66,6 +66,8 @@ Time (Hour, Minute, Second, Subsecond):
 
   %S - Second of the minute (00..59)
 
+  %L - Millisecond of the second (000..999)
+
 Weekday:
   %A - The full weekday name (``Sunday'')
           %^A  uppercased (``SUNDAY'')
@@ -136,6 +138,7 @@ Date.prototype.format = function(fmt) {
 				case '%^a': re = /%\^a/g; val = a_days[this.getDay()].toUpperCase; break;
 				case '%w':  re = /%w/g; val = ('' + this.getDay()); break;
 				case '%u':  re = /%u/g; val = '' + (this.getDay() == 0 ? 7 : this.getDay()); break;
+				case '%L':  re = /%L/g; val = ('' + this.getMilliseconds()).lpad(3); break;
 			};
 
 			fmt = fmt.replace(re, val);
@@ -145,4 +148,10 @@ Date.prototype.format = function(fmt) {
 	}
 	
 	return fmt;
+};
+
+function customDateWithMillisParse(str) {
+	date = new Date.parse(str.slice(0, str.lastIndexOf(":")));
+	date.setMilliseconds(str.slice(str.lastIndexOf(":")+1, str.length));
+	return date;
 };
