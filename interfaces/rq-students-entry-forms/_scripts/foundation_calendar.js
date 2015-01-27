@@ -37,7 +37,7 @@ $.fcdp = {
 	 ***/
 	getDateFromString: function(str, nullable) {
 		nullable = nullable || true;
-		return (!str && !nullable) ? null : (!str ? new Date() : new Date.parse(str));;		
+		return (!str && !nullable) ? null : (!str ? new Date() : customDateWithMillisParse(str));;		
 	},
 	
 	moveMonth: function(date, months) {
@@ -56,7 +56,8 @@ $.fcdp = {
 			day: date.getDate(),
 			hour: date.getHours(),
 			minute: date.getMinutes(),
-			second: date.getSeconds()
+			second: date.getSeconds(),
+			millisecond: date.getMilliseconds()
 		}
 		
 		parts.year += parts.year < 2000 ? 1900 : 0;
@@ -94,7 +95,7 @@ $.fcdp = {
 	},
 	
 	setWorkingDate: function(opts, date) {
-		opts.input.data('working-date', date ? date.format('%Y-%m-%d %H:%M:%S') : '');		
+		opts.input.data('working-date', date ? date.format('%Y-%m-%d %H:%M:%S:%L') : '');		
 		
 		var dateVal = '--';
 		var timeVal = '--';
@@ -141,7 +142,7 @@ $.fcdp = {
 			formats: {
 				'date': input.is('[data-date-format]') ? input.data('date-format') : '%A: %B %-d, %Y',
 				'time': input.is('[data-time-format]') ? input.data('time-format') : '%-I:%M %p',
-				'value': input.is('[data-value-format]') ? input.data('value-format') : '%Y-%m-%d %H:%M:%S'
+				'value': input.is('[data-value-format]') ? input.data('value-format') : '%Y-%m-%d %H:%M:%S:%L'
 			},
 			hasTimePicker: hasTimePicker,
 			hasDatePicker: hasDatePicker,
@@ -277,11 +278,15 @@ $.fcdp = {
 			var ctlHour = $('<div class="value-control hour"><label>Hr</label><a class="value-change up"><span></span></a><input type="text" class="display" value="12" /><a class="value-change down"><span></span></a></div>');
 			var ctlMinute = $('<div class="value-control minute"><label>Min</label><a class="value-change up"><span></span></a><input type="text" class="display" value="00" /><a class="value-change down"><span></span></a></div>');
 			var ctlSecond = $('<div class="value-control second"><label>Sec</label><a class="value-change up"><span></span></a><input type="text" class="display" value="00" /><a class="value-change down"><span></span></a></div>');
-			var ctlAmPm = $('<div class="value-control ampm"><label>A/P</label><a class="value-change up"><span></span></a><input type="text" class="display" value="AM" /><a class="value-change down"><span></span></a></div>');
+			var ctlMs = $('<div class="value-control millis"><label>Millis</label><a class="value-change up"><span></span></a><input type="text" class="display" value="000" /><a class="value-change down"><span></span></a></div>');
+			var ctlAmPm = $('<div class="value-control ampm"><label>AM/PM</label><a class="value-change up"><span></span></a><input type="text" class="display" value="AM" /><a class="value-change down"><span></span></a></div>');
+
+
 		
 			time.append(ctlHour);
 			time.append(ctlMinute);
 			time.append(ctlSecond);
+			time.append(ctlMs);
 			time.append(ctlAmPm);
 		
 			tp.append(time);
@@ -300,6 +305,9 @@ $.fcdp = {
 
 			var second = tp.find('.value-control.second');
 			this.wireupTimeValueControl(second, 0, 59, 2);
+
+			var milliseconds = tp.find('.value-control.millis');
+			this.wireupTimeValueControl(milliseconds, 0, 999, 3);
 		
 			var ampm = tp.find('.value-control.ampm');
 			this.wireupTimeAmPmControl(ampm);
@@ -401,6 +409,7 @@ $.fcdp = {
 				tp.find('.value-control.hour').find('input.display').val(fieldDate.format('%-I'));
 				tp.find('.value-control.minute').find('input.display').val(fieldDate.format('%M'));
 				tp.find('.value-control.second').find('input.display').val(fieldDate.format('%S'));
+				tp.find('.value-control.millis').find('input.display').val(fieldDate.format('%L'));
 				tp.find('.value-control.ampm').find('input.display').val(fieldDate.format('%p'));
 			}
 		}
@@ -418,6 +427,9 @@ $.fcdp = {
 		
 			var second = parseInt(tp.find('.value-control.second').find('input.display').val());
 			second = second ? parseInt(second) : 0;
+
+			var millisecond = parseInt(tp.find('.value-control.millis').find('input.display').val());
+			millisecond = millisecond ? parseInt(millisecond) : 0;
 		
 			var ampm = tp.find('.value-control.ampm').find('input.display').val();
 
@@ -430,7 +442,7 @@ $.fcdp = {
 			hour %= 24;
 
 			var wDate = this.getWorkingDate(opts);
-			var newDate = new Date(wDate.getFullYear(), wDate.getMonth(), wDate.getDate(), hour, minute, second);
+			var newDate = new Date(wDate.getFullYear(), wDate.getMonth(), wDate.getDate(), hour, minute, second, millisecond);
 			newDate = newDate ? newDate.add(-opts.utcOffset).hours() : newDate;
 			this.setFieldDate(opts, newDate);
 			
