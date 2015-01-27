@@ -115,6 +115,37 @@ fieldset {
     margin: 0;
     margin-left: -0.1875rem; }
 
+/* Styles defined by Tom ? 
+Moved them here for clean up 
+*/
+label {
+		margin-top: 20px;
+	}
+code {
+		font-size: 14px;
+	}
+	
+.row {
+		margin-bottom: 20px;
+	}
+	
+.header {
+		border-bottom: 1px solid #333;
+	}
+	
+dl dt {
+		display: inline-block;
+		width: 18%;
+		margin-right: 1%;
+		vertical-align: top;
+	}
+	
+dl dd {
+		display: inline-block;
+		width: 79%;
+		vertical-align: top;
+	}
+
  /* We add the star shapes for login pages */
 	.star0 {
 	    position: absolute;
