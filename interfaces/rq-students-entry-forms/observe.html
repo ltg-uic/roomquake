@@ -26,37 +26,29 @@
 	<script type="text/javascript" src="_helpers/date-helpers.js" ></script>
 	<script type="text/javascript" src="_helpers/string-helpers.js" ></script>
 	</head>
+
 	<body>
 	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
 	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
-	
 
-
-
-
-
-  <div class="row">
-  	<div class="large-12 columns">
-  		<img data-interchange="[_images/RoomQuakeHeader.png, (default)], [_images/RoomQuakeHeader_L.png, (large)], [_images/RoomQuakeHeader_S.png, (small)]">
-		<noscript><img src="_images/RoomQuakeHeader_S.png"></noscript>
+	<div class="row">
+		<div class="large-12 columns">
+  		<img data-interchange="[_images/RoomQuakeHeader.png, (default)], [_images/RoomQuakeHeader_L.png, (large)], [_images/RoomQuakeHeader_M.png, (medium)], [_images/RoomQuakeHeader_S.png, (small)]">
+		
+		<noscript><img src="_images/RoomQuakeHeader.png"></noscript>
   	</div>
-<script>
+	<script>
 		// Initialize nutella
 		var query_params = nutella.init(location.search);
 
-
 		//find out who this is
-
 		var d = document.URL;
 		var section = query_params.section;
 		var stud_name = query_params.stud_name;
 		document.write("<H1>Section: " + section + "   Student: " + stud_name + "</H1>");
-		//document.write('<div class="row"><div class="large-6 columns"><H1>Section: " + section + "   Student: " + name + "</H1>"'>);
-
 		const NS = 4; //number of seismographs
 	</script>
-  	
   </div>
   <form>
   <div class="row">
