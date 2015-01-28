@@ -161,5 +161,5 @@ function customDateWithMillisParseUTC(str) {
 	dt = str.split(" ");
 	ddd = dt[0].split("-");
 	tttt = dt[1].split(":");
-	return new Date( Date.UTC(ddd[0], ddd[1], ddd[2], tttt[0], tttt[1], tttt[2], tttt[3]) );
+	return new Date( Date.UTC(ddd[0], ddd[1]-1, ddd[2], tttt[0], tttt[1], tttt[2], tttt[3]) );
 };
