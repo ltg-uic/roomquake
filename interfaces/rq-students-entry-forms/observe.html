@@ -132,19 +132,20 @@ $( document ).ready(function() {
 				
 				// Assemble message
 				var message = {
-					p_arrival_time: customDateWithMillisParse(document.forms[0].P_arrival.value).getTime(),
-					s_arrival_time: customDateWithMillisParse(document.forms[0].S_arrival.value).getTime(),
-					quake_time: customDateWithMillisParse(document.forms[0].est_time.value).getTime(),
+					p_arrival_time: customDateWithMillisParseUTC(document.forms[0].P_arrival.value).getTime(),
+					s_arrival_time: customDateWithMillisParseUTC(document.forms[0].S_arrival.value).getTime(),
+					quake_time: customDateWithMillisParseUTC(document.forms[0].est_time.value).getTime(),
 					section: section, 
 					stud_name: stud_name, 
-					max_amplitude: document.forms[0].amplitude.value,
-					sp_gap: document.forms[0].difference.value,
+					max_amplitude: parseFloat(document.forms[0].amplitude.value),
+					sp_gap: parseFloat(document.forms[0].difference.value),
 					seismograph: parseInt(document.forms[0].seismograph.value),
 					distance: parseFloat(document.forms[0].distance.value),
-					magnitude: parseInt(document.forms[0].magnitude.value)
+					magnitude: parseFloat(document.forms[0].magnitude.value)
 				};
-				// console.debug( message );
+				console.debug( message );
 				nutella.publish("new_observation",message);
+				alert ("Observation submitted successfully!");
 				
 				// cleanup
 				document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
