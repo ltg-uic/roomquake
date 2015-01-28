@@ -143,13 +143,14 @@ $( document ).ready(function() {
 					distance: parseFloat(document.forms[0].distance.value),
 					magnitude: parseFloat(document.forms[0].magnitude.value)
 				};
-				console.debug( message );
-				nutella.publish("new_observation",message);
-				alert ("Observation submitted successfully!");
-				
-				// cleanup
-				document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
-				document.forms[0].reset();
+				// console.debug( message );
+				if (confirm("You are about to enter your observation. Remember, you can't change it later. Still want to submit?") == true) {
+					nutella.publish("new_observation",message);
+					alert ("Observation submitted successfully!");
+					// cleanup
+					document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
+					document.forms[0].reset();
+				} 
 			}	
 		} catch(e) {
 			// This will help us catch all input errors in debug and not show them to the user
