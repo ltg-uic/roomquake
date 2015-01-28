@@ -3,15 +3,19 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Students forms</title>
+  <title>RoomQuake Students forms</title>
   <meta name="description" content="Students' observations forms">
   <link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="_css/foundation.css" />
+  <link rel="stylesheet" href="_css/foundation.min.css" />
   <link rel="stylesheet" href="_css/app.css" />
-  <script src="_scripts/modernizr.js"></script>
+
+  
+	
 </head>
 
-<body>
+<body><!-- Add jQuery -->
+	<script type="text/javascript" src="_scripts/modernizr.js" charset="utf-8"></script>
+	<script type="text/javascript" src="_scripts/jquery.js" ></script>
 	<div class="row">
 		<div class="large-12 columns">
   		<img data-interchange="[_images/RoomQuakeHeader.png, (default)], [_images/RoomQuakeHeader_L.png, (large)], [_images/RoomQuakeHeader_M.png, (medium)], [_images/RoomQuakeHeader_S.png, (small)]">
@@ -19,16 +23,17 @@
 		<noscript><img src="_images/RoomQuakeHeader.png"></noscript>
   	</div>
   
-  <form>
+  	
   <div class="row"><h2> Please select your section </h2>
-    		
-    <div class="large-12 columns">
-    	<a class="star0" href=login2.html?section=6LM>6LM</a>
-    	<a class="star1" href=login2.html?section=6BS>6BS</a>
-    	<a class="star2" href=login2.html?section=6MV>6MV</a>
-    </div>
+    <form>	
+    	<div class="large-12 columns">
+    		<a class="star0" href=login2.html?section=6LM>6LM</a>
+    		<a class="star1" href=login2.html?section=6BS>6BS</a>
+    		<a class="star2" href=login2.html?section=6MV>6MV</a>
+    	</div> 
+	</form>
   </div>
-  </form>
+ 
 	
 	
 
@@ -48,7 +53,6 @@
 	</script>
 
 	<!-- Foundation plugins included here -->
-	<script type="text/javascript" src="_scripts/jquery.js" ></script>
 	<script src="_scripts/foundation/foundation.js"></script>
 	<script src="_scripts/foundation/foundation.interchange.js"></script>
   
