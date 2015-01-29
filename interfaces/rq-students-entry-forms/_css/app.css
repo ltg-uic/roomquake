@@ -185,3 +185,6 @@ dl dd {
 		background:transparent url('../_images/bang2_h.png')  no-repeat;
 	}
 
+.calendar .date-picker {
+	width:100%;
+}

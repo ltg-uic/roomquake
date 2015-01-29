@@ -156,10 +156,16 @@ function customDateWithMillisParse(str) {
 	return date;
 };
 
-function customDateWithMillisParseUTC(str) {
-	d_str = str.slice(0, str.lastIndexOf(":"));
-	dt = str.split(" ");
-	ddd = dt[0].split("-");
-	tttt = dt[1].split(":");
-	return new Date( Date.UTC(ddd[0], ddd[1]-1, ddd[2], tttt[0], tttt[1], tttt[2], tttt[3]) );
+// date comes in as "2015-01-29 08:14:10:131"
+// time comes in as "22:10:11.2"
+function customDateParseUTC(date, time) {
+	// Date
+	date_str = date.split(" ");
+	ddd = date_str[0].split("-");
+	// Time
+	f = time.split(':');	// HH=f[0], mm=f[1]
+	ff = f[2].split('.');	// ss = ff[0], d=ff[1]
+	var  HH=f[0], mm=f[1], ss = ff[0], d=ff[1];
+	date = new Date( Date.UTC(ddd[0], ddd[1]-1, ddd[2], HH, mm, ss, d*100) );
+	return date.getTime();
 };
