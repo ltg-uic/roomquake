@@ -196,10 +196,20 @@ var N_SEISMOGRAPHS = 4;
 	///////////////////
 	
 var READY=true;
+var ACTUAL_EVENT_TIME;
+
+
 
 // Initialize nutella
 var query_params = nutella.init(location.search, function() {
 	// Once initializaiton is complete:
+
+	/////GUGO I NEED A NEW REQUEST TYPE////
+
+	nutella.request("event_time", function (t) {
+			ACTUAL_EVENT_TIME = t;
+	});
+
 
 	//  Fetch room configuration and store the coordinates of the seismographs
 	nutella.request("room_configuration", function(response) { 
@@ -211,7 +221,7 @@ var query_params = nutella.init(location.search, function() {
 			SEISMOGRAPHS[e.id].x=e.x; 
 			SEISMOGRAPHS[e.id].y=e.y; 
 			if (SEISMOGRAPHS[e.id].x===undefined || SEISMOGRAPHS[e.id].y===undefined) { 
-				alert ("whoa"); console.error("Impossible to set seismograph location. The id you provided does not match any of the know IDs.");
+				console.error("Impossible to set seismograph location. The id you provided does not match any of the know IDs.");
 			} 
 		}); 
 			
@@ -221,7 +231,7 @@ var query_params = nutella.init(location.search, function() {
         // Once we fetched configuration we fetch previous observations
         nutella.request("observations", function(response) {
         	response.observations.forEach(function(e) {
-        		console.log(e);
+        		console.log(e); 
         		// a student observation includes the following fields: 
 				//  seismograph: seismograph number 
 				//  p_arrival_time: P arrival time
@@ -232,8 +242,10 @@ var query_params = nutella.init(location.search, function() {
 				//  magnitude: magnitude
 				//	quake_time: quake time
 				addObservation (e.seismograph, e.p_arrival_time, e.s_arrival_time, e.max_amplitude, e.sp_gap, e.distance, e.magnitude, e.quake_time);
-			});
+			}); 
         }); // close previous observations request
+
+
 	}); // close room config request
 
 
@@ -263,9 +275,6 @@ function radius(area) {
 
 }
 
-
-
-const ACTUAL_EVENT_TIME = new Date().getTime()+10000; //get from server.
 
 
 
