@@ -221,8 +221,8 @@ $( document ).ready(function() {
 				};
 				
 				if (confirm("You are about to enter your observation. Remember, you can't change it later. Still want to submit?") == true) {
-					console.debug( message );
-					// nutella.publish("new_observation",message);
+					//console.debug( message );
+					nutella.publish("new_observation",message);
 					alert ("Observation submitted successfully!");
 					// cleanup
 					document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
