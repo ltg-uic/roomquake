@@ -195,8 +195,9 @@ var N_SEISMOGRAPHS = 4;
 	// NUTELLA STUFF //
 	///////////////////
 	
-var READY=true;
+var READY=false;
 var ACTUAL_EVENT_TIME;
+var START;
 
 
 
@@ -204,18 +205,14 @@ var ACTUAL_EVENT_TIME;
 var query_params = nutella.init(location.search, function() {
 	// Once initializaiton is complete:
 
-	/////GUGO I NEED A NEW REQUEST TYPE////
-
-	nutella.request("event_time", function (t) {
-			ACTUAL_EVENT_TIME = t;
-	});
-
 
 	//  Fetch room configuration and store the coordinates of the seismographs
 	nutella.request("room_configuration", function(response) { 
 
 		room_width_x_meters = response.room_width_meters;
 		room_height_y_meters = response.room_height_meters; 
+		ACTUAL_EVENT_TIME = response.event_time;
+		START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 		unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
 		response.seismographs.forEach(function(e) { 
 			SEISMOGRAPHS[e.id].x=e.x; 
@@ -258,6 +255,11 @@ var query_params = nutella.init(location.search, function() {
 	// Subscribe to wipe all observations
     nutella.subscribe("wipe_observations", function() {
     	location.reload();
+    });
+
+    // Subscribe to set event time
+    nutella.subscribe("event_time", function(e) {
+    	setTimeout(function(){location.reload()},1000);
     });
 
 }); // close nutella init
@@ -346,7 +348,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 <script>
 
 
-const START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
+
 
 
 

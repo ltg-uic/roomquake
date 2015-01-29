@@ -49,3 +49,18 @@ $("#confirmation_yes").click(function() {
 	$("#confirmation").foundation("reveal", "close");
 	return false;
 });
+
+
+// Click on send event time
+$("#set_event_time").click(function(){
+	// Read and parse date
+	str = $("#event_time").val();
+	str_spl = str.split(" ");
+	// Date
+	ddd = str_spl[0].split("/");
+	// Time
+	ttt = str_spl[1].split(":");
+	date = new Date( Date.UTC(ddd[0], ddd[1]-1, ddd[2], ttt[0], ttt[1], ttt[2]) );
+	nutella.publish("event_time", {event_time: date.getTime()});
+	return false;
+});

@@ -61,5 +61,11 @@ nutella.net.subscribe('quakes_schedule_update', lambda do |m|
 end)
 
 
+# handle updates of event time
+nutella.net.subscribe('event_time', lambda do |m|
+  room_store.transaction { room_store['event_time'] = m['event_time'] }
+end)
+
+
 # Just sit there waiting for messages to come
 nutella.net.listen
