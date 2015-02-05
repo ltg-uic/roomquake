@@ -63,7 +63,7 @@ var query_params = nutella.init(location.search, function() {
 	});
 	quakes = new Array();
 	//Fetch quakes
-	nutella.request("quakes_schedule", function(response) {
+	nutella.request("quakes_series", function(response) {
 		// Update model
 		quakes = response.quakes_schedule;
 		// If there's no data, display the quakes schedule modal
@@ -231,6 +231,10 @@ function sortQuakesByDate() {
 	quakes.sort(function(a, b) {
 		return new Date(a.time ) - new Date(b.time);
 	});
+	// Re-assign the ids
+	for(i=0; i<quakes.length; i++) {
+		quakes[i].id = i+1;
+	}
 }
 
 // Converts the array of quakes into an array of calendar events 
@@ -350,5 +354,9 @@ function suggestQuakesSchedule(first, last, magMin, magMax, tot_quakes, f) {
 	suggested_quakes.sort(function(a, b){
 		return a.time - b.time;
 	});
+	// Assign ids
+	for(i=0; i<suggested_quakes.length; i++) {
+		suggested_quakes[i].id = i+1;
+	}
 	return suggested_quakes;
 }

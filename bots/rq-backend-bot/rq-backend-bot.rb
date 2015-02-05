@@ -22,6 +22,12 @@ nutella.net.handle_requests('quakes_schedule') do |req|
   rq_mode == 'schedule' ?  quakes_store.transaction { quakes_store.to_h } : demo_quakes_store.transaction { demo_quakes_store.to_h }
 end
 
+# handle quakes series exlclusively
+nutella.net.handle_requests('quakes_series') do |req|
+  quakes_store.transaction { quakes_store.to_h }
+end
+
+
 
 # Updates / Subscriptions
 
@@ -60,10 +66,12 @@ nutella.net.subscribe('quakes_schedule_update', lambda do |m|
   }
 end)
 
-
-# handle updates of event time
-nutella.net.subscribe('event_time', lambda do |m|
-  room_store.transaction { room_store['event_time'] = m['event_time'] }
+# handle updates of current quake
+nutella.net.subscribe('set_current_quake', lambda do |m|
+  room_store.transaction do 
+    room_store['current_quake_id'] = m['current_quake_id']
+    room_store['current_quake_time'] = m['current_quake_time']
+  end
 end)
 
 
