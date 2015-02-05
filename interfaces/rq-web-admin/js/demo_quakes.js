@@ -166,6 +166,7 @@ function countDownOver() {
 	mq.location.x = demo_p.manualQuakeXroom;
 	mq.location.y = demo_p.manualQuakeYroom;
 	mq.time = new Date();
+	mq.id = "d" + (quakes.length + 1);
 	// Update model
 	quakes.push(mq);
 	// Update table view

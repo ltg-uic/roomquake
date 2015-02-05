@@ -22,6 +22,12 @@ nutella.net.handle_requests('quakes_schedule') do |req|
   rq_mode == 'schedule' ?  quakes_store.transaction { quakes_store.to_h } : demo_quakes_store.transaction { demo_quakes_store.to_h }
 end
 
+# handle quakes series exlclusively
+nutella.net.handle_requests('quakes_series') do |req|
+  quakes_store.transaction { quakes_store.to_h }
+end
+
+
 
 # Updates / Subscriptions
 
