@@ -29,38 +29,31 @@
 		</nav>
 		
 		
-<!-- Observations controls -->
+
 		<div class="row">
 			<div class="large-12 column">
 				<h2>Students observations</h2>
-				<p>Clear students observation by clicking on the button below.</p>
+				<p>Students are currently working on quake <span id="c_quake_id_span"></span> that happened on <span id="c_quake_time_span"></span>.
 			</div>
-		</div>
-		<div class="row">
-			<div class="large-12 column">
-				<a id="clear_observations" class=" button">Clear students' observations</a>
-			</div>
-		</div>
-		<div class="row">
-			<div class="large-12 column">
-				<p>Set the event time (in UTC military time, NOT local!) Example: 2015/01/29 15:24:01</p>
-			</div>
-		</div>
-		<div class="row">
-			<div class="small-4 column">
-				<input id="event_time" type="text" placeholder="YYYY/MM/DD hh:mm:ss">
-			</div>	
-			<div class="small-4 column">
-				<a id="set_event_time" class="small button">Set event time</a>
-			</div>
-			<div class="small-4 column">
-			</div>	
-		</div>
+		</div>	
 		
+		
+<!-- Controls -->		
+		
+			<div class="row">
+				<div class="large-12 column">
+					 If you would like to change quake (and delete all students` observations relative to the current quake) select one from the list below and click on the "change quake" button.</p>
+					<select id="quake_drop">
+						<option value="0" disabled /> </option>
+					</select>
+					<a id="set_quake" class="small button">Change quake</a>
+				</div>
+			</div>		
+
 		
 <!-- Confirmation modal -->
 		<div id="confirmation" class="reveal-modal" data-reveal>
-			<p>Are you sure you want to delete all students' observations?</p>
+			<p>Are you sure you want to change quake? <span class="confirm_warn">This will delete all students' observations</span></p>
 			<a id="confirmation_no" class="button">No</a>
 			<a id="confirmation_yes" class="button">Yes</a>
 		</div>

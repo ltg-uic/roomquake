@@ -211,7 +211,7 @@ var query_params = nutella.init(location.search, function() {
 
 		room_width_x_meters = response.room_width_meters;
 		room_height_y_meters = response.room_height_meters; 
-		ACTUAL_EVENT_TIME = response.event_time;
+		ACTUAL_EVENT_TIME = response.current_quake_time;
 		START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 		unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
 		response.seismographs.forEach(function(e) { 
