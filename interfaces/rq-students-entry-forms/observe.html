@@ -126,14 +126,17 @@
 <script>
 // Utility function used below
 function checkField(f) {
+	if (section=="6LM") return false;			// HACK TO REMOVE VALIDATION
 	return f==undefined || f.value == ""
 }
 
 function isNumeric(f) {
+	if (section=="6LM" && f.value == "") return true;			// HACK TO REMOVE VALIDATION
 	return !isNaN(parseFloat(f.value)) && isFinite(f.value);
 }
 
 function checkTimeFormat(e) {
+	if (section=="6LM" && e.value == "") return false;			// HACK TO REMOVE VALIDATION
 	// Check that the date is in HH:mm:ss.d format
 	f = e.value.split(':');  // HH=f[0], mm=f[1]
 	if (f.length!=3) return true;
@@ -149,6 +152,7 @@ function checkTimeFormat(e) {
 }
 
 function checkTimeValue(e) {
+	if (section=="6LM" && e.value == "") return false;			// HACK TO REMOVE VALIDATION
 	f = e.value.split(':');	// HH=f[0], mm=f[1]
 	ff = f[2].split('.');	// ss = ff[0], d=ff[1]
 	var  HH=f[0], mm=f[1], ss = ff[0], d=ff[1];
@@ -207,17 +211,24 @@ $( document ).ready(function() {
 			else {
 				
 				// Assemble message
+				var p_a_t = document.forms[0].p_time.value;
+				var s_a_t = document.forms[0].s_time.value;
+				var e_a_t = document.forms[0].est_time.value;
+				var m_a = parseFloat(document.forms[0].amplitude.value);
+				var sp = parseFloat(document.forms[0].difference.value);
+				var d = parseFloat(document.forms[0].distance.value);
+				var mag = parseFloat(document.forms[0].magnitude.value);
 				var message = {
-					p_arrival_time: customDateParseUTC(document.forms[0].P_arrival.value, document.forms[0].p_time.value),
-					s_arrival_time: customDateParseUTC(document.forms[0].S_arrival.value, document.forms[0].s_time.value),
-					quake_time: 	customDateParseUTC(document.forms[0].est_date.value,  document.forms[0].est_time.value),
+					p_arrival_time: p_a_t=="" ? "" : customDateParseUTC(document.forms[0].P_arrival.value, document.forms[0].p_time.value),
+					s_arrival_time: s_a_t=="" ? "" : customDateParseUTC(document.forms[0].S_arrival.value, document.forms[0].s_time.value),
+					quake_time: 	e_a_t=="" ? "" : customDateParseUTC(document.forms[0].est_date.value,  document.forms[0].est_time.value),
 					section: section, 
 					stud_name: stud_name, 
-					max_amplitude: parseFloat(document.forms[0].amplitude.value),
-					sp_gap: parseFloat(document.forms[0].difference.value),
+					max_amplitude: isNaN(m_a) ? "" : m_a,
+					sp_gap: isNaN(sp) ? "" : sp,
 					seismograph: parseInt(document.forms[0].seismograph.value),
-					distance: parseFloat(document.forms[0].distance.value),
-					magnitude: parseFloat(document.forms[0].magnitude.value)
+					distance: isNaN(d) ? "" : d,
+					magnitude: isNaN(mag) ? "" : mag
 				};
 				
 				if (confirm("You are about to enter your observation. Remember, you can't change it later. Still want to submit?") == true) {
