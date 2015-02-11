@@ -189,7 +189,7 @@ var unit_size_meters;
 
 var SEISMOGRAPHS = [{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}] ;
 var N_SEISMOGRAPHS = 4;
-
+var N_OBS = [0,0,0,0,0];
 
 	///////////////////
 	// NUTELLA STUFF //
@@ -472,7 +472,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 	function checkField(f) {
- 		return !(f==undefined || f == "")
+ 		return !(f===undefined || f == "")
 	}
 
 
@@ -482,12 +482,12 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-	function addObservation (oU,oP,oS,oA,cG,cD,cM,cT) {
-
+	function addObservation (oU,oP,oS,oA,cG,cD,cM,cT) { 
+		N_OBS[oU]++; N_OBS[0]++;
 		if (checkField(oP)) {P_sum[oU] += oP; nP[oU]++;}
 		if (checkField(oS)) {S_sum[oU] += oS; nS[oU]++;}
 		if (checkField(oA)) {A_sum[oU] += oA; nA[oU]++;}
-		if (checkField(cG)) {G_sum[oU] += cG; nG[oU]++;}
+		if (checkField(cG)) {G_sum[oU] += cG; nG[oU]++; }
 		if (checkField(cD)) {D_sum[oU] += cD; nD[oU]++; D[oU][nD[oU]] = cD;}
 		if (checkField(cM)) {
 			M_sum[oU] += cM; nM[oU]++; M_sum[0] += cM; nM[0]++;
@@ -502,7 +502,6 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 			T[0][Tindex]++;
 		}
 
-//		alert("Seismograph "+oU+" nP= "+nP[oU]);
 	} //end function addObservation
 
 	
@@ -916,7 +915,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT); 
 
-				if (nG[S_U] > 0) processing.text((Math.round(G_sum[S_U]/nG[S_U]/1000*10)/10).toString()+" seconds", LX + WD + LE, TY+RO);
+				if (nG[S_U] > 0) processing.text((Math.round(G_sum[S_U]/nG[S_U]*100)/100).toString()+" seconds", LX + WD + LE, TY+RO);
 				RO+=25;
 
 				processing.textAlign(processing.RIGHT);
@@ -959,7 +958,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 			processing.textAlign(processing.LEFT); 
 
-			if (nT[S_U] > 0) processing.text(nT[S_U], LX + WD + LE, TY+RO); 
+			if (N_OBS[S_U] > 0) processing.text(N_OBS[S_U], LX + WD + LE, TY+RO); 
 
 			processing.textSize(16);
 
