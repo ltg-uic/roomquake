@@ -372,13 +372,27 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 	var T_sum = [N_SEISMOGRAPHS+1];
 
 
+	var nP = [N_SEISMOGRAPHS+1];
+
+	var nS = [N_SEISMOGRAPHS+1];
+
+	var nA = [N_SEISMOGRAPHS+1];
+
+	var nG = [N_SEISMOGRAPHS+1];
+
+	var nD = [N_SEISMOGRAPHS+1];
+
+	var nM = [N_SEISMOGRAPHS+1];
+
+	var nT = [N_SEISMOGRAPHS+1];
+
+
 
 	var D = [N_SEISMOGRAPHS+1];
 	var M = [N_SEISMOGRAPHS+1];
 
 	var T = [N_SEISMOGRAPHS+1];
 
-	var N = [N_SEISMOGRAPHS+1];
 
 
 
@@ -398,21 +412,20 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 		for (var i=0; i<N_SEISMOGRAPHS+1; i++) {
 
-			P_sum[i]=0;
+			P_sum[i]=0; nP[i]=0;
 
-			S_sum[i]=0;
+			S_sum[i]=0; nS[i]=0;
 
-			A_sum[i]=0;
+			A_sum[i]=0; nA[i]=0;
 
-			G_sum[i]=0;
+			G_sum[i]=0; nG[i]=0;
 
-			D_sum[i]=0;
+			D_sum[i]=0; nD[i]=0;
 
-			M_sum[i]=0;
+			M_sum[i]=0; nM[i]=0;
 
-			T_sum[i]=0;
+			T_sum[i]=0; nT[i]=0;
 
-			N[i]=0;
 
 		}
 
@@ -458,7 +471,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-
+	function checkField(f) { 		return !(f==undefined || f == "")	}
 
 
 
@@ -468,46 +481,25 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 	function addObservation (oU,oP,oS,oA,cG,cD,cM,cT) {
 
-		P_sum[oU] += oP;
+		if (checkField(oP)) {P_sum[oU] += oP; nP[oU]++;}
+		if (checkField(oS)) {S_sum[oU] += oS; nS[oU]++;}
+		if (checkField(oA)) {A_sum[oU] += oA; nA[oU]++;}
+		if (checkField(cG)) {G_sum[oU] += cG; nG[oU]++;}
+		if (checkField(cD)) {D_sum[oU] += cD; nD[oU]++; D[oU][nD[oU]] = cD;}
+		if (checkField(cM)) {
+			M_sum[oU] += cM; nM[oU]++; M_sum[0] += cM; nM[0]++;
+			var Mindex = Math.floor((cM-1)*10);
+			M[oU][Mindex]++;
+			M[0][Mindex]++;
+		}
+		if (checkField(cT)) {
+			T_sum[oU] += cT; nT[oU]++; T_sum[0] += cT; nT[0]++;
+			var Tindex = Math.floor((cT-START)/20000 * 200);
+			T[oU][Tindex]++;
+			T[0][Tindex]++;
+		}
 
-		S_sum[oU] += oS;
-
-		A_sum[oU] += oA;
-
-		G_sum[oU] += cG;
-
-		D_sum[oU] += cD;
-
-		M_sum[oU] += cM;
-
-		M_sum[0] += cM;
-
-		T_sum[oU] += cT;
-
-		T_sum[0] += cT;
-
-		++N[oU]; ++N[0];
-
-		D[oU][N[oU]] = cD;
-
-
-
-		var Mindex = Math.floor((cM-1)*10);
-
-		M[oU][Mindex]++;
-
-		M[0][Mindex]++;
-
-
-
-		var Tindex = Math.floor((cT-START)/20000 * 200);
-
-		T[oU][Tindex]++;
-
-		T[0][Tindex]++;
-
-
-
+//		alert("Seismograph "+oU+" nP= "+nP[oU]);
 	} //end function addObservation
 
 	
@@ -869,7 +861,9 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 			processing.textAlign(processing.LEFT); 
 
-			if (S_U == 0) {processing.text("All", LX + WD + LE, TY+RO);} 									else {processing.text(S_U, LX + WD + LE, TY+RO);} RO+=25;
+			if (S_U == 0) {processing.text("All", LX + WD + LE, TY+RO);} 									
+			else {processing.text(S_U, LX + WD + LE, TY+RO);} 
+			RO+=25;
 
 			if (S_U > 0) {
 
@@ -881,11 +875,13 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT);
 
-				var temp = new Date();
 
-				temp.setTime(P_sum[S_U]/N[S_U]);
-
-				if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
+				if (nP[S_U] > 0) {
+					var temp = new Date();
+					temp.setTime(P_sum[S_U]/nP[S_U]);
+					processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); 
+				}
+				RO+=25;
 
 				processing.textAlign(processing.RIGHT);
 
@@ -893,11 +889,13 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT); 
 
-				temp = new Date();
 
-				temp.setTime(S_sum[S_U]/N[S_U]);
-
-				if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
+				if (nS[S_U] > 0) {
+					temp = new Date();
+					temp.setTime(S_sum[S_U]/nS[S_U]);
+					processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO);
+				}
+				RO+=25;
 
 				processing.textAlign(processing.RIGHT);
 
@@ -905,7 +903,9 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT); 
 
-				if (N[S_U] > 0) processing.text(Math.round(A_sum[S_U]/N[S_U]).toString()+" millimeters", LX + WD + LE, TY+RO); RO+=25;
+				if (nA[S_U] > 0) processing.text(Math.round(A_sum[S_U]/nA[S_U]).toString()+" millimeters", LX + WD + LE, TY+RO); 
+				RO+=25;
+
 
 				processing.textAlign(processing.RIGHT);
 
@@ -913,7 +913,8 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT); 
 
-				if (N[S_U] > 0) processing.text((Math.round(G_sum[S_U]/N[S_U]/1000*10)/10).toString()+" seconds", LX + WD + LE, TY+RO); RO+=25;
+				if (nG[S_U] > 0) processing.text((Math.round(G_sum[S_U]/nG[S_U]/1000*10)/10).toString()+" seconds", LX + WD + LE, TY+RO);
+				RO+=25;
 
 				processing.textAlign(processing.RIGHT);
 
@@ -921,8 +922,8 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				processing.textAlign(processing.LEFT); 
 
-				if (N[S_U] > 0) processing.text((Math.round(D_sum[S_U]/N[S_U]*100)/100).toString()+" meters", LX + WD + LE, TY+RO); RO+=25;
-
+				if (nD[S_U] > 0) processing.text((Math.round(D_sum[S_U]/nD[S_U]*100)/100).toString()+" meters", LX + WD + LE, TY+RO); 
+				RO+=25;
 			}
 
 			processing.textSize(24);
@@ -933,7 +934,8 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 			processing.textAlign(processing.LEFT); 
 
-			if (N[S_U] > 0) processing.text((Math.round(M_sum[S_U]/N[S_U]*10)/10).toString(), LX + WD + LE, TY+RO); RO+=25;
+			if (nM[S_U] > 0) processing.text((Math.round(M_sum[S_U]/nM[S_U]*10)/10).toString(), LX + WD + LE, TY+RO); 
+			RO+=25;
 
 			processing.textAlign(processing.RIGHT);
 
@@ -941,19 +943,20 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 			processing.textAlign(processing.LEFT); 
 
-			temp = new Date();
 
-			temp.setTime(T_sum[S_U]/N[S_U] + 500);
-
-			if (N[S_U] > 0) processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); RO+=25;
-
+			if (nT[S_U] > 0) {
+				temp = new Date();
+				temp.setTime(T_sum[S_U]/nT[S_U] + 500); 
+				processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); 
+			}
+			RO+=25;
 			processing.textAlign(processing.RIGHT);
 
 			processing.text("Observations: ", LX + WD + LE, TY+RO);
 
 			processing.textAlign(processing.LEFT); 
 
-			if (N[S_U] > 0) processing.text(N[S_U], LX + WD + LE, TY+RO); RO+=25;
+			if (nT[S_U] > 0) processing.text(nT[S_U], LX + WD + LE, TY+RO); 
 
 			processing.textSize(16);
 
@@ -1008,7 +1011,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 		var t = ACTUAL_EVENT_TIME+Math.random()*600;
 
 
-		addObservation (u,p,s,a,g,d,m,t);
+		addObservation (u,p,s,"",g,d,m,t);
 
 
 		setTimeout(ooch, 5000);
@@ -1038,7 +1041,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-	// ooch();
+		setTimeout(ooch, 5000);
 
 
 
