@@ -429,12 +429,6 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 		}
 
-	
-
-
-
-
-
 
 
 	//	prep histograms for the whole-class magnitude and timeline
@@ -471,16 +465,11 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-	function checkField(f) {
- 		return !(f===undefined || f == "")
-	}
-
+	function checkField(f) { 		return !(f===undefined || f == "" || f==null || f==undefined)	}
 
 
 
 //	message handler for new observation
-
-
 
 	function addObservation (oU,oP,oS,oA,cG,cD,cM,cT) { 
 		N_OBS[oU]++; N_OBS[0]++;
@@ -489,13 +478,13 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 		if (checkField(oA)) {A_sum[oU] += oA; nA[oU]++;}
 		if (checkField(cG)) {G_sum[oU] += cG; nG[oU]++; }
 		if (checkField(cD)) {D_sum[oU] += cD; nD[oU]++; D[oU][nD[oU]] = cD;}
-		if (checkField(cM)) {
+		if (checkField(cM)) { 
 			M_sum[oU] += cM; nM[oU]++; M_sum[0] += cM; nM[0]++;
 			var Mindex = Math.floor((cM-1)*10);
 			M[oU][Mindex]++;
 			M[0][Mindex]++;
 		}
-		if (checkField(cT)) {
+		if (checkField(cT)) { 
 			T_sum[oU] += cT; nT[oU]++; T_sum[0] += cT; nT[0]++;
 			var Tindex = Math.floor((cT-START)/20000 * 200);
 			T[oU][Tindex]++;
@@ -671,6 +660,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 			var alignWithMagnitudesY = bottom+2-10;
 
 			var interval = (right-left)/20;
+			var temp = new Date();
 
 
 
@@ -694,7 +684,6 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 				{processing.strokeWeight(2); 
 
-				var temp = new Date();
 
 				temp.setTime(START+dt*1000);
 
@@ -832,7 +821,13 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 					}
-
+					if (S_U != 0) {
+						processing.noFill(); processing.stroke(processing.color(0,0,130,100));
+						processing.strokeWeight(6);
+						processing.ellipse(px,py,D_sum[i]/nD[i]/room_width_x_meters * WD*2,D_sum[i]/nD[i]/room_height_y_meters * HT*2);
+						processing.noFill(); processing.stroke(processing.color(130,0,0,100));
+						processing.strokeWeight(2);
+					}
 				}
 
 
@@ -879,7 +874,6 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 				if (nP[S_U] > 0) {
-					var temp = new Date();
 					temp.setTime(P_sum[S_U]/nP[S_U]);
 					processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); 
 				}
@@ -893,7 +887,6 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 				if (nS[S_U] > 0) {
-					temp = new Date();
 					temp.setTime(S_sum[S_U]/nS[S_U]);
 					processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO);
 				}
@@ -947,8 +940,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 			if (nT[S_U] > 0) {
-				temp = new Date();
-				temp.setTime(T_sum[S_U]/nT[S_U] + 500); 
+				temp.setTime(T_sum[S_U]/nT[S_U]); 
 				processing.text(temp.toUTCString().substr(5), LX + WD + LE, TY+RO); 
 			}
 			RO+=25;
@@ -1016,7 +1008,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 		addObservation (u,p,s,"",g,d,m,t);
 
 
-		// setTimeout(ooch, 5000);
+		setTimeout(ooch, 5000);
 
 
 	}
@@ -1043,7 +1035,7 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-		// setTimeout(ooch, 5000);
+//		setTimeout(ooch, 5000);
 
 
 
