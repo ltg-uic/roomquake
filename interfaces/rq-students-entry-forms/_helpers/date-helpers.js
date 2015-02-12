@@ -163,9 +163,11 @@ function customDateParseUTC(date, time) {
 	date_str = date.split(" ");
 	ddd = date_str[0].split("-");
 	// Time
-	f = time.split(':');	// HH=f[0], mm=f[1]
-	ff = f[2].split('.');	// ss = ff[0], d=ff[1]
-	var  HH=f[0], mm=f[1], ss = ff[0], d=ff[1];
+	var f = time.split(':');	// HH=f[0], mm=f[1]
+	var ff = f[2].split('.');	// ss = ff[0], d=ff[1]
+	var HH=f[0], mm=f[1], ss = ff[0];
+	var d = '0';
+	if (ff.length==2) d=ff[1];
 	date = new Date( Date.UTC(ddd[0], ddd[1]-1, ddd[2], HH, mm, ss, d*100) );
 	return date.getTime();
 };

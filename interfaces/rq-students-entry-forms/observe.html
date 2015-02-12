@@ -138,11 +138,12 @@ function isNumeric(f) {
 function checkTimeFormat(e) {
 	if (section=="6LM" && e.value == "") return false;			// HACK TO REMOVE VALIDATION
 	// Check that the date is in HH:mm:ss.d format
-	f = e.value.split(':');  // HH=f[0], mm=f[1]
+	var f = e.value.split(':');  // HH=f[0], mm=f[1]
 	if (f.length!=3) return true;
-	ff = f[2].split('.');	// ss = ff[0], d=ff[1]
-	if (ff.length!=2) return true;
-	var  HH=f[0], mm=f[1], ss = ff[0], d=ff[1];
+	var ff = f[2].split('.');	// ss = ff[0], d=ff[1]
+	var HH=f[0], mm=f[1], ss = ff[0];
+	var d = '0';
+	if (ff.length==2) d=ff[1];
 	if (HH.length>2) return true;
 	if (mm.length>2) return true;
 	if (ss.length>2) return true;
@@ -153,9 +154,11 @@ function checkTimeFormat(e) {
 
 function checkTimeValue(e) {
 	if (section=="6LM" && e.value == "") return false;			// HACK TO REMOVE VALIDATION
-	f = e.value.split(':');	// HH=f[0], mm=f[1]
-	ff = f[2].split('.');	// ss = ff[0], d=ff[1]
-	var  HH=f[0], mm=f[1], ss = ff[0], d=ff[1];
+	var f = e.value.split(':');	// HH=f[0], mm=f[1]
+	var ff = f[2].split('.');	// ss = ff[0], d=ff[1]
+	var HH=f[0], mm=f[1], ss = ff[0];
+	var d = '0';
+	if (ff.length==2) d=ff[1];
 	try {
 		if (isNaN(parseInt(HH))) return true; 
 		if (isNaN(parseInt(mm))) return true; 
