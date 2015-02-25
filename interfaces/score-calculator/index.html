@@ -67,7 +67,7 @@ document.myform.diffT.value = '-'+diff;
 
 document.myform.diffM.value = '-'+Math.floor(Math.abs(document.myform.eM.value-document.myform.aM.value));
 
-var total = 7 -document.myform.diffD1.value - document.myform.diffD2.value - document.myform.diffT.value - document.myform.diffM.value;
+var total = 7 + parseInt(document.myform.diffD1.value) + parseInt(document.myform.diffD2.value) + parseInt(document.myform.diffT.value) + parseInt(document.myform.diffM.value);
 if (total < 0) total = 0;
 document.myform.T.value = total;
 
