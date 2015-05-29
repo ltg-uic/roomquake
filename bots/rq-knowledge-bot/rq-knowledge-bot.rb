@@ -15,9 +15,9 @@ obs_store = nutella.persist.get_json_object_store('observations')
 # Requests
 
 # handle observations requests
-nutella.net.handle_requests('observations') do |req, from|
+nutella.net.handle_requests('observations', lambda do |req, from|
   obs_store.to_h
-end
+end)
 
 
 # Updates / Subscriptions
@@ -33,6 +33,8 @@ nutella.net.subscribe('wipe_observations', lambda do |m, f|
   obs_store['observations'] = Array.new
 end)
 
+
+puts 'RQ Data bot listening'
 
 # Just sit there waiting for messages to come
 nutella.net.listen

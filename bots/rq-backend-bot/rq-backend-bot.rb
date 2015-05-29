@@ -17,20 +17,20 @@ demo_quakes_store = nutella.persist.get_json_object_store('demo_quakes')
 # Requests
 
 # handle room configuration request
-nutella.net.handle_requests('room_configuration') do |req, from|
+nutella.net.handle_requests('rq_room_configuration', lambda do |req, from|
   room_store.to_h
-end
+end)
 
 # handle quakes schedule request
-nutella.net.handle_requests('quakes_schedule') do |req, from|
+nutella.net.handle_requests('quakes_schedule', lambda do |req, from|
   rq_mode = room_store['rq_mode']
   rq_mode == 'schedule' ?  quakes_store.to_h : demo_quakes_store.to_h
-end
+end)
 
 # handle quakes series exlclusively
-nutella.net.handle_requests('quakes_series') do |req, from|
+nutella.net.handle_requests('quakes_series', lambda do |req, from|
   quakes_store.to_h
-end
+end)
 
 
 
@@ -68,6 +68,8 @@ nutella.net.subscribe('set_current_quake', lambda do |m, f|
   room_store['current_quake_time'] = m['current_quake_time']
 end)
 
+
+puts 'RR Backend bot listening'
 
 # Just sit there waiting for messages to come
 nutella.net.listen

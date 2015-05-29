@@ -15,21 +15,22 @@ var edit_p = new Processing(edit_canvas, SeismoMap);
 
 
 // Initialize nutella and fetch data from backend
-var query_params = nutella.init(location.search, function() {
-	//Fetch room configuration
-	nutella.request("room_configuration", function(response) {
-		// Update model
-		room_height = response.room_height_meters;
-		room_width = response.room_width_meters;
-		seismographs = response.seismographs;
-		mode = response.rq_mode;
-		// If there are data, update the views, otherwise show the setup modal
-		if (seismographs===undefined) {
-			seismographs = new Array();
-			$("#roomSetup").foundation("reveal", "open");
-		}
-		updateViews();
-	});
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+
+//Fetch room configuration
+nutella.net.request("rq_room_configuration", undefined, function(response) {
+	// Update model
+	room_height = response.room_height_meters;
+	room_width = response.room_width_meters;
+	seismographs = response.seismographs;
+	mode = response.rq_mode;
+	// If there are data, update the views, otherwise show the setup modal
+	if (seismographs===undefined) {
+		seismographs = new Array();
+		$("#roomSetup").foundation("reveal", "open");
+	}
+	updateViews();
 });
 
 // Update links to reflect nutella parameters
@@ -139,7 +140,7 @@ $("#seismographs_setup_btn").click(function() {
 	updateViews();
 	// Ship to backend
 	shipToBackend();
-	nutella.publish( 'mode_update', {rq_mode : mode} );
+	nutella.net.publish( 'mode_update', {rq_mode : mode} );
 	return false;
 });
 
@@ -175,7 +176,7 @@ $("#mode_switch").change(function() {
 	}
 	$("#mode_span").text(mode + " mode");
 	// Send mode update
-	nutella.publish( 'mode_update', {rq_mode : mode} );
+	nutella.net.publish( 'mode_update', {rq_mode : mode} );
 });
 
 // Utility functions
@@ -210,7 +211,7 @@ function shipToBackend() {
 	m.room_width_meters = room_width;
 	m.room_height_meters = room_height;
 	m.seismographs = seismographs;
-	nutella.publish("room_config_update", m);
+	nutella.net.publish("room_config_update", m);
 }
 
 
