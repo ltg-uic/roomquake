@@ -14,12 +14,12 @@ var edit_canvas = document.getElementById("edit_canvas");
 var edit_p = new Processing(edit_canvas, SeismoMap);
 
 
-// Initialize nutella and fetch data from backend
+// Initialize nutella
 var query_params = NUTELLA.parseURLParameters();
 var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
 
 //Fetch room configuration
-nutella.net.request("rq_room_configuration", undefined, function(response) {
+nutella.net.request("room_configuration", undefined, function(response) {
 	// Update model
 	room_height = response.room_height_meters;
 	room_width = response.room_width_meters;

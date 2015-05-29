@@ -17,7 +17,7 @@ demo_quakes_store = nutella.persist.get_json_object_store('demo_quakes')
 # Requests
 
 # handle room configuration request
-nutella.net.handle_requests('rq_room_configuration', lambda do |req, from|
+nutella.net.handle_requests('room_configuration', lambda do |req, from|
   room_store.to_h
 end)
 

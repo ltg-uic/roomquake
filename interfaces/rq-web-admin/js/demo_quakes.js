@@ -13,27 +13,28 @@ var demo_canvas = document.getElementById("demo_canvas");
 var demo_p = new Processing(demo_canvas, DemoQuakesMap);
 
 // Initialize nutella
-var query_params = nutella.init(location.search, function() {
-	//Fetch room configuration
-	nutella.request("room_configuration", function(response) {
-		// Update model
-		room_height = response.room_height_meters;
-		room_width = response.room_width_meters;
-		seismographs = response.seismographs;
-		// TODO If there's no data, it's a problem, we shouldn't be here... 
-		updateCanvasSize();
-	});
-	quakes = new Array();
-	//Fetch quakes
-	nutella.request("quakes_schedule", function(response) {
-		// Update model
-		quakes = response.quakes_schedule;
-		// If there's no data initialize the model
-		if (quakes===undefined)
-			quakes = new Array();
-		// Update the quakes table view (only demo quakes)
-		updateQuakesTableView('demo_quakes_table', true);
-	});
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+
+//Fetch room configuration
+nutella.net.request("room_configuration", '', function(response) {
+	// Update model
+	room_height = response.room_height_meters;
+	room_width = response.room_width_meters;
+	seismographs = response.seismographs;
+	// TODO If there's no data, it's a problem, we shouldn't be here... 
+	updateCanvasSize();
+});
+quakes = new Array();
+//Fetch quakes
+nutella.net.request("quakes_schedule", '', function(response) {
+	// Update model
+	quakes = response.quakes_schedule;
+	// If there's no data initialize the model
+	if (quakes===undefined)
+		quakes = new Array();
+	// Update the quakes table view (only demo quakes)
+	updateQuakesTableView('demo_quakes_table', true);
 });
 
 // Update links to reflect nutella parameters
@@ -124,7 +125,7 @@ $(document).on('close.fndtn.reveal', '#countdown', function (e) {
 // Click the "Clear generated quakes" button
 $('#clear_demo_quakes').click(function() {
 	// Send message and reload
-	nutella.publish("demo_quakes_clean", {});
+	nutella.net.publish("demo_quakes_clean", {});
 	location.reload();
 	return false;
 });
@@ -172,7 +173,7 @@ function countDownOver() {
 	// Update table view
 	updateQuakesTableView('demo_quakes_table', true);
 	// Ship to backend
-	nutella.publish("new_demo_quake", mq);
+	nutella.net.publish("new_demo_quake", mq);
 	// Hide mouse quake dot
 	demo_p.manualQuakeX = -100;
 	demo_p.manualQuakeY = -100;

@@ -30,21 +30,22 @@ var current_quake_id;
 var current_quake_time;
 var quakes_schedule;
 
-// Initialize nutella and fetch data from backend
-var query_params = nutella.init(location.search, function() {
-	//Fetch room configuration (need mode)
-	nutella.request("room_configuration", function(response) {
-		current_quake_id = response.current_quake_id;
-		current_quake_time = new Date(response.current_quake_time);
-		$("#c_quake_id_span").text(current_quake_id);
-		$("#c_quake_time_span").text(current_quake_time.toGMTString());
-	});
-	nutella.request("quakes_schedule", function(response) {
-		quakes_schedule = response.quakes_schedule;
-		quakes_schedule.forEach(function(q) {
-			addQuakeToDropdown(q);
-		});
-	});
+// Initialize nutella
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+
+//Fetch room configuration (need mode)
+nutella.net.request("room_configuration", '', function(response) {
+  current_quake_id = response.current_quake_id;
+  current_quake_time = new Date(response.current_quake_time);
+  $("#c_quake_id_span").text(current_quake_id);
+  $("#c_quake_time_span").text(current_quake_time.toGMTString());
+});
+nutella.net.request("quakes_schedule", '', function(response) {
+  quakes_schedule = response.quakes_schedule;
+  quakes_schedule.forEach(function(q) {
+    addQuakeToDropdown(q);
+  });
 });
 
 // Update links to reflect nutella parameters
@@ -83,8 +84,8 @@ $("#confirmation_yes").click(function() {
 	$("#c_quake_id_span").text(current_quake_id);
 	$("#c_quake_time_span").text(current_quake_time.toGMTString());
 	// Send messages
-	nutella.publish("set_current_quake", {current_quake_id: current_quake_id, current_quake_time: current_quake_time.getTime()});
-	nutella.publish("wipe_observations")
+	nutella.net.publish("set_current_quake", {current_quake_id: current_quake_id, current_quake_time: current_quake_time.getTime()});
+	nutella.net.publish("wipe_observations")
 	// Close modal
 	$("#confirmation").foundation("reveal", "close");
 	return false;
