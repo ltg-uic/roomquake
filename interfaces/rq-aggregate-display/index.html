@@ -4,9 +4,7 @@
 	<title>Aggregate view</title>
 	<meta name="description" content="Students observations aggregate view">
 
-	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
+	<script src="nutella_lib.js" charset="utf-8"></script>
 	
 	<script src="bower_components/Processing.js/processing.js"></script>
 
@@ -202,8 +200,9 @@ var START;
 
 
 // Initialize nutella
-var query_params = nutella.init(location.search, function() {
-	// Once initializaiton is complete:
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+	
 
 
 	//  Fetch room configuration and store the coordinates of the seismographs
@@ -262,7 +261,6 @@ var query_params = nutella.init(location.search, function() {
     	setTimeout(function(){location.reload()},1000);
     });
 
-}); // close nutella init
 
 ///////////////////////
 // END NUTELLA STUFF //
@@ -465,7 +463,10 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-	function checkField(f) { 		return !(f===undefined || f == "" || f==null || f==undefined)	}
+	function checkField(f) {
+ 		return !(f===undefined || f == "" || f==null || f==undefined)
+	}
+
 
 
 

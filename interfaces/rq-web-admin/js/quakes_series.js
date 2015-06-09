@@ -55,7 +55,7 @@ var live_p = new Processing(live_canvas, ScheduledQuakesMap);
 var query_params = NUTELLA.parseURLParameters();
 var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
 //Fetch room configuration
-nutella.net.request("room_configuration", function(response) {
+nutella.net.request('room_configuration', '', function(response) {
 	// Update model
 	room_height = response.room_height_meters;
 	room_width = response.room_width_meters;
@@ -64,7 +64,7 @@ nutella.net.request("room_configuration", function(response) {
 });
 quakes = new Array();
 //Fetch quakes
-nutella.net.request("quakes_series", function(response) {
+nutella.net.request("quakes_series", '', function(response) {
 	// Update model
 	quakes = response.quakes_schedule;
 	// If there's no data, display the quakes schedule modal
@@ -78,7 +78,7 @@ nutella.net.request("quakes_series", function(response) {
 $('a').each(function (index) {
 	var link = $(this).attr('href');
 	if (link!="" && link!="#")
-	$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+	$(this).attr('href', link + "?app_id="+ query_params.app_id + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
 });
 
 
@@ -211,6 +211,8 @@ function updateCanvasSize() {
 // if demo_flag is set to true, only demo quakes are visualized
 function updateQuakesTableAndCalendarView(table_name) {
 	$("#"+table_name+" tbody").empty();
+	if (quakes===undefined)
+		return;
 	quakes.forEach(function(el, i) {
 		var date = new Date(el.time);
 		var coord_s = + el.location.x.toFixed(2) + ', ' + el.location.y.toFixed(2);

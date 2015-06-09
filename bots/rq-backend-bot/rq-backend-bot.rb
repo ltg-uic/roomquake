@@ -49,7 +49,7 @@ end)
 # handle new demo quakes
 nutella.net.subscribe('new_demo_quake', lambda do |m, f|
   demo_quakes_store['quakes_schedule'] = Array.new if demo_quakes_store['quakes_schedule'].nil?
-  demo_quakes_store['quakes_schedule'].push(m)
+  demo_quakes_store['quakes_schedule'] = demo_quakes_store['quakes_schedule'].push(m)
 end)
 
 # handle clear demo quakes
@@ -69,7 +69,7 @@ nutella.net.subscribe('set_current_quake', lambda do |m, f|
 end)
 
 
-puts 'RR Backend bot listening'
+puts 'RQ Backend bot listening'
 
 # Just sit there waiting for messages to come
 nutella.net.listen

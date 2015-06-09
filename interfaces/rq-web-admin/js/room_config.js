@@ -37,7 +37,7 @@ nutella.net.request("room_configuration", undefined, function(response) {
 $('a').each(function (index) {
 	var link = $(this).attr('href');
 	if (link!="" && link!="#")
-	$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+	$(this).attr('href', link + "?app_id="+ query_params.app_id + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
 });
 
 
