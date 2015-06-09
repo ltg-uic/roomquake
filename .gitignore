@@ -1,7 +1,6 @@
-# Nutella
+# nutella
+bots/*/data
 
-bots/rq-backend-bot/db/
-bots/rq-knowledge-bot/db/
 
 # Intellij
 .idea

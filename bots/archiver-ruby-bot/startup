@@ -1,4 +1,0 @@
-#!/bin/sh
-
-BASEDIR=$(dirname $0)
-ruby $BASEDIR/archiver_ruby_bot.rb $1 $2

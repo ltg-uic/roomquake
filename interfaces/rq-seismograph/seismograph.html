@@ -4,9 +4,7 @@
 <html>
 <head>
 
-	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
+	<script src="nutella_lib.js" charset="utf-8"></script>
 	
 	<script src="bower_components/Processing.js/processing.js"></script>
 
@@ -264,11 +262,12 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 
 
 	// Initialize nutella
-	var query_params = nutella.init(location.search, function() {
+	var query_params = NUTELLA.parseURLParameters();
+	var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
 		// Once initializaiton is complete:
 		
 		// 1. Fetch room configuration and store the coordinates of the current seismograph
-		nutella.request("room_configuration", function(response) { 
+		nutella.net.request("room_configuration", '', function(response) { 
 			room_width_x_meters = response.room_width_meters;
 			room_height_y_meters = response.room_height_meters;
 			response.seismographs.forEach(function(e) {
@@ -276,41 +275,40 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 					seismograph_loc.x = e.x; ;
 					seismograph_loc.y = e.y; 
 				}
-			unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
+				unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
 			});
 			if (seismograph_loc.x===undefined || seismograph_loc.y===undefined)
 					console.error("Impossible to set seismograph location. The id you provided doens't seem to match any of the know IDs.");
-            
-            // 2. Fetch quakes schedule
-            nutella.request("quakes_schedule", function(response) {
-                // Update model
-                TOTAL_QUAKES=0; LAST_QUAKE=0;
-			quakes = response.quakes_schedule;
-                quakes.forEach(function(el,i) { 
-                    	var Devent_loc =  { x: el.location.x, y: el.location.y };
-                    	var Dtime = new Date(el.time).getTime(); 
-                  	event_message (Devent_loc, Dtime, el.magnitude, seismograph_loc);
-				var dd = new Date().getTime(); if (Dtime < dd) LAST_QUAKE=TOTAL_QUAKES;
-                });
-            });
 		});
 
-		// 3. Subscribe to clear events
-		nutella.subscribe("demo_quakes_clean", function() {location.reload();});
+		// 2. Fetch quakes schedule
+      nutella.net.request("quakes_schedule", '', function(response) {
+      	// Update model
+        TOTAL_QUAKES=0; LAST_QUAKE=0;
+				quakes = response.quakes_schedule;
+        quakes.forEach(function(el,i) { 
+        	var Devent_loc =  { x: el.location.x, y: el.location.y };
+          var Dtime = new Date(el.time).getTime(); 
+          event_message (Devent_loc, Dtime, el.magnitude, seismograph_loc);
+					var dd = new Date().getTime(); if (Dtime < dd) LAST_QUAKE=TOTAL_QUAKES;
+         });
+      });
 
-        // 4. Subscribe to schedule change events
-        nutella.subscribe("quakes_schedule_update", function() {location.reload();});
+		// 3. Subscribe to clear events
+		nutella.net.subscribe("demo_quakes_clean", function() {location.reload();});
+
+    // 4. Subscribe to schedule change events
+    nutella.net.subscribe("quakes_schedule_update", function() {location.reload();});
 
 		// 5. Subscribe to quakes schedule updates
-		nutella.subscribe("new_demo_quake", function(message) {
+		nutella.net.subscribe("new_demo_quake", function(message) {
 			var Devent_loc =  { x: message.location.x, y: message.location.y };
 			var Dtime = new Date(message.time).getTime();
 			event_message (Devent_loc, Dtime, message.magnitude, seismograph_loc);
 		});
 
 		// 6. Subscribe to "mode_changes"
-		nutella.subscribe("mode_update", function() {location.reload();});
-	});
+		nutella.net.subscribe("mode_update", function() {location.reload();});
 	
 
 	

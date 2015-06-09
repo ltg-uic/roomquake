@@ -52,33 +52,33 @@ var live_canvas = document.getElementById("live_canvas");
 var live_p = new Processing(live_canvas, ScheduledQuakesMap);
 
 // Initialize nutella
-var query_params = nutella.init(location.search, function() {
-	//Fetch room configuration
-	nutella.request("room_configuration", function(response) {
-		// Update model
-		room_height = response.room_height_meters;
-		room_width = response.room_width_meters;
-		seismographs = response.seismographs;
-		updateCanvasSize();
-	});
-	quakes = new Array();
-	//Fetch quakes
-	nutella.request("quakes_series", function(response) {
-		// Update model
-		quakes = response.quakes_schedule;
-		// If there's no data, display the quakes schedule modal
-		if (quakes===undefined)
-			$('#quakes_schedule_modal').foundation("reveal", "open");
-		// Update the quakes table view
-		updateQuakesTableAndCalendarView('quakes_schedule');
-	});
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+//Fetch room configuration
+nutella.net.request('room_configuration', '', function(response) {
+	// Update model
+	room_height = response.room_height_meters;
+	room_width = response.room_width_meters;
+	seismographs = response.seismographs;
+	updateCanvasSize();
+});
+quakes = new Array();
+//Fetch quakes
+nutella.net.request("quakes_series", '', function(response) {
+	// Update model
+	quakes = response.quakes_schedule;
+	// If there's no data, display the quakes schedule modal
+	if (quakes===undefined)
+		$('#quakes_schedule_modal').foundation("reveal", "open");
+	// Update the quakes table view
+	updateQuakesTableAndCalendarView('quakes_schedule');
 });
 
 // Update links to reflect nutella parameters
 $('a').each(function (index) {
 	var link = $(this).attr('href');
 	if (link!="" && link!="#")
-	$(this).attr('href', link + "?run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+	$(this).attr('href', link + "?app_id="+ query_params.app_id + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
 });
 
 
@@ -106,7 +106,7 @@ $("#quakes_schedule_form").on('valid.fndtn.abide submit', function(e) {
 		});
 		updateQuakesTableAndCalendarView('quakes_schedule');
 		$("#quakes_schedule_modal").foundation("reveal", "close");
-		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		nutella.net.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 	}
 	return false;
 });
@@ -132,7 +132,7 @@ $('#quakes_calendar').fullCalendar({
 		quakes[event.id].time = event.start.format();
 		sortQuakesByDate();
 		updateQuakesTableAndCalendarView('quakes_schedule');
-		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		nutella.net.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 	},
 	// Add event
 	dayClick: function(date, jsEvent, view) {
@@ -179,7 +179,7 @@ $("#quake_edit_form").on('valid.fndtn.abide submit', function(e) {
 		sortQuakesByDate();
 		updateQuakesTableAndCalendarView('quakes_schedule');
 		$("#quake_edit_modal").foundation("reveal", "close");
-		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		nutella.net.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 		// }
 		return false;
 });
@@ -190,7 +190,7 @@ $("#delete_quake").click(function() {
 		quakes.splice(current_edit_id, 1);
 		sortQuakesByDate();
 		updateQuakesTableAndCalendarView('quakes_schedule');
-		nutella.publish('quakes_schedule_update', { quakes_schedule : quakes } );
+		nutella.net.publish('quakes_schedule_update', { quakes_schedule : quakes } );
 		current_edit_id = undefined;
 	}
 	$("#quake_edit_modal").foundation("reveal", "close");
@@ -211,6 +211,8 @@ function updateCanvasSize() {
 // if demo_flag is set to true, only demo quakes are visualized
 function updateQuakesTableAndCalendarView(table_name) {
 	$("#"+table_name+" tbody").empty();
+	if (quakes===undefined)
+		return;
 	quakes.forEach(function(el, i) {
 		var date = new Date(el.time);
 		var coord_s = + el.location.x.toFixed(2) + ', ' + el.location.y.toFixed(2);

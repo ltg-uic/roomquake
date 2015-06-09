@@ -4,9 +4,7 @@
 	<title>Aggregate view</title>
 	<meta name="description" content="Students observations aggregate view">
 
-	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" charset="utf-8"></script>
+	<script src="nutella_lib.js" charset="utf-8"></script>
 	
 	<script src="bower_components/Processing.js/processing.js"></script>
 
@@ -202,12 +200,13 @@ var START;
 
 
 // Initialize nutella
-var query_params = nutella.init(location.search, function() {
-	// Once initializaiton is complete:
+var query_params = NUTELLA.parseURLParameters();
+var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
+	
 
 
 	//  Fetch room configuration and store the coordinates of the seismographs
-	nutella.request("room_configuration", function(response) { 
+	nutella.net.request("room_configuration", '', function(response) { 
 
 		room_width_x_meters = response.room_width_meters;
 		room_height_y_meters = response.room_height_meters; 
@@ -226,7 +225,7 @@ var query_params = nutella.init(location.search, function() {
            
 
         // Once we fetched configuration we fetch previous observations
-        nutella.request("observations", function(response) {
+        nutella.net.request("observations", '', function(response) {
         	response.observations.forEach(function(e) {
         		console.log(e); 
         		// a student observation includes the following fields: 
@@ -247,22 +246,21 @@ var query_params = nutella.init(location.search, function() {
 
 
 	// Subscribe to new observation 	
-	nutella.subscribe("new_observation", function(e) {
+	nutella.net.subscribe("new_observation", function(e) {
 		addObservation (e.seismograph, e.p_arrival_time, e.s_arrival_time, e.max_amplitude, e.sp_gap, e.distance, e.magnitude, e.quake_time);
 	});
 
 	
 	// Subscribe to wipe all observations
-    nutella.subscribe("wipe_observations", function() {
+    nutella.net.subscribe("wipe_observations", function() {
     	location.reload();
     });
 
     // Subscribe to set event time
-    nutella.subscribe("event_time", function(e) {
+    nutella.net.subscribe("event_time", function(e) {
     	setTimeout(function(){location.reload()},1000);
     });
 
-}); // close nutella init
 
 ///////////////////////
 // END NUTELLA STUFF //
@@ -465,7 +463,10 @@ document.getElementById("top").style.width = WINDOW_WIDTH + "px";
 
 
 
-	function checkField(f) { 		return !(f===undefined || f == "" || f==null || f==undefined)	}
+	function checkField(f) {
+ 		return !(f===undefined || f == "" || f==null || f==undefined)
+	}
+
 
 
 
