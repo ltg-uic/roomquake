@@ -25,7 +25,7 @@ end)
 # handle new students observations
 nutella.net.subscribe('new_observation', lambda do |m, f|
   obs_store['observations'] = Array.new if obs_store['observations'].nil?
-  obs_store['observations'].push(m)
+  obs_store['observations'] = obs_store['observations'].push(m)
 end)
 
 # handle observations wiping

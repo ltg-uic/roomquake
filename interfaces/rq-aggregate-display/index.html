@@ -206,7 +206,7 @@ var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_param
 
 
 	//  Fetch room configuration and store the coordinates of the seismographs
-	nutella.request("room_configuration", function(response) { 
+	nutella.net.request("room_configuration", '', function(response) { 
 
 		room_width_x_meters = response.room_width_meters;
 		room_height_y_meters = response.room_height_meters; 
@@ -225,7 +225,7 @@ var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_param
            
 
         // Once we fetched configuration we fetch previous observations
-        nutella.request("observations", function(response) {
+        nutella.net.request("observations", '', function(response) {
         	response.observations.forEach(function(e) {
         		console.log(e); 
         		// a student observation includes the following fields: 
@@ -246,18 +246,18 @@ var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_param
 
 
 	// Subscribe to new observation 	
-	nutella.subscribe("new_observation", function(e) {
+	nutella.net.subscribe("new_observation", function(e) {
 		addObservation (e.seismograph, e.p_arrival_time, e.s_arrival_time, e.max_amplitude, e.sp_gap, e.distance, e.magnitude, e.quake_time);
 	});
 
 	
 	// Subscribe to wipe all observations
-    nutella.subscribe("wipe_observations", function() {
+    nutella.net.subscribe("wipe_observations", function() {
     	location.reload();
     });
 
     // Subscribe to set event time
-    nutella.subscribe("event_time", function(e) {
+    nutella.net.subscribe("event_time", function(e) {
     	setTimeout(function(){location.reload()},1000);
     });
 

@@ -31,18 +31,15 @@
 	
 	
 	<script src="_scripts/jquery.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script src="nutella_lib.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript">
-		var query_params = nutella.init(location.search, function() {
+			var query_params = NUTELLA.parseURLParameters();
 			// Pass the nutella parameters down
 			$('a').each(function (index) {
 				var link = $(this).attr('href');
 				if (link!="" && link!="#")
-					$(this).attr('href', link + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+					$(this).attr('href', link + "&app_id="+ query_params.app_id + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
 			});
-		});
 		// Sections and names definitions
 		var sections = ["6LM","6BS","6MV"];
 		// Choose from "ARG", "BAF", "BOZ", "DOB", "FOT", "GUB", "HAP", "JUR", "KEP", "MID", "NAR", "PAB", "PHA", "REN", "SOM", "SUG", "TUZ", "WAT", "WIR", "YIM"
@@ -60,6 +57,7 @@
 		for (j=0; j<names[index].length; j++) {
 			$('#buttons').append("<button class='button' onClick='location.assign(\"observe.html?section=" + query_params.section + 
 			"&stud_name=" + names[index][j] + 
+			"&app_id="+ query_params.app_id +
 			"&broker=" + query_params.broker + 
 			"&run_id=" + query_params.run_id + "\");'>" + names[index][j] + "</button>");
 		}

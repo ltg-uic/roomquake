@@ -28,9 +28,7 @@
 	</head>
 
 	<body>
-	<script src="bower_components/bower-mqttws/mqttws31.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/simple-js-mqtt-client/simple-js-mqtt-client.js" type="text/javascript" charset="utf-8"></script>
-	<script src="bower_components/nutella_lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script src="nutella_lib.js" type="text/javascript" charset="utf-8"></script>
 
 	<div class="row">
 		<div class="large-12 columns">
@@ -40,7 +38,8 @@
   	</div>
 	<script>
 		// Initialize nutella
-		var query_params = nutella.init(location.search);
+		var query_params = NUTELLA.parseURLParameters();
+		var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
 
 		//find out who this is
 		var d = document.URL;
@@ -236,7 +235,7 @@ $( document ).ready(function() {
 				
 				if (confirm("You are about to enter your observation. Remember, you can't change it later. Still want to submit?") == true) {
 					//console.debug( message );
-					nutella.publish("new_observation",message);
+					nutella.net.publish("new_observation",message);
 					alert ("Observation submitted successfully!");
 					// cleanup
 					document.forms[0].seismograph.options[Number(document.forms[0].seismograph.value)].disabled=true;
