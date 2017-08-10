@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+  <script src="nutella_lib.js" type="text/javascript"></script>
+
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css" />
+ 
+  <style type="text/css">
+
+    .inactiveLink {
+       pointer-events: none;
+       cursor: default;
+    }
+    td {
+      width:250px;
+    }
+
+
+    li {
+      font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
+      border-bottom: 1px solid #ccc;
+      padding:5px 5px 5px 5px;
+      background-color:white;
+      list-style-type: none;
+    }
+    ul {
+       background-color:white;
+   }
+/*    li:last-child {
+      border: none;
+    }
+*/
+    li  a {
+      text-decoration: none;
+      color: white;
+
+      -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+      transition: font-size 0.3s ease, background-color 0.3s ease;
+      /*display: block;*/
+    }
+
+    #mydiv {
+      text-align: center;
+
+    }
+
+    button {
+      font-size: 20px;
+    }
+
+    li  a:hover {
+      font-size: 25px;
+      /*background: white;*/
+    }
+
+    .header:hover
+    {
+      font-size: 30px;
+            -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+      transition: font-size 0.3s ease, background-color 0.3s ease;
+
+
+    }
+
+
+    #portals {
+      /*list-style: none;*/
+      padding-left: 0;
+    }
+ 
+    #portals .sort-handle {
+      display: none;
+    }
+ 
+    #portals .ui-selected .sort-handle
+     {
+      display: inline;
+      padding: 0 0.5em;
+      cursor: pointer;
+    }
+
+    #activities {
+      /*list-style: none;*/
+      padding-left: 0;
+    }
+ 
+    #activities .sort-handle {
+      display: none;
+    }
+ 
+    #activities .ui-selected .sort-handle
+     {
+      display: inline;
+      padding: 0 0.5em;
+      cursor: pointer;
+    }
+
+    #resources li a
+    {
+      /*list-style: none;*/
+      padding-left: 0;
+    }
+
+    #resources li a.toggleList {
+      font-weight: bold;
+    }
+ 
+    #resources .sort-handle {
+      display: none;
+    }
+ 
+    #resources .ui-selected
+     {
+      font-weight: bold;
+/*      display: inline;
+      padding: 0 0.5em;
+      cursor: pointer;
+*/    }
+
+    #rosters
+    {
+      /*list-style: none;*/
+      padding-left: 0;
+    }
+
+    .header {font-size:25px; font-family:Helvetica; cursor:pointer;}
+
+    li a.ui-selected {
+      background-color: white;
+      color: black;
+      font-weight: bold;
+      background-image: none;
+    }
+    li a.ui-selecting {
+      background-color: white;
+      color: red;
+      background-image: none;
+    }
+
+
+
+    li.ui-selected {
+      background-color: white;
+      color: black;
+      font-weight: bold;
+      background-image: none;
+    }
+    li.ui-selecting {
+      background-color: white;
+      color: red;
+      background-image: none;
+    }
+ 
+  </style>
+    <script>
+      var query_parameters = NUTELLA.parseURLParameters();
+      var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId()); 
+      nutella.net.subscribe('rosters_set',function() {location.reload(true);});
+      nutella.net.subscribe('portals_set',function() {location.reload(true);});
+
+
+    $(function() {
+      var instanceName = '';
+      var portalName = '';
+      var activityName = '';
+      var instanceID = 0;
+      var portalID = 0;
+      var activityID = 0;
+
+      var rosters = [];
+
+      nutella.net.request('get_portals',{},function(parm_portals,from){ console.log(parm_portals);
+        var topPortalID = parm_portals.topID;
+        var portals = parm_portals.portalList;
+	    for(var i=0; i<portals.length;i++) 
+	      	$('#portals').append(' <li class="ui-widget-content" value="' + portals[i].portalID + '"><span class="sort-handle">&#9776;</span><a href="#">' + portals[i].name + '</a></li> ');
+        // nutella.net.request('get_rosters',{},function(parm_rosters,from){ 
+//            var rosters = parm_rosters;
+          // var rosters = [{portalID:1,topPortalID:1,rosterList:[{name:"Billy", ID: 1}]}];
+          nutella.net.request('get_rosters',{},function(arg,from) {
+            rosters = arg;
+             var activityID = -1;
+            nutella.net.request('get_activity',{},function(activity,from){
+            	activityID = activity;
+              
+
+
+                $( "#portals li a" ).on( "click", function( event, ui ) { 
+                  portalName = this.innerHTML;// if ($( "#resources" ).children("li.ui-selected")[0].value == )
+                  $( "#portals li a" ).removeClass('ui-selected');
+                  document.getElementById("open2").innerHTML = "roster";
+                  var p = event.currentTarget;
+                  console.log(p);
+                  p = $(p); 
+                  console.log(p);
+                  portalID = p.parent()[0].value;
+  //                current_portalName = p.parent()[0].name;
+                  p.addClass('ui-selected');
+                  loadRoster();
+
+                });
+
+                $("#open").click (function (event)    // Open button Treatment
+                  {
+                    if (!$("#dialog").dialog ("isOpen")) $("#dialog").dialog ("open");
+                  });
+                $("#close").click (function (event)   // Close button Treatment
+                  {
+                    if ($("#dialog").dialog ("isOpen")) $("#dialog").dialog ("close");
+                  }); 
+
+                $("#open2").click (function (event)    // Open button Treatment
+                  {
+                    if (!$("#dialog2").dialog ("isOpen")) $("#dialog2").dialog ("open");
+                  });
+                $("#close2").click (function (event)   // Close button Treatment
+                  {
+                    if ($("#dialog2").dialog ("isOpen")) $("#dialog2").dialog ("close");
+                  }); 
+
+                $("div#dialog").dialog ({
+                  autoOpen : false
+                });
+                $("div#dialog2").dialog ({
+                  autoOpen : false
+                });
+
+
+                // if ($( "#portals li a" ).length > 0) $( "#portals li a" )[0].click();
+
+                function launchRoomcast() {
+                    var s = 'http://';
+                    s += window.location.host + '/';
+                    s += query_parameters.app_id + '/';
+                    s += query_parameters.run_id + '/';
+                    s += 'runs/';
+                    s += 'roomcast' + '/';
+                    s += 'index.html' + '?';
+                    s += 'broker=' + query_parameters.broker + '&';
+                    s += 'app_id=' + query_parameters.app_id + '&';
+                    s += 'run_id=' + query_parameters.run_id+ '&' ;
+                    s += 'portalID=' + portalID+ '&' ;
+                    s += 'instanceID=' + instanceID + '&' ;
+                    s += 'activityID=' + activityID + '&' ;
+                    s += 'portalName=' + portalName+ '&' ;
+                    s += 'instanceName=' + instanceName + '&' ;
+                    s += 'activityName=' + activityName;
+
+                    console.log(s);
+
+                    if (inIframe()) window.top.location.href = s;
+                    else location.href=s; 
+
+                }
+
+                function inIframe () {
+                    try {
+                        return window.self !== window.top;
+                    } catch (e) {
+                        return true;
+                    }
+                }
+
+      				function loadRoster(){
+      					$('#rosters').empty();
+      					var index = -1;
+      					for (var i=0; i<rosters.length; i++){
+      						if (rosters[i].portalID == portalID) {index = i; break;}
+      					}
+                if (rosters[index].rosterList.length == 1) {
+                  instanceID = rosters[index].rosterList[0].ID;
+                  instanceName = rosters[index].rosterList[0].name;
+                  launchRoomcast();
+                }
+      					if (index > -1){
+      						for (var i=0; i<rosters[index].rosterList.length; i++)
+      							$('#rosters').append(' <li class="ui-widget-content" value="' + rosters[index].rosterList[i].ID + '"><span class="sort-handle"></span><a href="#">' + rosters[index].rosterList[i].name + '</a></li> ');
+      					}		
+      	              $( "#rosters li a" ).on( "click", function( event, ui ) { 
+      	                // if ($( "#resources" ).children("li.ui-selected")[0].value == )
+      	                instanceName = this.innerHTML;
+                        var p = event.currentTarget;
+      	                console.log(p);
+      	                p = $(p); 
+      	                p.addClass('ui-selected');
+      	                console.log(p);
+      	                instanceID = p.parent()[0].value;
+      	                launchRoomcast();
+      	              });
+
+    				  } //end function loadroster
+
+          }); // end nutella (current) activity request
+        }); // end nutella rosters request
+      }); //end nutella portals request
+    }); // end jquery onload
+  </script>
+
+</head>
+<body>
+  <table >
+    <tr>
+      <td valign=top align=center>
+        <span class="header" style="" id="open">portal</span><br>
+        <ul id="portals" class="list" ></ul>
+<!--         <div style="text-align: center;"> <button id="addPortal">+</button>&nbsp&nbsp<input id="portalName" type=text value="" size=10 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">&nbsp&nbsp<button id="deletePortal">-</button></div>
+ -->      </td>
+      </td>
+      <td valign=top align=center >
+        <span class="header" id="open2"></span><br>
+        <ul id="rosters" class="list"></ul>
+      </td>
+
+    </tr>
+
+  </table>
+    <div  hidden id="dialog" title="Select portal">
+    <p> Select a portal. To the right, you will see the roster of individuals or devices who use that type of portal.</p>
+    <button id="close">OK</button>
+  </div>
+  <div  hidden id="dialog2" title="Edit roster">
+    <p> Select an individual from the roster for your portal. When you click on the individual, you will be reloaded with the appropriate resources for that portal and the current activity. </p>
+    <button id="close2">OK</button>
+  </div>
+
+  
+</body>

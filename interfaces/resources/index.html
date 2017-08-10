@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+  <script src="nutella_lib.js" type="text/javascript"></script>
+
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css" />
+ 
+  <style type="text/css">
+
+    .inactiveLink {
+       pointer-events: none;
+       cursor: default;
+    }
+    td {
+      width:250px;
+    }
+
+ .menu {
+          overflow-y: auto;
+          overflow-x: hidden;
+          max-height: 500px;
+          width: 250px;
+        } 
+
+    li {
+      font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
+      border-bottom: 1px solid #ccc;
+      padding:5px 5px 5px 5px;
+      background-color:white;
+      list-style-type: none;
+    }
+    ul {
+       background-color:interit;
+   }
+/*    li:last-child {
+      border: none;
+    }
+*/
+    li  a {
+      text-decoration: none;
+      color: white;
+
+      -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+      transition: font-size 0.3s ease, background-color 0.3s ease;
+      /*display: block;*/
+    }
+
+    .short {
+      width: auto;
+    }
+
+    #mydiv {
+      text-align: center;
+
+    }
+
+    button {
+      font-size: 20px;
+    }
+
+    li  a:hover {
+      font-size: 25px;
+      /*background: white;*/
+    }
+
+        .header:hover
+    {
+      font-size: 30px;
+            -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+      transition: font-size 0.3s ease, background-color 0.3s ease;
+
+
+    }
+
+
+    #resources {
+      /*list-style: none;*/
+      padding-left: 0;
+    }
+ 
+    #resources .sort-handle {
+      display: none;
+    }
+ 
+    #resources .ui-selected .sort-handle
+     {
+      display: inline;
+      padding: 0 0.5em;
+      cursor: pointer;
+    }
+
+
+
+
+    .header {font-size:25px; font-family:Helvetica;cursor:pointer;}
+
+
+
+
+    li.ui-selected {
+      background-color: white;
+      color: black;
+      font-weight: bold;
+      background-image: none;
+    }
+    li.ui-selecting {
+      background-color: white;
+      color: red;
+      background-image: none;
+    }
+
+
+    /*************** SCROLLBAR BASE CSS ***************/
+ 
+    .scroll-wrapper {
+        overflow: auto !important;
+        padding: 0 !important;
+        position: relative;
+    }
+     
+    .scroll-wrapper > .scroll-content {
+        border: none !important;
+        box-sizing: content-box !important;
+        height: auto;
+        left: 0;
+        margin: 0;
+        max-height: 400;
+        max-width: none !important;
+        overflow: scroll !important;
+        padding: 0;
+        position: relative !important;
+        top: 0;
+        width: auto !important;
+    }
+     
+    .scroll-wrapper > .scroll-content::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+    }
+     
+    .scroll-element {
+        display: none;
+    }
+    .scroll-element, .scroll-element div {
+        box-sizing: content-box;
+    }
+     
+    .scroll-element.scroll-x.scroll-scrollx_visible,
+    .scroll-element.scroll-y.scroll-scrolly_visible {
+        display: block;
+    }
+     
+    .scroll-element .scroll-bar,
+    .scroll-element .scroll-arrow {
+        cursor: default;
+    }
+     
+    .scroll-textarea {
+        border: 1px solid #cccccc;
+        border-top-color: #999999;
+    }
+    .scroll-textarea > .scroll-content {
+        overflow: hidden !important;
+    }
+    .scroll-textarea > .scroll-content > textarea {
+        border: none !important;
+        box-sizing: border-box;
+        height: 100% !important;
+        margin: 0;
+        max-height: none !important;
+        max-width: none !important;
+        overflow: scroll !important;
+        outline: none;
+        padding: 2px;
+        position: relative !important;
+        top: 0;
+        width: 100% !important;
+    }
+    .scroll-textarea > .scroll-content > textarea::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+    }
+     
+     
+     
+     
+    /*************** SCROLLBAR RAIL ***************/
+     
+    .scrollbar-rail > .scroll-element,
+    .scrollbar-rail > .scroll-element div
+    {
+        border: none;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        z-index: 10;
+    }
+     
+    .scrollbar-rail > .scroll-element {
+        background-color: #ffffff;
+    }
+     
+    .scrollbar-rail > .scroll-element div {
+        display: block;
+        height: 100%;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+     
+    .scrollbar-rail > .scroll-element .scroll-element_size {
+        background-color: #999;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+     
+    .scrollbar-rail > .scroll-element .scroll-element_outer:hover .scroll-element_size {
+        background-color: #666;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+     
+    .scrollbar-rail > .scroll-element.scroll-x {
+        bottom: 0;
+        height: 12px;
+        left: 0;
+        min-width: 100%;
+        padding: 3px 0 2px;
+        width: 100%;
+    }
+     
+    .scrollbar-rail > .scroll-element.scroll-y {
+        height: 100%;
+        min-height: 100%;
+        padding: 0 2px 0 3px;
+        right: 0;
+        top: 0;
+        width: 12px;
+    }
+     
+    .scrollbar-rail > .scroll-element .scroll-bar {
+        background-color: #d0b9a0;
+     
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+     
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+     
+    .scrollbar-rail > .scroll-element .scroll-element_outer:hover .scroll-bar {
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+    }
+     
+    /* scrollbar height/width & offset from container borders */
+     
+    .scrollbar-rail > .scroll-content.scroll-scrolly_visible { left: -17px; margin-left: 17px; }
+    .scrollbar-rail > .scroll-content.scroll-scrollx_visible { margin-top: 17px; top: -17px; }
+     
+    .scrollbar-rail > .scroll-element.scroll-x .scroll-bar { height: 10px; min-width: 10px; top: 1px; }
+    .scrollbar-rail > .scroll-element.scroll-y .scroll-bar { left: 1px; min-height: 10px; width: 10px; }
+     
+    .scrollbar-rail > .scroll-element.scroll-x .scroll-element_outer { height: 15px; left: 5px; }
+    .scrollbar-rail > .scroll-element.scroll-x .scroll-element_size { height: 2px; left: -10px; top: 5px; }
+     
+    .scrollbar-rail > .scroll-element.scroll-y .scroll-element_outer { top: 5px; width: 15px; }
+    .scrollbar-rail > .scroll-element.scroll-y .scroll-element_size { left: 5px; top: -10px; width: 2px; }
+     
+    /* update scrollbar offset if both scrolls are visible */
+     
+    .scrollbar-rail > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_size { left: -25px; }
+    .scrollbar-rail > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size { top: -25px; }
+     
+    .scrollbar-rail > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_track { left: -25px; }
+    .scrollbar-rail > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_track { top: -25px; }
+ 
+  </style>
+    <script>
+    $(function() {
+      // $('.scrollbar-rail').scrollbar();
+
+      var query_parameters = NUTELLA.parseURLParameters();
+      var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
+ 
+          nutella.net.request('get_resources',{},function(parm_resources,from){ 
+            var resources = parm_resources.resourceList;
+            var topResourceID = parm_resources.topID;
+              
+              for(var i=0; i<resources.length;i++) 
+                $('#resources').append('<li class="ui-widget-content" value="' + resources[i].resourceID + '"><span class="sort-handle">&#9776;</span><a href="#">' + resources[i].name + '</a></li> ');
+
+              var current_resourceID = -1;
+              setupList("resources");
+
+              $( "#resources" ).on( "selectableselected", function( event, ui ) {
+                var list = event.target; console.log(event.target);
+                current_resourceID = $( "#resources" ).children("li.ui-selected")[0].value; 
+                var resource = resources.filter(function(arg) {return(arg.resourceID == current_resourceID);})[0];
+
+                document.getElementById('resourceName').value = resource.name;
+                document.getElementById('URL').value = resource.URL;
+                document.getElementById('description').value = resource.description;
+                document.getElementById('query').value = resource.query;
+                document.getElementById('photo').src = constructURL(resource.URL) + resource.query;
+                $('#unfold').show();
+              });
+
+
+
+              $('#addResource').on("click",function(){
+                var ID = ++topResourceID; 
+                var name = "untitled";
+                $('#resources li').removeClass('ui-selected');
+                $('#resources li a').removeClass('ui-selected');
+                $('#resources').append(' <li class="ui-selected ui-widget-content" value="' + ID + '"><span class="sort-handle">&#9776;</span><a href="#">' + name + '</a></li> ');
+                resources.push({resourceID: ID, name: name, description:"",URL:"",query:""});
+                save();
+                current_resourceID = $( "#resources" ).children("li.ui-selected")[0].value; 
+                document.getElementById('resourceName').value = name;
+                document.getElementById('resourceName').select();
+                document.getElementById('URL').value = "";
+                document.getElementById('description').value = "";
+                document.getElementById('query').value = "";
+                document.getElementById('photo').src = '';
+                $('#unfold').show();
+                
+              });
+
+
+              $('#deleteResource').on("click",function(){
+                var ID = current_resourceID; //$('#resources li.ui-selected')[0].value;
+                if (ID <= 5) {alert ("Sorry. You can't delete that resource."); return;}
+                $('#resources li.ui-selected').remove();
+                document.getElementById('resourceName').value = '';
+                resources = resources.filter(function(arg){
+                  return (arg.resourceID != ID);
+                });
+                console.log(resources);
+                current_resourceID = -1;
+                document.getElementById('resourceName').value = "";
+                document.getElementById('URL').value = "";
+                document.getElementById('description').value = "";
+                document.getElementById('query').value = "";
+                document.getElementById('photo').src = '';
+                save();
+                $('#unfold').hide();
+                // should add warning dialog
+                // should clean out distribution entries with this resource
+              });
+
+
+              $("#resourceName").on('keyup', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('resourceName').value = ''; return;}
+                  if (e.keyCode == 13) {
+                    var name = document.getElementById('resourceName').value; 
+                    $('#resources li.ui-selected a')[0].innerHTML = name; 
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].name = name; break;}
+                    }
+                    save();
+                  }
+              });
+
+
+              $("#description").on('keyup', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('description').value = ''; return;}
+                  if (e.keyCode == 13) {
+                    var description = document.getElementById('description').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].description = description; break;}
+                    }
+                    save();
+                  }
+              });
+
+              $("#URL").on('keyup', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('URL').value = ''; return;}
+                  if (e.keyCode == 13) {
+                    var URL = document.getElementById('URL').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].URL = URL; break;}
+                    }
+                    save();
+                    document.getElementById('photo').src = constructURL(document.getElementById('URL').value) + document.getElementById('query').value;
+                  }
+              });
+
+              $("#query").on('keyup', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('query').value = ''; return;}
+                  if (e.keyCode == 13) {
+                    var query = document.getElementById('query').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].query = query; break;}
+                    }
+                    document.getElementById('photo').src = constructURL(document.getElementById('URL').value) + document.getElementById('query').value;
+                    save();
+                  }
+              });
+
+              $("#resourceName").on('mouseout', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('resourceName').value = ''; return;}
+                  if (true) {
+                    var name = document.getElementById('resourceName').value; 
+                    $('#resources li.ui-selected a')[0].innerHTML = name; 
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].name = name; break;}
+                    }
+                    save();
+                  }
+              });
+
+
+              $("#description").on('mouseout', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('description').value = ''; return;}
+                  if (true) {
+                    var description = document.getElementById('description').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].description = description; break;}
+                    }
+                    save();
+                  }
+              });
+
+              $("#URL").on('mouseout', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('URL').value = ''; return;}
+                  if (true) {
+                    var URL = document.getElementById('URL').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].URL = URL; break;}
+                    }
+                    save();
+                    document.getElementById('photo').src = constructURL(document.getElementById('URL').value) + document.getElementById('query').value;
+
+                  }
+              });
+
+              $("#query").on('mouseout', function (e) { console.log('current_resourceID:   ' + current_resourceID);
+                  if (current_resourceID < 0) {document.getElementById('query').value = ''; return;}
+                  if (true) {
+                    var query = document.getElementById('query').value;  
+                    for (var i=0; i<resources.length; i++){ console.log (resources[i]);
+                      if (resources[i].resourceID == current_resourceID) {resources[i].query = query; break;}
+                    }
+                    save();
+                    document.getElementById('photo').src = constructURL(document.getElementById('URL').value) + document.getElementById('query').value;
+                  }
+              });
+
+
+              $("#open").click (function (event)    // Open button Treatment
+                {
+                  if (!$("#dialog").dialog ("isOpen")) $("#dialog").dialog ("open");
+                });
+              $("#close").click (function (event)   // Close button Treatment
+                {
+                  if ($("#dialog").dialog ("isOpen")) $("#dialog").dialog ("close");
+                }); 
+
+              $("#open2").click (function (event)    // Open button Treatment
+                {
+                  if (!$("#dialog2").dialog ("isOpen")) $("#dialog2").dialog ("open");
+                });
+              $("#close2").click (function (event)   // Close button Treatment
+                {
+                  if ($("#dialog2").dialog ("isOpen")) $("#dialog2").dialog ("close");
+                }); 
+
+              $("div#dialog").dialog ({
+                autoOpen : false
+              });
+              $("div#dialog2").dialog ({
+                autoOpen : false
+              });
+ 
+
+              function setupList(type){ 
+
+                $('#'+type).selectable({
+                  cancel: '.sort-handle'
+                }).sortable({
+                  items: "> li",
+                  handle: '.sort-handle',
+                  helper: function(e, item) { 
+                    if ( ! item.hasClass('ui-selected') ) {  
+                      item.parent().children('.ui-selected').removeClass('ui-selected');
+                      item.addClass('ui-selected');
+                    }
+           
+                    var selected = item.parent().children('.ui-selected').clone();
+                    item.data('multidrag', selected).siblings('.ui-selected').remove();
+                    return $('<li/>').append(selected);
+                  },
+                  stop: function(e, ui) {
+                    var selected = ui.item.data('multidrag');
+                    ui.item.after(selected);
+                    ui.item.remove();
+
+                    if (type == 'resources') {
+
+                    	var newResources = [];
+
+                    	// rebuild the resources array
+
+                    	for (var i=0; i<$('#resources li').length; i++) {
+                    		// find the original index in the resources array
+                    		var index = 0;
+                    		for (var j=0; j<resources.length; j++) 
+                    			if (resources[j].resourceID == $('#resources li')[i].value) {index = j; break;}
+                    		console.log('index = ' + index);
+                    		console.log(resources[j].resourceID);
+                    		console.log($('#resources li')[i].value);
+                    		newResources[i] = resources[index];
+                    	}
+                    	resources = newResources;
+
+                      // for (var i=0; i<resources.length; i++) {
+                      //   var name = $('#'+type).children("li")[i].innerHTML.match(/<a.*a>/g)[0];
+                      //   name = name.match(/>.*</g)[0];
+                      //   name = name.substr(1);
+                      //   name = name.substr(0,name.length-1);  
+                      //   var ID = $('#'+type).children("li")[i].value;
+                      //   resources[i].name = name;
+                      //   resources[i].resourceID = ID;
+                      // };
+
+                      	console.log(resources);
+                      	save();
+
+                    }
+
+                  }
+                });
+
+              }; // end function setupList definition
+
+
+//              setupToggleList(
+              function save(){ 
+
+              	nutella.net.publish('set_resources',{topID: topResourceID, resourceList: resources});
+
+              	// nutella.net.publish('set_resources',{topID: topResourceID, resourceList: resources});
+
+               //  distribution = distribution.filter(function(arg) 
+               //    {return((arg.portalID != current_portalID) || (arg.activityID != current_activityID));});
+               //  console.log($( "#resources li a.ui-selected").parent()[0].value);
+
+               //  var selectedResources = [];
+
+               //  for (var i=0; i< $('#resources li a.ui-selected').length; i++) {
+               //    selectedResources.push($('#resources li a.ui-selected').parent()[i].value);
+               //  }
+
+               //  // var selectedResources = $( "#resources li a.ui-selected").map(function(arg){ console.log("arg " + arg);
+               //  //    return ($('#resources li a.ui-selected').parent()[arg].value);}); 
+               //  // console.log(selectedResources);
+
+               //  for (var i=0; i<selectedResources.length; i++){
+               //    distribution.push({portalID: current_portalID, activityID: current_activityID, resourceID: selectedResources[i]});
+               //  }
+               //  nutella.net.publish('set_distribution',distribution);
+
+              }; 
+
+              function constructURL(arg){
+                if (arg.substring(0,4) != "http") { 
+                    var s = 'http://';
+                    s += window.location.host + '/';
+                    s += query_parameters.app_id + '/';
+                    s += query_parameters.run_id + '/';
+                    s += 'runs/';
+                    s += arg + '/';
+                    s += 'index.html' + '?';
+                    s += 'broker=' + query_parameters.broker + '&';
+                    s += 'app_id=' + query_parameters.app_id + '&';
+                    s += 'run_id=' + query_parameters.run_id ;
+                    return s; 
+                } else {
+                  return (arg);
+                }
+              };
+
+
+
+
+          }); // end nutella resources request
+
+    }); // end jquery onload
+  </script>
+
+</head>
+<body >
+  <table style="border:none;">
+    <tr>
+      <td valign=top align=center>
+        <span class="header" style="" id="open">resources</span><br>
+        <div class="menu scrollbar-rail">
+          <ul id="resources" ></ul>
+        </div>
+        <div style="text-align: center;"> <button id="addResource">+</button>&nbsp&nbsp<input id="resourceName" type=text value="" style="width:150px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">&nbsp&nbsp<button id="deleteResource">-</button></div>
+      </td>
+
+      <td hidden id="unfold" valign=top align=center style="width:500px;">
+        <span class="header" style="" id="open2">properties</span><br><br>
+        <iframe id="photo" height=300 width=400> </iframe>
+        <table style="font-family: Helvetica; font-size: 125%;" align=center>
+          <tr>
+            <td style="width:20%;" class='short' align=right> link </td>
+            <td class='short' align=left>  <input id="URL" type=text style="width:339px;"></td>
+          </tr>
+          <tr>
+            <td class='short' align=right> query </td>
+            <td class='short' align=left>  <input id="query" type=text style="width:339px;"></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class='short' align=left> description </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class='short' align=left>  <textarea id="description" style="width:339px; height:150px"></textarea></td>
+          </tr>
+        </table>
+      </td>
+
+    </tr>
+
+  </table>
+    <div  hidden id="dialog" title="Select resource">
+    <p> Select a resource.</p>
+    <button id="close">OK</button>
+  </div>
+  <div  hidden id="dialog2" title="Resource attributes">
+    <p> Resource attributes. </p>
+    <button id="close2">OK</button>
+  </div>
+
+  
+</body>

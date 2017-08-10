@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+
+<head>
+  <meta charset="utf-8">
+  <title>Seismograph</title>
+	<meta name="description" content="Seismograph interface">
+	
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
+	<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+<body>
+	<h1>Choose your seismograph</h1>
+	<ul>
+	  <li><a href="seismograph.html?instanceID=1"><span>Seismograph 1</span></a></li>
+		<li><a href="seismograph.html?instanceID=2"><span>Seismograph 2</span></a></li>
+		<li><a href="seismograph.html?instanceID=3"><span>Seismograph 3</span></a></li>
+		<li><a href="seismograph.html?instanceID=4"><span>Seismograph 4</span></a></li>
+	</ul>
+	
+	<script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+	
+			var query_params = NUTELLA.parseURLParameters();
+			$('a').each(function (index) {
+				var link = $(this).attr('href');
+				if (link!="" && link!="#")
+					$(this).attr('href', link + "&app_id="+ query_params.app_id + "&run_id=" + query_params.run_id + "&broker=" + query_params.broker);
+			});
+
+
+
+	</script>
+		
+</body>
+</html>
