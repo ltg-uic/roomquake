@@ -270,9 +270,9 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 			room_width_x_meters = response.room_width_meters;
 			room_height_y_meters = response.room_height_meters;
 			response.seismographs.forEach(function(e) {
-				if (e.id==parent.document.getElementById('instanceID').value) {	
+				if (e.id==top.instance.ID) {	
 					//whichSEISMOGRAPH = e.id;	
-					seismograph_loc.x = e.x; ;
+					seismograph_loc.x = e.x; 
 					seismograph_loc.y = e.y; 
 				}
 				unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
@@ -335,9 +335,20 @@ function ooch() {
 
 	function signedRandom () {
 		return (Math.random() - 0.5)*2;
+
+	// return (gaussianRand() - 0.5)*2;
+		
 	}
 
+	function gaussianRand() {
+	  var rand = 0;
 
+	  for (var i = 0; i < 6; i += 1) {
+	    rand += Math.random();
+	  }
+
+	  return rand / 6;
+	}
 
 	// interval_timer is called every time_interval seconds. it updates the seismograph.
 
@@ -428,19 +439,32 @@ function ooch() {
 
 
 		var t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude ;}
+		// while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude ;}
 		
 
-		t = t + (1+magnitude) * .05;
+		t = t + (2+magnitude) * .05;
 		
 			
 		while (i < n_displacements*t) event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude;
 
 
-		t += .10;
+		t += .20;
 
-		t_counter = 0;
-		while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;}
+		// t_counter = 0;
+
+		t_counter=0;
+
+		// while (i < n_displacements*t) {event_buffer[TOTAL_QUAKES][i++] = signedRandom() * s_amplitude * (1 - t_counter/(3*SAMPLING_FREQUENCY)); t_counter++;} //here's where i need to introduce logarithmic decay
+
+		var t_total = Math.floor(n_displacements*t) - i;
+
+		while (i < n_displacements*t) {
+			// if(Math.log10(10*t_counter/t_total) < 0) alert('less');
+			event_buffer[TOTAL_QUAKES][i++] = 
+				signedRandom() * (s_amplitude - s_amplitude*Math.log10(1+10*t_counter/t_total)); 
+			t_counter++; 
+
+		} //here's where i need to introduce logarithmic decay
 
 
 				

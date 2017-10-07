@@ -13,6 +13,7 @@
        pointer-events: none;
        cursor: default;
     }
+
     td {
       width:250px;
     }
@@ -20,7 +21,7 @@
 
     li {
       font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
-
+      border-bottom: 1px solid #ccc;
       padding:5px 5px 5px 5px;
       background-color:white;
       list-style-type: none;
@@ -58,17 +59,6 @@
       /*background: white;*/
     }
 
-    .header:hover{
-      font-size: 30px;
-            -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
-      transition: font-size 0.3s ease, background-color 0.3s ease;
-
-
-    }
-
     #portals {
       /*list-style: none;*/
       padding-left: 0;
@@ -85,20 +75,23 @@
       cursor: pointer;
     }
 
-    #rosters {
+    #activities {
       /*list-style: none;*/
       padding-left: 0;
     }
  
-    #rosters .sort-handle {
+    #activities .sort-handle {
       display: none;
     }
  
-    #rosters .ui-selected .sort-handle
+    #activities .ui-selected .sort-handle
      {
-      display: inline;
-      padding: 0 0.5em;
-      cursor: pointer;
+      display: none;
+    }
+
+    #resources {
+      /*list-style: none;*/
+      padding-left: 0;
     }
 
     #resources li a
@@ -123,15 +116,9 @@
       cursor: pointer;
 */    }
 
-    input {
-      font-size: 125%;
-    }
-
-
     .header {
       font-size:25px; 
-      font-family:Helvetica;      
-      cursor:pointer;
+      font-family:Helvetica;
     }
 
     li a.ui-selected {
@@ -139,10 +126,6 @@
       color: black;
       font-weight: bold;
       background-image: none;
-    }
-
-    unitName {
-      font-size:30;
     }
 
     li.ui-selected {
@@ -156,48 +139,36 @@
       color: red;
       background-image: none;
     }
+
  
   </style>
-    <script>
+  <script>
     var query_parameters = NUTELLA.parseURLParameters();
     var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
+
     $(function() {
-
-      nutella.net.request('get_unitname',{},function(unitname,from){ 
-        document.getElementById('unitName').value=unitname;
-
-        $("#unitName").on('mouseout', function (e) { 
-          nutella.net.publish('set_unitname',document.getElementById('unitName').value);
-          window.top.document.getElementById('unitName').innerHTML = document.getElementById('unitName').value;
+    	document.getElementById('unitname').value = top.unitname.name;
+        $("#unitname").on('mouseout', function (e) { 
+        	top.update_unitname(document.getElementById('unitname').value);
         });
-
-        $("#unitName").on('keyup', function (e) { 
-          nutella.net.publish('set_unitname',document.getElementById('unitName').value);
-          window.top.document.getElementById('unitName').innerHTML = document.getElementById('unitName').value;
+        $("#unitname").on('keyup', function (e) { 
+        	top.update_unitname(document.getElementById('unitname').value);
         });
-      }); //end get_unitname request
-    }); // end jquery onload
-  </script>
+	});
+
+
+
+</script>
 
 </head>
 <body>
   <table >
     <tr>
-      <td valign=top  align=middle>
-         <span class="header" style="" id="open">unit name</span><br><br>
-         <input type=text size=20 id="unitName">
+      <td valign=top align=middle>
+         <span class="header"  id="open">unit name</span><br>
+        <input type=text id="unitname">
       </td>
     </tr>
-
   </table>
-  <div  hidden id="dialog" title="Select portal">
-    <p> Select a portal. To the right, you will see the roster of individuals or devices who use that type of portal.</p>
-    <button id="close">OK</button>
-  </div>
-  <div  hidden id="dialog2" title="Edit roster">
-    <p> Edit roster. Click to select an individual from the roster. Edit the name of the individual in the text box and <return> to complete. Click on the - button to delete the currently selected individual. Drag selected items to rearrange the roster. Click on the + button to add to the roster. </p>
-    <button id="close2">OK</button>
-  </div>
-
-  
 </body>
+</html>

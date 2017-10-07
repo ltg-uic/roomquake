@@ -15,7 +15,7 @@
     }
 
     td {
-      width:250px;
+      width:200px;
     }
 
 
@@ -57,17 +57,6 @@
     li  a:hover {
       font-size: 25px;
       /*background: white;*/
-    }
-
-    .header:hover{
-      font-size: 30px;
-            -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -o-transition: font-size 0.3s ease, background-color 0.3s ease;
-      -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
-      transition: font-size 0.3s ease, background-color 0.3s ease;
-
-
     }
 
     #portals {
@@ -127,12 +116,9 @@
       cursor: pointer;
 */    }
 
-
-
     .header {
       font-size:25px; 
       font-family:Helvetica;
-      cursor:pointer;
     }
 
     li a.ui-selected {
@@ -141,8 +127,6 @@
       font-weight: bold;
       background-image: none;
     }
-
-
 
     li.ui-selected {
       background-color: white;
@@ -155,106 +139,57 @@
       color: red;
       background-image: none;
     }
+
  
   </style>
-    <script>
+  <script>
     var query_parameters = NUTELLA.parseURLParameters();
     var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
-    nutella.net.subscribe('activities_set',function() {location.reload(true);});
+    // nutella.net.subscribe('activities_set',function() {location.reload(true);});
 
     $(function() {
 
-      nutella.net.request('get_activities',{},function(parm_activities,from){ 
-        var activities = parm_activities.activityList;
-        nutella.net.request('get_activity',{},function(parm_activity,from){ 
-          var activity = parm_activity; 
-            // var topResourceID = parm_resources.topID;
-          for(var i=0; i<activities.length;i++) 
-            $('#activities').append(' <li class="ui-widget-content" value="' + activities[i].activityID + '"><span class="sort-handle">&#9776;</span><a href="#">' + activities[i].name + '</a></li> ');
+    	// build the activities menu
 
-          $( "#activities li" ).filter(function(arg){
-            return( $( "#activities li" )[arg].value == activity)
-          }).addClass('ui-selected');
+    	for (var i=0; i<top.activities.activityList.length; i++) {
+    		var item = top.activities.activityList[i];
+	    	var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
+			$('#activities').append(li);
+    	}
 
-          $( "#activities li a" ).on( "click", function( event, ui ) { 
-            $( "#activities li" ).removeClass('ui-selected'); 
-            $( "#activities li a" ).removeClass('ui-selected');
+    	// highlight the current activity
 
-            var p = event.currentTarget;
-            p = $(p);
-            p.addClass('ui-selected'); 
-            var old_activity=activity;
-            activity = p.parent()[0].value; 
-            if (activity != old_activity) {nutella.net.publish('set_activity',activity);}
-          });
+    	$( "#activities li" ).filter(function(arg){
+            return( $( "#activities li" )[arg].value == top.activity.ID)
+        }).addClass('ui-selected');
 
-          $("#open").click (function (event)    // Open button Treatment
-            {
-              if (!$("#dialog").dialog ("isOpen")) $("#dialog").dialog ("open");
-            });
-          $("#close").click (function (event)   // Close button Treatment
-            {
-              if ($("#dialog").dialog ("isOpen")) $("#dialog").dialog ("close");
-            }); 
+    	// when an activity is selected, highlight it
 
-          $("div#dialog").dialog ({
-            autoOpen : false
-          });
+  		$( "#activities li a" ).on( "click", function( event, ui ) { 
+  			$( "#activities li" ).removeClass('ui-selected'); 
+  			$( "#activities li a" ).removeClass('ui-selected');
+  			var p = event.currentTarget;
+  			top.activity.name = p.innerHTML;
+  			p = $(p);
+  			p.addClass('ui-selected');
+  			top.activity.ID = p.parent()[0].value;
+  			top.set_activity();
+        if (top.portal.ID == 1) top.build_page();
+  		});
 
-          //  function launchRoomcast() { 
-          //   var s = 'http://';
-          //   s += window.location.host + '/';
-          //   s += query_parameters.app_id + '/';
-          //   s += query_parameters.run_id + '/';
-          //   s += 'runs/';
-          //   s += 'roomcast' + '/';
-          //   s += 'index.html' + '?';
-          //   s += 'broker=' + query_parameters.broker + '&';
-          //   s += 'app_id=' + query_parameters.app_id + '&';
-          //   s += 'run_id=' + query_parameters.run_id+ '&' ;
-          //   s += 'portalID=' + window.top.query_parameters.portalID + '&' ;
-          //   s += 'instanceID=' + window.top.query_parameters.instanceID + '&' ;
-          //   s += 'activityID=' + activity;
-          //   console.log(s);
+});
 
-          //   if (inIframe()) window.top.location.href = s;
-          //   else location.href=s; 
-
-          // }
-
-              // function inIframe () {
-              //     try {
-              //         return window.self !== window.top;
-              //     } catch (e) {
-              //         return true;
-              //     }
-              // }
-
-
-          // if ($( "#activities li a" ).length > 0) $( "#activities li a" )[0].click();
-
-
-        }); //end nutella activity request
-      }); //end nutella activities request
-    }); // end jquery onload
-  </script>
+</script>
 
 </head>
 <body>
   <table >
     <tr>
       <td valign=top align=middle>
-         <span class="header" style="cursor:pointer;" id="open">activity</span><br>
+         <span class="header"  id="open">activity</span><br>
         <ul id="activities" class="list"></ul>
       </td>
-
     </tr>
-
   </table>
-  <div hidden id="dialog" title="Select activity">
-    <p> Select a new activity. This will cause all portals to reinitialize based on the distribution of resources for the new activity and this type of portal.</p>
-    <button id="close">OK</button>
-  </div>
-
-  
 </body>
+</html>

@@ -139,11 +139,10 @@ $(function() {
 
                 // substitute with query parameters if available
 
-                if (query_parameters.hasOwnProperty('portal')) {
-                  portalID = query_parameters.portal; 
-                  instanceID = 0;
-                  if (query_parameters.hasOwnProperty('instance'))   
-                    instanceID = query_parameters.instance;
+                if (query_parameters.hasOwnProperty('portal') &&
+                    query_parameters.hasOwnProperty('instance')) { 
+                      portalID = query_parameters.portal; 
+                      instanceID = query_parameters.instance;
                 };
 
                 // find the portal object
@@ -156,17 +155,13 @@ $(function() {
 
                 // find the instance object within that portal
 
-                if (instanceID !=0) {
-                  var temp2 = instances.data.filter(function(item){
-                    return (item.portalID == portalID);
-                  })[0].instanceList.filter(function(item){
-                    return (item.ID == instanceID);
-                  })[0];
-                  instance = {ID: temp2.ID, name: temp2.name};
-                  console.log(instance);
-                } else {
-                  instance = {ID: 0, name: ""};
-                };
+                var temp2 = instances.data.filter(function(item){
+                  return (item.portalID == portalID);
+                })[0].instanceList.filter(function(item){
+                  return (item.ID == instanceID);
+                })[0];
+                instance = {ID: temp2.ID, name: temp2.name};
+                console.log(instance);
                 // build the page
 
                 build_page();
@@ -232,7 +227,7 @@ $(function() {
   });
 });
 
-function build_page() { 
+function build_page() {
 
   // var currentTab = $('#tabs >ul >li').length == 0 ? -1 : $( "#tabs" ).tabs( "option", "active" );
 
@@ -272,7 +267,6 @@ function build_tab_bar() {
     return ((item.activityID == activity.ID || item.activityID == 0) & item.portalID == portal.ID);
     }).map(function(item){return (item.resourceID)});
 
-  if (instance.ID == 0) r = [];
   
   if (portal.ID == 1) r.push(100);
   if (portal.ID == 2) r.push(101);
