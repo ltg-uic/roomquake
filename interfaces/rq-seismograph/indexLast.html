@@ -1,4 +1,5 @@
 
+
 <html>
 <head>
 
@@ -263,9 +264,6 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 	var query_params = NUTELLA.parseURLParameters();
 	var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_params.run_id, NUTELLA.parseComponentId());
 		// Once initializaiton is complete:
-
-	nutella.net.subscribe("mode_update", function() {location.reload(true);});
-
 		
 		// 1. Fetch room configuration and store the coordinates of the current seismograph
 		nutella.net.request("room_configuration", '', function(response) { 
@@ -300,7 +298,7 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 		nutella.net.subscribe("demo_quakes_clean", function() {location.reload();});
 
     // 4. Subscribe to schedule change events
-    // nutella.net.subscribe("quakes_schedule_update", function() {location.reload();});
+    nutella.net.subscribe("quakes_schedule_update", function() {location.reload();});
 
 		// 5. Subscribe to quakes schedule updates
 		nutella.net.subscribe("new_demo_quake", function(message) {
@@ -310,6 +308,7 @@ document.getElementById("seismogram").style.width = SEISMOGRAM_WIDTH + "px";
 		});
 
 		// 6. Subscribe to "mode_changes"
+		nutella.net.subscribe("mode_update", function() {location.reload();});
 	
 
 	

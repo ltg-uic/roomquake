@@ -37,7 +37,7 @@
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 
-
+  		nutella.net.publish( 'mode_update', {rq_mode : "demo"} );
 
 		nutella.net.request("room_configuration", undefined, function(response) {
 			nutella.net.request("quakes_schedule", '', function(list) {
@@ -49,8 +49,8 @@
  					document.getElementById("history").value += 
  						"RoomQuake " + (i+1) + '\n' +
 						"Date: " + d + '\n' +
-						"X: " + qList[i].location.x + "   Y: " + qList[i].location.y + '\n' +
-						"Magnitude: " + qList[i].magnitude + '\n\n';
+						"Epicenter X: " + qList[i].location.x + " Y: " + qList[i].location.y + 
+						"  Magnitude: " + qList[i].magnitude + '\n\n';
 						// document.getElementById("history").value;
 				};
 
@@ -111,16 +111,17 @@
 		        	var rect = canvas.getBoundingClientRect(); 
 		        	var pendingX = event.clientX-rect.left;
 		        	var pendingY = event.clientY-rect.top;
-		        	var cX = (pendingX/ctx.canvas.width) * document.getElementById("maxRoomX").value;
+		        	var cX = pendingX/ctx.canvas.width * document.getElementById("maxRoomX").value;
 		        	if (cX > document.getElementById("maxRoomX").value)
 		        		cX = document.getElementById("maxRoomX").value;
 		        	if (cX < 0) cX = 0;
-		        	var cY = document.getElementById("maxRoomY").value - (pendingY/ctx.canvas.height) * document.getElementById("maxRoomY").value;
+		        	// var cY = document.getElementById("maxRoomY").value - (pendingY/ctx.canvas.height) * document.getElementById("maxRoomY").value;
+		        	var cY = document.getElementById("maxRoomY").value * (1 - pendingY/ctx.canvas.height);
 		        	if (cY > document.getElementById("maxRoomY").value)
 		        		cY = document.getElementById("maxRoomY").value;
 		        	if (cY < 0) cY = 0;
-		        	document.getElementById("instantX").value = cX;
-		        	document.getElementById("instantY").value = cY;
+		        	document.getElementById("instantX").value = parseInt(cX*1000)/1000;
+		        	document.getElementById("instantY").value = parseInt(cY*1000)/1000;
 
 		        	// document.getElementById('instantX').value = 
 		        	redrawRoom();
@@ -196,8 +197,8 @@
 					document.getElementById("history").value = 
 						"RoomQuake " + nextRQindex++ + '\n' +
 						"Date: " + mq.time + '\n' +
-						"X: " + mq.location.x + "   Y: " + mq.location.y + '\n' +
-						"Magnitude: " + mq.magnitude + '\n\n' +
+						"Epicenter X: " + mq.location.x + " Y: " + mq.location.y + 
+						"  Magnitude: " + mq.magnitude + '\n\n' +
 						document.getElementById("history").value;
 					// Hide mouse quake dot
 					// demo_p.manualQuakeX = -100;
@@ -236,7 +237,7 @@
 				</select><br><br>
 				<button id="instant">Generate quake</button><br><br>
 				Event History<br>
-				<textarea id="history" rows=14 cols=40></textarea>
+				<textarea id="history" rows=11 cols=40></textarea>
 				<br><br><br>
 				<button id="clear_demo_quakes">Clear demo quakes</button>
 
