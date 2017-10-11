@@ -42,8 +42,8 @@ nutella.net.request("room_configuration", '', function(response) {
   $("#c_quake_time_span").text(current_quake_time.toGMTString());
 });
 nutella.net.request("quakes_schedule", '', function(response) {
-  quakes_schedule = response.quakes_schedule;
-  quakes_schedule.forEach(function(q) {
+  quakes_schedule = response.quakes_schedule; console.log(quakes_schedule);
+  quakes_schedule.forEach(function(q) { console.log(q);
     addQuakeToDropdown(q);
   });
 });
@@ -66,7 +66,6 @@ $("#set_quake").click(function() {
 	$("#confirmation").foundation("reveal", "open")
 	return false;
 });
-
 // Click on NO button in confirmation modal
 $("#confirmation_no").click(function() {
 	$("#confirmation").foundation("reveal", "close");
@@ -74,16 +73,19 @@ $("#confirmation_no").click(function() {
 });
 
 // Click on YES button in confirmation modal
-$("#confirmation_yes").click(function() {
+$("#confirmation_yes").click(function() { 
 	// Fetch values and update model
-	current_quake_id = $("#quake_drop").val();
+	current_quake_id = $("#quake_drop").val(); 
 	current_quake_time = new Date( quakes_schedule.find(function(e) {
 		return e.id==current_quake_id;
-	}).time);
+	}).time); console.log('quake time'); 
 	// Update UI
-	$("#c_quake_id_span").text(current_quake_id);
+  // $("#c_quake_id_span").text(current_quake_id);
+  $("#c_quake_id_span").text(current_quake_id);
 	$("#c_quake_time_span").text(current_quake_time.toGMTString());
-	// Send messages
+	// Send messages 
+
+  
 	nutella.net.publish("set_current_quake", {current_quake_id: current_quake_id, current_quake_time: current_quake_time.getTime()});
 	nutella.net.publish("wipe_observations")
 	// Close modal

@@ -209,6 +209,18 @@
           return(item.portalID == tentativePortalID);
         })[0].instanceList;
 
+// ======== new =======
+        if (instanceList.length == 1) {
+          top.portal.ID = tentativePortalID;
+          top.portal.name = tentativePortalName;
+          top.instance.ID = instanceList[0].ID;
+          top.instance.name = instanceList[0].name;
+          top.build_page();
+        }
+// ======== new =======
+
+        $('#open').html("instance");
+
         // rebuild the instances menu
 
         for (var i=0; i<instanceList.length; i++) {
@@ -243,38 +255,38 @@
 
     	// {"data":[{"portalID":1,"topID":1,"instanceList":[{"ID":1,"name":"designer"}]}]}
 
-    	var instanceList = top.instances.data.filter(function(item){
-    		return(item.portalID == top.portal.ID);
-    	})[0].instanceList;
+   //  	var instanceList = top.instances.data.filter(function(item){
+   //  		return(item.portalID == top.portal.ID);
+   //  	})[0].instanceList;
 
 
 
-    	// build the instances menu
+   //  	// build the instances menu
 
-    	for (var i=0; i<instanceList.length; i++) {
-    		var item = instanceList[i];
-	    	var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
-			$('#instances').append(li);
-    	}
+   //  	for (var i=0; i<instanceList.length; i++) {
+   //  		var item = instanceList[i];
+	  //   	var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
+			// $('#instances').append(li);
+   //  	}
 
-    	// highlight the current instance
+   //  	// highlight the current instance
 
-    	$( "#instances li" ).filter(function(arg){
-            return( $( "#instances li" )[arg].value == top.instance.ID)
-        }).addClass('ui-selected');
+   //  	$( "#instances li" ).filter(function(arg){
+   //          return( $( "#instances li" )[arg].value == top.instance.ID)
+   //      }).addClass('ui-selected');
 
-    	// when an instance is selected, highlight it
+   //  	// when an instance is selected, highlight it
 
-  		$( "#instances li a" ).on( "click", function( event, ui ) { 
-  			$( "#instances li" ).removeClass('ui-selected'); 
-  			$( "#instances li a" ).removeClass('ui-selected');
-  			var p = event.currentTarget;
-  			top.instance.name = p.innerHTML;
-  			p = $(p);
-  			p.addClass('ui-selected');
-  			top.instance.ID = p.parent()[0].value;
-  			top.build_page();
-  		});
+  	// 	$( "#instances li a" ).on( "click", function( event, ui ) { 
+  	// 		$( "#instances li" ).removeClass('ui-selected'); 
+  	// 		$( "#instances li a" ).removeClass('ui-selected');
+  	// 		var p = event.currentTarget;
+  	// 		top.instance.name = p.innerHTML;
+  	// 		p = $(p);
+  	// 		p.addClass('ui-selected');
+  	// 		top.instance.ID = p.parent()[0].value;
+  	// 		top.build_page();
+  	// 	});
 
 
 	});
@@ -286,11 +298,11 @@
   <table>
     <tr>
       <td valign=top align=middle>
-         <span class="header"  id="open">portal</span><br>
+         <span class="header">portal</span><br>
         <ul id="portals" class="list"></ul>
       </td>
       <td valign=top align=middle>
-         <span class="header"  id="open">instance</span><br>
+         <span class="header"  id="open"></span><br>
         <ul id="instances" class="list"></ul>
       </td>
     </tr>

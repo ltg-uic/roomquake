@@ -8,9 +8,9 @@
 	
 	<script src="bower_components/Processing.js/processing.js"></script>
 
-<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen"
+<!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css" media="screen"
           title="no title" charset="utf-8">
-
+ -->
 <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
 
 </head>
@@ -206,28 +206,26 @@ var nutella = NUTELLA.init(query_params.broker, query_params.app_id, query_param
 
 
 	//  Fetch room configuration and store the coordinates of the seismographs
-	nutella.net.request("room_configuration", '', function(response) { 
-
+	nutella.net.request("room_configuration", '', function(response) { console.log(response.seismographs);
 		room_width_x_meters = response.room_width_meters;
 		room_height_y_meters = response.room_height_meters; 
 		ACTUAL_EVENT_TIME = response.current_quake_time;
 		START = (Math.round(ACTUAL_EVENT_TIME/5000) * 5000) - 10*1000;
 		unit_size_meters = Math.sqrt((room_width_x_meters * room_width_x_meters) + (room_height_y_meters * room_height_y_meters));
 		response.seismographs.forEach(function(e) { 
-			SEISMOGRAPHS[e.id].x=e.x; 
-			SEISMOGRAPHS[e.id].y=e.y; 
-			if (SEISMOGRAPHS[e.id].x===undefined || SEISMOGRAPHS[e.id].y===undefined) { 
+			SEISMOGRAPHS[e.id-1].x=e.x; 
+			SEISMOGRAPHS[e.id-1].y=e.y; 
+			if (SEISMOGRAPHS[e.id-1].x===undefined || SEISMOGRAPHS[e.id-1].y===undefined) { 
 				console.error("Impossible to set seismograph location. The id you provided does not match any of the know IDs.");
 			} 
 		}); 
 			
 		READY=true; 
-           
 
         // Once we fetched configuration we fetch previous observations
         nutella.net.request("observations", '', function(response) {
         	response.observations.forEach(function(e) {
-        		console.log(e); 
+        		console.log('observations');console.log(e); 
         		// a student observation includes the following fields: 
 				//  seismograph: seismograph number 
 				//  p_arrival_time: P arrival time

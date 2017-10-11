@@ -29,7 +29,11 @@
 	nutella.net.subscribe("room_config_update", function(m){
 		location.reload(true);
 	});
-
+	var S = 0; //currently selected seismograph range 0 (all) through 5
+	var readings = [];
+	var d_filters = [{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100}];
+	var instantX = -1;
+	var instantY = -1;
     $(function() {
 		var canvas = document.getElementById("myCanvas");
 		var ctx = canvas.getContext("2d");
@@ -40,20 +44,8 @@
   		nutella.net.publish( 'mode_update', {rq_mode : "demo"} );
 
 		nutella.net.request("room_configuration", undefined, function(response) {
-			nutella.net.request("quakes_schedule", '', function(list) {
-
-				var qList = list.quakes_schedule;
-				var nextRQindex = qList.length + 1;
-				for (var i=qList.length-1; i>=0; i--){
-					var d = new Date(qList[i].time).toUTCString();
- 					document.getElementById("history").value += 
- 						"RoomQuake " + (i+1) + '\n' +
-						"Date: " + d + '\n' +
-						"Epicenter X: " + qList[i].location.x + " Y: " + qList[i].location.y + 
-						"  Magnitude: " + qList[i].magnitude + '\n\n';
-						// document.getElementById("history").value;
-				};
-
+			nutella.net.request("get_readings",{},function(message){
+				readings = message;
 				// Update model
 				document.getElementById('maxRoomX').value = response.room_width_meters;
 				document.getElementById('maxRoomY').value = response.room_height_meters;
@@ -81,29 +73,56 @@
 		            redrawRoom();
 		        }
 
+		        $("input[name=s_sel]:eq(0)").click();
+		        $('#filterDiv').hide();
 
-		        $("#instant").click(function(){
-		        	trigger();
-		        });
-
-		        $(".field").keyup(function(){ 
+		        nutella.net.subscribe("reading",function(arg){
+		        	var record = response.seismographs.filter(function(item){
+		        		return(item.id == arg.seismograph);
+		        	})[0];
+		        	var s = record.id;		        	
+		        	var x = record.x; 
+		        	var y = record.y;
+		        	var d = Number(arg.distance);
+		        	readings.push({s:s,x:x,y:y,d:d});
+		        	nutella.net.publish('set_readings',readings);
 		        	redrawRoom();
+
+
 		        });
 
-		        $(".field").mouseout(function(){ 
-		        	redrawRoom();
-		        });
+	            function drawCircle(x,y,r,color) {
+	                ctx.fillStyle = "#FF0000";
+	                ctx.beginPath();
+	                ctx.arc(x, y, r, 0, 2 * Math.PI);
+	                ctx.strokeStyle = color;
+	                ctx.stroke();
+	            }
 
-		        $("#save").click(function(){
-		        	saveConfiguration();
-		        });
 
-		        $('#clear_demo_quakes').click(function() {
-					// Send message and reload
-					nutella.net.publish("demo_quakes_clean", {});
-					location.reload();
-					return false;
-				});
+
+		  //       $("#instant").click(function(){
+		  //       	trigger();
+		  //       });
+
+		  //       $(".field").keyup(function(){ 
+		  //       	redrawRoom();
+		  //       });
+
+		  //       $(".field").mouseout(function(){ 
+		  //       	redrawRoom();
+		  //       });
+
+		  //       $("#save").click(function(){
+		  //       	saveConfiguration();
+		  //       });
+
+		  //       $('#clear_demo_quakes').click(function() {
+				// 	// Send message and reload
+				// 	nutella.net.publish("demo_quakes_clean", {});
+				// 	location.reload();
+				// 	return false;
+				// });
 
 				canvas.addEventListener("mousedown",epicenter,false);
 
@@ -115,14 +134,19 @@
 		        	if (cX > document.getElementById("maxRoomX").value)
 		        		cX = document.getElementById("maxRoomX").value;
 		        	if (cX < 0) cX = 0;
-		        	// var cY = document.getElementById("maxRoomY").value - (pendingY/ctx.canvas.height) * document.getElementById("maxRoomY").value;
 		        	var cY = document.getElementById("maxRoomY").value * (1 - pendingY/ctx.canvas.height);
 		        	if (cY > document.getElementById("maxRoomY").value)
 		        		cY = document.getElementById("maxRoomY").value;
 		        	if (cY < 0) cY = 0;
-		        	document.getElementById("instantX").value = parseInt(cX*1000)/1000;
-		        	document.getElementById("instantY").value = parseInt(cY*1000)/1000;
-
+		        	var newX = parseInt(cX*1000)/1000;
+		        	var newY = parseInt(cY*1000)/1000;
+		        	if (Math.abs(newX - instantX)< .2 && Math.abs(newY - instantY) < .2){
+		        		instantX = -1;
+		        		instantY = -1;
+		        	} else {
+		        		instantX = newX;
+		        		instantY = newY;
+		        	}
 		        	// document.getElementById('instantX').value = 
 		        	redrawRoom();
 		        };
@@ -169,14 +193,88 @@
 		    			var sX = Number(document.getElementById("x" + (i+1)).value);
 		    			var sY = Number(document.getElementById("y" + (i+1)).value);
 		    			if (sX <= 0 || sY <= 0) continue;
-		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width,ctx.canvas.height-(sY/maxY*ctx.canvas.height));
+		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
 		    		};
-					if (document.getElementById("instantX").value > 0 && document.getElementById("instantY").value > 0) {
-						var x = document.getElementById("instantX").value/document.getElementById("maxRoomX").value * ctx.canvas.width;
-						var y = ctx.canvas.height - document.getElementById("instantY").value/document.getElementById("maxRoomY").value * ctx.canvas.height;
+					// if (document.getElementById("instantX").value > 0 && document.getElementById("instantY").value > 0) {
+					// 	var x = document.getElementById("instantX").value/document.getElementById("maxRoomX").value * ctx.canvas.width;
+					// 	var y = ctx.canvas.height - document.getElementById("instantY").value/document.getElementById("maxRoomY").value * ctx.canvas.height;
+					// 	ctx.fillText("💥",x-15,y+12);
+					// }
+
+					var s = $('input[name=s_sel]:checked').val();
+					var r = readings.filter(function(item){
+						var keep = 	(s == 0 || s == item.s) &&
+									(item.d >= d_filters[item.s].min) &&
+									(item.d <= d_filters[item.s].max);
+						return (keep);			
+					});
+
+					var mean_distance = [];
+					var sum = [0,0,0,0,0,0];
+					var count = [0,0,0,0,0,0];
+
+					for (var i=0; i<r.length; i++){
+						var x = m_to_screenX(r[i].x);
+			        	var y = m_to_screenY(r[i].y);
+			        	var d = r[i].d*unit(); 
+			        	drawCircle(x,y,d,"silver");
+
+			        	sum[r[i].s] += r[i].d;
+			        	count[r[i].s]++;
+		        	}
+
+		        	$('#mean_distance').html("N/C");
+					$('#mean_N').html("0")
+		        	if (S > 0) {
+			        	if (count[S] > 0) {
+				        	var md = Math.round(sum[S]/count[S] * 1000)/1000;
+				        	$('#mean_distance').html(md);
+					        	$('#mean_N').html(count[S]);
+				        	var thisS = response.seismographs.filter(function(item){
+				        		return (item.id == S)
+				        	})[0];
+				        	drawCircle (m_to_screenX(thisS.x), m_to_screenY(thisS.y), md*unit(),"brown");
+			        	}
+			        } else {
+				        	for (i=1; i<=5; i++) {
+				        	if (count[i] > 0) {
+					        	var md = Math.round(sum[i]/count[i] * 1000)/1000;
+					        	$('#mean_distance').html(md);
+					        	$('#mean_N').html(count[i]);
+					        	var thisS = response.seismographs.filter(function(item){
+					        		return (item.id == i)
+					        	})[0];
+					        	drawCircle (m_to_screenX(thisS.x), m_to_screenY(thisS.y), md*unit(),"brown");
+				        	}			        		
+			        	}
+
+			        }
+
+			        if (instantX >=0 && instantY>=0)
+			        {
+			        	var x = m_to_screenX(instantX);
+						var y = m_to_screenY(instantY);
 						ctx.fillText("💥",x-15,y+12);
-					}
+						ctx.font="15px Arial";
+						ctx.fillStyle = "brown";
+						ctx.fillText('(' + instantX + ',' + instantY + ')',
+							(x<370)?x+15:x-115,y+3);
+
+			        }
 		        }
+
+		        function m_to_screenX (m) {
+		        	return (m/document.getElementById("maxRoomX").value * ctx.canvas.width);
+		        }
+
+		        function m_to_screenY (m) {
+		        	return (ctx.canvas.height * (1 - m/document.getElementById("maxRoomY").value));
+		        }
+
+		        function unit() {
+		        	return (ctx.canvas.width/document.getElementById("maxRoomX").value);
+		        }
+
 
 		        function trigger() {
 					// Gather data
@@ -203,9 +301,35 @@
 					// Hide mouse quake dot
 					// demo_p.manualQuakeX = -100;
 					// demo_p.manualQuakeY = -100;
-				}
+				};
+
+				$("input[name=s_sel]").click(function(){
+					S = this.value;
+					if (S == 0) $('#filterDiv').hide(); else $('#filterDiv').show();
+				    $('#d_min').val(d_filters[S].min);
+				    $('#d_max').val(d_filters[S].max);
+				    redrawRoom();
+				});
+
+				$("#d_min").keyup(function(){
+					d_filters[S].min = this.value;
+		        	redrawRoom();
+		        });
+
+				$("#d_max").keyup(function(){
+					d_filters[S].max = this.value;
+		        	redrawRoom();
+		        });			
+
+				$('#clearReadings').click(function(){
+					readings = [];
+					nutella.net.publish('set_readings',readings);
+					redrawRoom();
+				});
+			
 			});
-	    });
+		});
+
 	});
 
     </script>
@@ -222,8 +346,28 @@
 			<td  align=center>
 				<input readonly id="maxRoomX" class="field" type=text size=6 maxlength=6 value=10>
 			</td>
-			<td align=center valign=top rowspan=3>
-				<b>Instant quake</b><br><br>
+			<td valign=top rowspan=3 style="padding: 20px;">
+				<div align=center> 
+					<b>Readings</b><br>
+				 	All&nbsp<input type="radio" name="s_sel" value="0">&nbsp
+				 	1&nbsp<input type="radio" name="s_sel" value="1"> &nbsp
+				 	2&nbsp<input type="radio" name="s_sel" value="2"> &nbsp
+				 	3&nbsp<input type="radio" name="s_sel" value="3"> &nbsp
+				 	4&nbsp<input type="radio" name="s_sel" value="4"> &nbsp
+				 	5&nbsp<input type="radio" name="s_sel" value="5"> &nbsp&nbsp&nbsp
+				 <br><br>
+				</div>
+				<div align=center id="filterDiv">
+					 <b>Filters</b><br>
+					 Distance: Min <input type=text size=6 maxlength=6 id="d_min"> Max <input type=text size=6 maxlength=6 id="d_max">
+					 <br><br>
+					 <b>Means</b><br>N: <span id="mean_N"></span> &nbsp
+					 Distance: <span id="mean_distance"></span>
+				</div>
+				<button id="clearReadings">Clear readings</button>
+
+
+<!-- 				<b>Instant quake</b><br><br>
 				Epicenter:
 				X: <input class="field" id="instantX" type=text size=6 maxlength=6>
 				Y: <input class="field" id="instantY" type=text size=6 maxlength=6>
@@ -240,6 +384,7 @@
 				<textarea id="history" rows=11 cols=40></textarea>
 				<br><br><br>
 				<button id="clear_demo_quakes">Clear demo quakes</button>
+ -->
 
 			</td>
 		</tr>
@@ -253,7 +398,7 @@
 				</canvas>
 			</td>
 		</tr>
-		<tr>
+		<tr hidden>
 			<td>
 			</td>
 			<td  align=center>
