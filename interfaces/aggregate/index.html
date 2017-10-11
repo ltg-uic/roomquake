@@ -276,32 +276,32 @@
 		        }
 
 
-		        function trigger() {
-					// Gather data
-					var mq = {};
-					mq.magnitude = document.getElementById("magnitude").selectedIndex+2;
-					mq.location = {};
-					mq.demo = true;
-					mq.location.x = Number(document.getElementById("instantX").value);
-					mq.location.y = Number(document.getElementById("instantY").value);
-					mq.time = new Date().toISOString();
-					mq.id = "d" + nextRQindex;
-					// Update model
-					// quakes.push(mq);
-					// // Update table view
-					// updateQuakesTableView('demo_quakes_table', true);
-					// Ship to backend
-					nutella.net.publish("new_demo_quake", mq);
-					document.getElementById("history").value = 
-						"RoomQuake " + nextRQindex++ + '\n' +
-						"Date: " + mq.time + '\n' +
-						"Epicenter X: " + mq.location.x + " Y: " + mq.location.y + 
-						"  Magnitude: " + mq.magnitude + '\n\n' +
-						document.getElementById("history").value;
-					// Hide mouse quake dot
-					// demo_p.manualQuakeX = -100;
-					// demo_p.manualQuakeY = -100;
-				};
+		  //       function trigger() {
+				// 	// Gather data
+				// 	var mq = {};
+				// 	mq.magnitude = document.getElementById("magnitude").selectedIndex+2;
+				// 	mq.location = {};
+				// 	mq.demo = true;
+				// 	mq.location.x = Number(document.getElementById("instantX").value);
+				// 	mq.location.y = Number(document.getElementById("instantY").value);
+				// 	mq.time = new Date().toISOString();
+				// 	mq.id = "d" + nextRQindex;
+				// 	// Update model
+				// 	// quakes.push(mq);
+				// 	// // Update table view
+				// 	// updateQuakesTableView('demo_quakes_table', true);
+				// 	// Ship to backend
+				// 	nutella.net.publish("new_demo_quake", mq);
+				// 	document.getElementById("history").value = 
+				// 		"RoomQuake " + nextRQindex++ + '\n' +
+				// 		"Date: " + mq.time + '\n' +
+				// 		"Epicenter X: " + mq.location.x + " Y: " + mq.location.y + 
+				// 		"  Magnitude: " + mq.magnitude + '\n\n' +
+				// 		document.getElementById("history").value;
+				// 	// Hide mouse quake dot
+				// 	// demo_p.manualQuakeX = -100;
+				// 	// demo_p.manualQuakeY = -100;
+				// };
 
 				$("input[name=s_sel]").click(function(){
 					S = this.value;

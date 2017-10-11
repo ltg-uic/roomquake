@@ -117,7 +117,7 @@
 	    			var sX = Number(document.getElementById("x" + (i+1)).value);
 	    			var sY = Number(document.getElementById("y" + (i+1)).value);
 	    			if (sX <= 0 || sY <= 0) continue;
-	    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width,ctx.canvas.height-(sY/maxY*ctx.canvas.height));
+		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
 	    		}
 	        }
 	    });
