@@ -336,7 +336,7 @@
 		    		// var Xarrow=document.getElementById("Xarrow");
 		    		ctx.drawImage(Xarrow,50,ctx.canvas.height-40);
 		    		ctx.drawImage(Yarrow,10,ctx.canvas.height-160);
-		    		ctx.fillStyle = "brown";
+		    		ctx.fillStyle = "orange";
 		    		ctx.font = "30px Arial";
 		    		for (var i=0; i<5; i++){
 		    			var sX = Number(document.getElementById("x" + (i+1)).value);
@@ -351,7 +351,7 @@
 					// }
 
 					// alert($('#schedule tbody tr').length);
-
+					ctx.fillStyle = "brown";
 					for (var i=0; i<$('#schedule tbody tr').length; i++) {
 
 						var ex = $('#schedule tbody tr:eq(' + i + ') td:eq(2) input:eq(0)').val();
