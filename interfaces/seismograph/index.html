@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<!-- Your interface name here-->
+	<title></title>
+	<!-- The description of this interfaces here -->
+	<meta name="description" content="">
+	<!-- Your CSS here -->
+  	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+	<script src="nutella_lib.js" type="text/javascript"></script>
+	<style>
+		body {
+	    	font-family: "Arial";
+	    	overflow: hidden;
+		}
+	</style>
+
+	<script type="text/javascript">
+
+	// Parse the query parameters
+	var query_parameters = NUTELLA.parseURLParameters();
+
+	// Get an instance of nutella. 
+	var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
+
+
+
+	const WINDOW = 30; //number of seconds in seismograph window
+	const SAMPLING_RESOLUTION = 30; //number of data points per second
+	const ADVANCE_WINDOW_THRESHOLD = 0;
+	const P_WAVE_VELOCITY = 1; //meters per second
+	const S_WAVE_VELOCITY = P_WAVE_VELOCITY / 1.76; //meters per second
+	const MAX_DISPLACEMENT = 200;
+	const MAX_MAGNITUDE = 5;
+	const S_TAIL = .2; // proportion of S wave waveform devoted to decay
+
+
+    $(function() {
+
+		// var sound = document.getElementById("rumble"); alert(sound.src)
+		// sound.play();
+		// sound.oncanplaythrough = function() { alert('yo');
+		// 	// sound.loop = true;
+		// 	sound.play();			
+		// 	sound.volume = 0.5;
+		// }
+		// aud.oncanplaythrough = function() {
+		//     alert("Can play through audio without stopping");
+		// };
+
+
+
+    	document.getElementById("seismogram").width=window.innerWidth;
+    	document.getElementById("seismogram").height=Math.round(window.innerHeight*.9);
+		var canvas = document.getElementById("seismogram");
+		var ctx = canvas.getContext("2d");
+		// redrawRoom();
+		// ctx.fillStyle = "white";
+  //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+
+		nutella.net.subscribe("mode_update", function() {location.reload(true);});
+
+
+		nutella.net.request("room_configuration", undefined, function(room) {
+			var max_distance = Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2)); // maximum distance of an event from a seismograph
+			var s_length_ratio = 2;
+				// 0.9 * ((P_WAVE_VELOCITY * WINDOW) / (S_WAVE_VELOCITY * Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2))) - 1);
+			var this_seismograph = room.seismographs.filter(function(item){
+				return (Number(item.id) == Number(top.instance.ID))
+			})[0];
+
+			nutella.net.request("quakes_schedule",undefined, function(arg){ 
+				var quakes = [];
+				quakes = arg.quakes_schedule;
+				var next_event_index=0; 
+				var waveform_index = 0;
+				var in_event = false;
+				var live = true; // true if showing real-time seismograph
+				var liveBuffer = []; //array of y values sufficient to fill seismogram window
+				var waveforms = [];
+				var prior_quake;
+				var back_delay = false;
+
+				for (var i=0; i<quakes.length; i++) {
+					waveforms[i] = build_waveform(quakes[i]); 
+					schedule_quake(quakes[i]);
+				}
+				liveBuffer = initializeNoiseBuffer(); 
+				setInterval(tick,1000/SAMPLING_RESOLUTION);
+
+				
+				nutella.net.subscribe("new_demo_quake", function(quake){
+					quakes.push(quake);
+					waveforms.push(build_waveform(quake));
+					schedule_quake(quake);
+					// next_event_index++
+
+				});
+
+				function build_waveform(quake){
+					var distance = Math.sqrt(Math.pow(this_seismograph.x - quake.location.x,2) + Math.pow(this_seismograph.y - quake.location.y,2));
+					 return(constructWaveform(distance,quake.magnitude));
+				}; // end stock_waveforms
+
+				function constructWaveform(distance,magnitude) { 
+					var s_amplitude = (ctx.canvas.height/2) * (magnitude/MAX_MAGNITUDE) * Math.pow(1 - distance/max_distance,.5); // hack
+					var p_amplitude = s_amplitude * .3; //hack
+					var buffer = []; 
+					var s_minus_p = distance * S_WAVE_VELOCITY/P_WAVE_VELOCITY;
+					var p_length = Math.floor(s_minus_p * SAMPLING_RESOLUTION); 
+					for (var i=0; i<p_length; i++) { 
+						buffer[i] = p_amplitude * randomPlusMinus();
+					}; 
+					var s_length = Math.round(p_length + s_length_ratio*p_length);
+					var s_body = Math.round(p_length + (1 - S_TAIL) * (s_length_ratio*p_length));
+					for (var i=p_length; i < s_body; i++) {
+						buffer[i] = s_amplitude * randomPlusMinus(); 
+					}; 
+					for (var i=s_body; i < s_length; i++) {
+						buffer[i] = s_amplitude * randomPlusMinus() * 
+							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body)))); 
+					};
+					return (buffer);
+				}; // end constructWaveform
+
+				function schedule_quake(quake){ //assumes quakes in proper time order
+					var distance = Math.sqrt(Math.pow(this_seismograph.x - quake.location.x,2) + Math.pow(this_seismograph.y - quake.location.y,2));
+
+					var then = new Date(quake.time) ;
+					var now = new Date();
+					var delay = then.getTime() + distance*P_WAVE_VELOCITY*1000 - now.getTime();
+					if (delay > ADVANCE_WINDOW_THRESHOLD)
+						setTimeout(function(){in_event = true; live=true; back_delay=true}, delay);
+						setTimeout(function(){back_delay = false;}, delay + 30*1000);
+					else next_event_index++;
+				}; // end schedule_quakes
+
+
+
+
+				function tick() {
+					if (in_event ) {
+						advanceSeismogram(waveforms[next_event_index][waveform_index++]);
+						if (waveform_index >= waveforms[next_event_index].length) {
+							next_event_index++; waveform_index = 0; in_event = false;
+						}
+					}
+					else
+						advanceSeismogram(backgroundNoise());
+					if (live) drawLiveBuffer();
+				};
+
+				function advanceSeismogram(y) {
+					liveBuffer.shift();
+					liveBuffer.push(y);
+				};
+
+				function initializeNoiseBuffer() {
+					var buffer = [];
+					for (var i=0; i<WINDOW * SAMPLING_RESOLUTION; i++)
+						buffer[i] = backgroundNoise();
+					return(buffer);
+				};
+
+				function drawLiveBuffer() {
+					var t = new Date();
+					// var now = t.getTime();
+					// var then = now - WINDOW * 1000;
+					drawSeismogram (liveBuffer,t.getTime());
+				};
+
+				function drawSeismogram (buffer, now) {
+
+					// erase current seismogram
+					ctx.fillStyle = 'white';
+					ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+					// draw vertical markers at second intervals, label at 5 second intervals
+					// add amplitude labels
+
+					ctx.fillStyle = 'brown';
+					ctx.strokeStyle='orange';
+					// var now = new Date();
+					var t_right = now;
+					var integer_time = Math.ceil(t_right/1000)*1000;
+					var t_offset = t_right - integer_time; 
+					var line_x = t_offset/(WINDOW*1000) * ctx.canvas.width;
+					for (var i=0; i<WINDOW*1.07; i++){
+						ctx.beginPath();
+						var x_pos = ctx.canvas.width - line_x - i*ctx.canvas.width/WINDOW;
+						ctx.moveTo(x_pos,0);
+						ctx.lineTo(x_pos,ctx.canvas.height);
+						ctx.stroke();
+						var label_time = new Date(integer_time);
+						var label = label_time.toGMTString();
+						var label_freq = 5 ; // this could be improved
+						if (Math.round(integer_time/1000) % label_freq == 0) {
+							ctx.save();
+							ctx.translate(x_pos-3, ctx.canvas.height-5);
+							ctx.rotate(-Math.PI/2);
+							ctx.textAlign = "left";
+							ctx.fillText(label, 0, 0);
+							ctx.restore();
+						}
+						if (Math.round(integer_time/1000) % (label_freq * 2) == 7) {
+							var y_offset = ctx.canvas.height/8;
+							var x_label = x_pos + 0;
+							var pos_offset = 15;
+							var neg_offset = -5;
+							ctx.fillText("200mm", x_label, 15);
+							ctx.fillText("150", x_label, y_offset+pos_offset);
+							ctx.fillText("100", x_label, 2*y_offset+pos_offset);
+							ctx.fillText("50", x_label, 3*y_offset+pos_offset);
+							ctx.fillText("-50", x_label, 5*y_offset+neg_offset);
+							ctx.fillText("-100", x_label, 6*y_offset+neg_offset);
+							ctx.fillText("-150", x_label, 7*y_offset+neg_offset);
+							ctx.fillText("-200", x_label, 8*y_offset+neg_offset);
+						}
+
+						integer_time -= 1000;
+					};
+
+					// draw horizontal markers at second intervals, label at 5 second intervals
+
+					var displacement = MAX_DISPLACEMENT; // millimeters
+					var displacementLabelDelta = ctx.canvas.height/8;
+					for (var i=0; i<9; i++) {
+						ctx.strokeStyle="orange";
+						ctx.beginPath();
+						ctx.moveTo(0,i*displacementLabelDelta);
+						ctx.lineTo(ctx.canvas.width,i*displacementLabelDelta);
+						ctx.stroke();
+					}
+
+
+					//draw waveform
+
+					ctx.fillStyle = "black";
+					ctx.strokeStyle = 'black';
+					ctx.beginPath();
+					ctx.moveTo(0,ctx.canvas.height/2+ buffer[0]);
+					for (var i=0; i<(.982*WINDOW * SAMPLING_RESOLUTION); i++)
+						ctx.lineTo (i*ctx.canvas.width/(WINDOW * SAMPLING_RESOLUTION),ctx.canvas.height/2 + buffer[i]);
+					ctx.stroke();
+
+					//draw pen
+
+					ctx.fillStyle="brown";
+					var dataPoint = buffer [Math.round(.98 * buffer.length)] + ctx.canvas.height/2;
+					ctx.beginPath();
+					ctx.moveTo (Math.round(.98 * ctx.canvas.width),dataPoint);
+					ctx.lineTo (ctx.canvas.width,dataPoint+10);
+					ctx.lineTo (ctx.canvas.width,dataPoint-10);
+					// ctx.lineTo (Math.round(.98 * ctx.canvas.width),dataPoint);
+					ctx.fill(); 
+					// if (in_event)alert(Math.abs(buffer[Math.round(.98 * buffer.length)]/(ctx.canvas.height/2)));
+					// sound.volume = Math.abs(buffer[Math.round(.98 * buffer.length)]/(ctx.canvas.height/2));
+					// sound.volume = .5;
+
+				};
+
+				function backgroundNoise () {
+					return (Math.random() - 0.5)*5;
+				};
+
+				function randomPlusMinus () {
+					return (Math.random() - 0.5) * 2;
+				}
+
+				$('#back').click(function() {
+					if (back_delay) return;
+					if (next_event_index == 0) return;
+					if (live) { 
+						live=false; prior_quake = next_event_index-1;
+					} else {
+						if (prior_quake > 0) prior_quake--;
+					}
+					drawPriorQuake(prior_quake);
+				});
+
+				$('#forward').click(function() {
+					if (live) return;
+					prior_quake++;
+					if (prior_quake == next_event_index) {live=true; return;};
+					drawPriorQuake(prior_quake);
+				});
+
+				$('#live').click(function() {
+					live = true;
+				});
+
+
+				function drawPriorQuake(q){
+					var buffer=initializeNoiseBuffer();
+					var distance = Math.sqrt(Math.pow(this_seismograph.x - quakes[q].location.x,2) + Math.pow(this_seismograph.y - quakes[q].location.y,2));
+					var t_offset = distance * P_WAVE_VELOCITY*1000
+
+					var t = new Date(quakes[q].time);
+					var now = t.getTime() + WINDOW*1000 + t_offset - 2000;
+					for (var i=2 * SAMPLING_RESOLUTION; i<2*SAMPLING_RESOLUTION + waveforms[q].length; i++){
+						buffer[i] = waveforms[q][i-2*SAMPLING_RESOLUTION];
+					}
+					drawSeismogram(buffer,now);
+					var oldfont = ctx.font;
+					ctx.font = "30px Arial";
+					ctx.fillText("RoomQuake " + (q+1), 50, 50);
+					ctx.font = oldfont;
+
+				}
+
+			}); // end quakes schedule request
+
+		}); // end room configuration request
+
+	}); // end on load
+
+
+
+	// 		// Update model
+	// 		document.getElementById('maxRoomX').value = response.room_width_meters;
+	// 		document.getElementById('maxRoomY').value = response.room_height_meters;
+	// 		for (var i=0; i<response.seismographs.length; i++){ 
+	// 			document.getElementById('x' + response.seismographs[i].id).value = response.seismographs[i].x;
+	// 			document.getElementById('y' + response.seismographs[i].id).value = response.seismographs[i].y;
+	// 		}
+	// 		// seismographs = response.seismographs;
+	// 		// mode = response.rq_mode;
+
+	//         var Xarrow = new Image();
+	//         Xarrow.src = 'Xarrow.png';
+
+	//         // WAIT TILL IMAGE IS LOADED.
+	//         Xarrow.onload = function () {
+	//             redrawRoom();
+	//         }
+
+	//         var Yarrow = new Image();
+	//         Yarrow.src = 'Yarrow.png';
+
+	//         // WAIT TILL IMAGE IS LOADED.
+	//         Yarrow.onload = function () {
+	//             redrawRoom();
+	//         }
+
+
+
+	//         $(".field").keyup(function(){ 
+	//         	redrawRoom();
+	//         });
+
+	//         $(".field").mouseout(function(){ 
+	//         	redrawRoom();
+	//         });
+
+	//         $("#save").click(function(){
+	//         	saveConfiguration();
+	//         })
+
+	//         function saveConfiguration(){
+	// 			var m = {}
+	// 			m.room_width_meters = Number(document.getElementById("maxRoomX").value);
+	// 			m.room_height_meters = Number(document.getElementById("maxRoomY").value);
+	// 			m.seismographs = [];
+	// 			for (var i=0; i<5; i++) {
+	//     			var sX = Number(document.getElementById("x" + (i+1)).value);
+	//     			var sY = Number(document.getElementById("y" + (i+1)).value);
+	//     			if (sX <= 0 || sY <= 0) continue;
+	// 				m.seismographs.push( {id:i+1,x:sX,y:sY});
+	// 			}
+	// 			m.rq_mode = "demo";
+	// 			nutella.net.publish("room_config_update", m);
+	//         }
+
+
+
+	//         function redrawRoom(){ 
+	//         	var seismoSymbols = ["①","②","③","④","⑤"];
+	//         	var maxX = Number(document.getElementById("maxRoomX").value);
+	//         	var maxY = Number(document.getElementById("maxRoomY").value);
+	//         	if (maxX <= 0 || maxY <= 0) return;
+	//         	if (maxX >= maxY) {
+	//         		ctx.canvas.width = 500;
+	//         		ctx.canvas.height = Math.floor(500 * (maxY / maxX));
+	//         	} else {
+	//         		ctx.canvas.height = 500;
+	//         		ctx.canvas.width = Math.floor(500 * (maxX / maxY));
+	//         	}
+	//         	ctx.fillStyle = "white";
+	//     		ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+	//     		// var Xarrow=document.getElementById("Xarrow");
+	//     		ctx.drawImage(Xarrow,50,ctx.canvas.height-40);
+	//     		ctx.drawImage(Yarrow,10,ctx.canvas.height-160);
+	//     		ctx.fillStyle = "orange";
+	//     		ctx.font = "30px Arial";
+	//     		for (var i=0; i<5; i++){
+	//     			var sX = Number(document.getElementById("x" + (i+1)).value);
+	//     			var sY = Number(document.getElementById("y" + (i+1)).value);
+	//     			if (sX <= 0 || sY <= 0) continue;
+	// 	    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
+	//     		}
+	//         }
+	//     });
+	// });
+
+    </script>
+
+</head>
+<body onresize="location.reload(true);">
+	
+	<canvas id="seismogram" width="10" height="10" style="border:1px solid black;"></canvas>
+	<br><button id="back">Back</button><button id="forward">Forward</button><button id="live">Live</button>
+</body>
+</html>
