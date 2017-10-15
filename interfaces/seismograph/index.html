@@ -134,9 +134,10 @@
 					var then = new Date(quake.time) ;
 					var now = new Date();
 					var delay = then.getTime() + distance*P_WAVE_VELOCITY*1000 - now.getTime();
-					if (delay > ADVANCE_WINDOW_THRESHOLD)
-						setTimeout(function(){in_event = true; live=true; back_delay=true}, delay);
-						setTimeout(function(){back_delay = false;}, delay + 30*1000);
+					if (delay > ADVANCE_WINDOW_THRESHOLD){
+						setTimeout(function(){in_event = true; live=true; back_delay=true;}, delay);
+						setTimeout(function(){back_delay = false;}, delay + WINDOW*1000);
+					}
 					else next_event_index++;
 				}; // end schedule_quakes
 
