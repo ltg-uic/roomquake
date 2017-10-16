@@ -50,6 +50,10 @@ nutella.net.subscribe('set_readings', function (message, from){
     // nutella.net.publish('portals_set',message);
 });
 
+nutella.net.subscribe('reading', function (message, from){
+    readings.data.push(message);
+    readings.save();
+});
 
 
 

@@ -34,27 +34,29 @@
 	var d_filters = [{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100}];
 	var instantX = -1;
 	var instantY = -1;
+	var seismographs=[{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}];
     $(function() {
 		var canvas = document.getElementById("myCanvas");
 		var ctx = canvas.getContext("2d");
+		var canvas2 = document.getElementById("timeline");
+		var ctx2 = canvas2.getContext("2d");
+
+		ctx2.fillStyle = "white";
+		ctx2.fillRect(0,0,ctx2.canvas.width,ctx2.canvas.height);
+
 		// redrawRoom();
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 
   		nutella.net.publish( 'mode_update', {rq_mode : "demo"} );
 
-		nutella.net.request("room_configuration", undefined, function(response) {
+		nutella.net.request("room_configuration", undefined, function(room) {
+			for (var i=0; i<room.seismographs.length; i++)
+				seismographs[room.seismographs[i].id] = 
+					{x: room.seismographs[i].x, y: room.seismographs[i].y};
+
 			nutella.net.request("get_readings",{},function(message){
 				readings = message;
-				// Update model
-				document.getElementById('maxRoomX').value = response.room_width_meters;
-				document.getElementById('maxRoomY').value = response.room_height_meters;
-				for (var i=0; i<response.seismographs.length; i++){ 
-					document.getElementById('x' + response.seismographs[i].id).value = response.seismographs[i].x;
-					document.getElementById('y' + response.seismographs[i].id).value = response.seismographs[i].y;
-				}
-				// seismographs = response.seismographs;
-				// mode = response.rq_mode;
 
 
 		        var Xarrow = new Image();
@@ -76,16 +78,8 @@
 		        $("input[name=s_sel]:eq(0)").click();
 		        $('#filterDiv').hide();
 
-		        nutella.net.subscribe("reading",function(arg){
-		        	var record = response.seismographs.filter(function(item){
-		        		return(item.id == arg.seismograph);
-		        	})[0];
-		        	var s = record.id;		        	
-		        	var x = record.x; 
-		        	var y = record.y;
-		        	var d = Number(arg.distance);
-		        	readings.push({s:s,x:x,y:y,d:d});
-		        	nutella.net.publish('set_readings',readings);
+		        nutella.net.subscribe("reading",function(arg){ 
+		        	readings.push(arg);
 		        	redrawRoom();
 
 
@@ -98,6 +92,15 @@
 	                ctx.strokeStyle = color;
 	                ctx.stroke();
 	            }
+
+	            function drawDot(x,y,r,color) {
+	                ctx2.fillStyle = "#GhostWhite";
+	                ctx2.beginPath();
+	                ctx2.arc(x, y, r, 0, 2 * Math.PI);
+	                ctx2.strokeStyle = color;
+	                ctx2.stroke();
+	            }
+
 
 
 
@@ -130,17 +133,17 @@
 		        	var rect = canvas.getBoundingClientRect(); 
 		        	var pendingX = event.clientX-rect.left;
 		        	var pendingY = event.clientY-rect.top;
-		        	var cX = pendingX/ctx.canvas.width * document.getElementById("maxRoomX").value;
-		        	if (cX > document.getElementById("maxRoomX").value)
-		        		cX = document.getElementById("maxRoomX").value;
+		        	var cX = pendingX/ctx.canvas.width * room.room_width_meters;
+		        	if (cX > room.room_width_meters)
+		        		cX = room.room_width_meters;
 		        	if (cX < 0) cX = 0;
-		        	var cY = document.getElementById("maxRoomY").value * (1 - pendingY/ctx.canvas.height);
-		        	if (cY > document.getElementById("maxRoomY").value)
-		        		cY = document.getElementById("maxRoomY").value;
+		        	var cY = room.room_height_meters * (1 - pendingY/ctx.canvas.height);
+		        	if (cY > room.room_height_meters)
+		        		cY = room.room_height_meters;
 		        	if (cY < 0) cY = 0;
 		        	var newX = parseInt(cX*1000)/1000;
 		        	var newY = parseInt(cY*1000)/1000;
-		        	if (Math.abs(newX - instantX)< .2 && Math.abs(newY - instantY) < .2){
+		        	if (Math.abs(newX - instantX) < .2 && Math.abs(newY - instantY) < .2){
 		        		instantX = -1;
 		        		instantY = -1;
 		        	} else {
@@ -153,27 +156,28 @@
 
 
 
-		        function saveConfiguration(){
-					var m = {}
-					m.room_width_meters = Number(document.getElementById("maxRoomX").value);
-					m.room_height_meters = Number(document.getElementById("maxRoomY").value);
-					m.seismographs = [];
-					for (var i=0; i<5; i++) {
-		    			var sX = Number(document.getElementById("x" + (i+1)).value);
-		    			var sY = Number(document.getElementById("y" + (i+1)).value);
-		    			if (sX <= 0 || sY <= 0) continue;
-						m.seismographs.push( {id:i+1,x:sX,y:sY});
-					}
-					m.rq_mode = "demo";
-					nutella.net.publish("room_config_update", m);
-		        }
+		   //      function saveConfiguration(){
+					// var m = {}
+					// m.room_width_meters = Number(document.getElementById("maxRoomX").value);
+					// m.room_height_meters = Number(document.getElementById("maxRoomY").value);
+					// m.seismographs = [];
+					// for (var i=0; i<5; i++) {
+		   //  			var sX = Number(document.getElementById("x" + (i+1)).value);
+		   //  			var sY = Number(document.getElementById("y" + (i+1)).value);
+		   //  			if (sX <= 0 || sY <= 0) continue;
+					// 	m.seismographs.push( {id:i+1,x:sX,y:sY});
+					// }
+					// m.rq_mode = "demo";
+					// nutella.net.publish("room_config_update", m);
+		   //      }
 
+//		("reading",{s:seismograph,d:distance,time:time,magnitude:mag})
 
 
 		        function redrawRoom(){ 
-		        	var seismoSymbols = ["①","②","③","④","⑤"];
-		        	var maxX = Number(document.getElementById("maxRoomX").value);
-		        	var maxY = Number(document.getElementById("maxRoomY").value);
+		        	var seismoSymbols = ["","①","②","③","④","⑤"];
+		        	var maxX = room.room_width_meters;
+		        	var maxY = room.room_height_meters;
 		        	if (maxX <= 0 || maxY <= 0) return;
 		        	if (maxX >= maxY) {
 		        		ctx.canvas.width = 500;
@@ -184,14 +188,30 @@
 		        	}
 		        	ctx.fillStyle = "white";
 		    		ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+
+		    		ctx2.fillStyle = "white";
+					ctx2.fillRect(0,0,ctx2.canvas.width,ctx2.canvas.height);
+		    		ctx2.strokeStyle = "orange";
+			        ctx2.beginPath();
+			        ctx2.moveTo(0,ctx2.canvas.height/2);
+			        ctx2.lineTo(ctx2.canvas.width,ctx2.canvas.height/2);
+			        ctx2.stroke();
+			        for (var i=0; i<=60; i+=5){
+			        	ctx2.strokeStyle = 'orange';
+				        ctx2.beginPath();
+				        ctx2.moveTo(i/60*ctx2.canvas.width,0);
+				        ctx2.lineTo(i/60*ctx2.canvas.width,ctx2.canvas.height);
+				        ctx2.stroke();
+			        }
+
 		    		// var Xarrow=document.getElementById("Xarrow");
 		    		ctx.drawImage(Xarrow,50,ctx.canvas.height-40);
 		    		ctx.drawImage(Yarrow,10,ctx.canvas.height-160);
 		    		ctx.fillStyle = "orange";
 		    		ctx.font = "30px Arial";
-		    		for (var i=0; i<5; i++){
-		    			var sX = Number(document.getElementById("x" + (i+1)).value);
-		    			var sY = Number(document.getElementById("y" + (i+1)).value);
+		    		for (var i=1; i<6; i++){
+		    			var sX = seismographs[i].x;
+		    			var sY = seismographs[i].y;
 		    			if (sX <= 0 || sY <= 0) continue;
 		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
 		    		};
@@ -201,9 +221,8 @@
 					// 	ctx.fillText("💥",x-15,y+12);
 					// }
 
-					var s = $('input[name=s_sel]:checked').val();
 					var r = readings.filter(function(item){
-						var keep = 	(s == 0 || s == item.s) &&
+						var keep = 	(S == 0 || S == item.s) &&
 									(item.d >= d_filters[item.s].min) &&
 									(item.d <= d_filters[item.s].max);
 						return (keep);			
@@ -214,8 +233,8 @@
 					var count = [0,0,0,0,0,0];
 
 					for (var i=0; i<r.length; i++){
-						var x = m_to_screenX(r[i].x);
-			        	var y = m_to_screenY(r[i].y);
+						var x = m_to_screenX(seismographs[r[i].s].x);
+			        	var y = m_to_screenY(seismographs[r[i].s].y);
 			        	var d = r[i].d*unit(); 
 			        	drawCircle(x,y,d,"silver");
 
@@ -226,55 +245,185 @@
 		        	$('#mean_distance').html("N/C");
 					$('#mean_N').html("0")
 		        	if (S > 0) {
-			        	if (count[S] > 0) {
+			        	if (count[S]>0) {
 				        	var md = Math.round(sum[S]/count[S] * 1000)/1000;
 				        	$('#mean_distance').html(md);
 					        	$('#mean_N').html(count[S]);
-				        	var thisS = response.seismographs.filter(function(item){
-				        		return (item.id == S)
-				        	})[0];
-				        	drawCircle (m_to_screenX(thisS.x), m_to_screenY(thisS.y), md*unit(),"brown");
+				        	drawCircle (m_to_screenX(seismographs[S].x), m_to_screenY(seismographs[S].y), md*unit(),"brown");
 			        	}
 			        } else {
 				        	for (i=1; i<=5; i++) {
-				        	if (count[i] > 0) {
-					        	var md = Math.round(sum[i]/count[i] * 1000)/1000;
-					        	$('#mean_distance').html(md);
-					        	$('#mean_N').html(count[i]);
-					        	var thisS = response.seismographs.filter(function(item){
-					        		return (item.id == i)
-					        	})[0];
-					        	drawCircle (m_to_screenX(thisS.x), m_to_screenY(thisS.y), md*unit(),"brown");
-				        	}			        		
-			        	}
+					        	if (count[i] > 0) {
+						        	var md = Math.round(sum[i]/count[i] * 1000)/1000;
+						        	$('#mean_distance').html(md);
+						        	$('#mean_N').html(count[i]);
+						        	drawCircle (m_to_screenX(seismographs[i].x), m_to_screenY(seismographs[i].y), md*unit(),"brown");
+					        	}			        		
+			        		}
 
-			        }
+			        };
 
 			        if (instantX >=0 && instantY>=0)
-			        {
-			        	var x = m_to_screenX(instantX);
-						var y = m_to_screenY(instantY);
-						ctx.fillText("💥",x-15,y+12);
-						ctx.font="15px Arial";
-						ctx.fillStyle = "brown";
-						ctx.fillText('(' + instantX + ',' + instantY + ')',
-							(x<370)?x+15:x-115,y+3);
+				        {
+				        	var x = m_to_screenX(instantX);
+							var y = m_to_screenY(instantY);
+							ctx.fillText("💥",x-15,y+12);
+							ctx.font="15px Arial";
+							ctx.fillStyle = "brown";
+							ctx.fillText('(' + instantX + ',' + instantY + ')',
+								(x<370)?x+15:x-115,y+3);
+			        	};
 
+
+
+
+
+			        if (readings.length > 0) {
+			        // draw timeline
+
+				        var mid = near_median_time (readings);
+				        var low = mid.n - 30 * 1000;
+				        var nextTime = low;
+
+				        ctx2.strokeStyle = 'orange';
+						ctx2.fillStyle = 'orange';
+						for (var i=0; i<60; i+=5){
+							ctx2.save();
+							ctx2.translate(i/60*ctx2.canvas.width+14, ctx2.canvas.height-4);
+							ctx2.rotate(-Math.PI/2);
+							ctx2.textAlign = "left";
+							var d = new Date(nextTime);
+							var t = d.toGMTString();
+							ctx2.fillText(t, 0, 0);
+							ctx2.restore();
+							nextTime += 5 * 1000;
+						}
+
+				        var i = 0;
+				        var last = mid.v[0]; 
+				        var freq = 0;
+						while (i<mid.v.length){
+							var t = Math.round(mid.v[i] / 1000) * 1000;
+							if (t != last) {
+								drawDot((last-low)/(60*1000)*ctx2.canvas.width,ctx2.canvas.height/2,3 * freq,'black');
+								freq = 1;							
+							} else {
+								freq++;
+							}
+							last = t;
+							i++;
+						}
+						drawDot((last-low)/(60*1000)*ctx2.canvas.width,ctx2.canvas.height/2,3 * freq,'black');
+
+				        
 			        }
-		        }
+
+
+				};
+
+			   //      if (true){
+						// var r = readings.filter(function(item){
+						// 	var keep = 	(S == 0 || S == item.s) &&
+						// 				(item.d >= d_filters[item.s].min) &&
+						// 				(item.d <= d_filters[item.s].max);
+						// 	return (keep);			
+						// });
+
+						// var mean_distance = [];
+						// var sum = [0,0,0,0,0,0];
+						// var count = [0,0,0,0,0,0];
+
+						// for (var i=0; i<r.length; i++){
+						// 	var x = m_to_screenX(seismographs[r[i].s].x);
+				  //       	var y = m_to_screenY(seismographs[r[i].s].y);
+				  //       	var d = r[i].d*unit(); 
+				  //       	drawCircle(x,y,d,"silver");
+
+				  //       	sum[r[i].s] += r[i].d;
+				  //       	count[r[i].s]++;
+			   //      	}
+
+			   //      	$('#mean_distance').html("N/C");
+						// $('#mean_N').html("0")
+			   //      	if (S > 0) {
+				  //       	if (count[S]>0) {
+					 //        	var md = Math.round(sum[S]/count[S] * 1000)/1000;
+					 //        	$('#mean_distance').html(md);
+						//         	$('#mean_N').html(count[S]);
+					 //        	drawCircle (m_to_screenX(seismographs[S].x), m_to_screenY(seismographs[S].y), md*unit(),"brown");
+				  //       	}
+				  //       } else {
+					 //        	for (i=1; i<=5; i++) {
+						//         	if (count[i] > 0) {
+						// 	        	var md = Math.round(sum[i]/count[i] * 1000)/1000;
+						// 	        	$('#mean_distance').html(md);
+						// 	        	$('#mean_N').html(count[i]);
+						// 	        	drawCircle (m_to_screenX(seismographs[i].x), m_to_screenY(seismographs[i].y), md*unit(),"brown");
+						//         	}			        		
+				  //       		}
+
+				  //       };
+				  //   };
+
+
+
+
+
 
 		        function m_to_screenX (m) {
-		        	return (m/document.getElementById("maxRoomX").value * ctx.canvas.width);
+		        	return (m/room.room_width_meters * ctx.canvas.width);
 		        }
 
 		        function m_to_screenY (m) {
-		        	return (ctx.canvas.height * (1 - m/document.getElementById("maxRoomY").value));
+		        	return (ctx.canvas.height * (1 - m/room.room_height_meters));
 		        }
 
 		        function unit() {
-		        	return (ctx.canvas.width/document.getElementById("maxRoomX").value);
+		        	return (ctx.canvas.width/room.room_width_meters);
 		        }
 
+				function near_median_time(readings) {
+
+					if (readings.length == 0) return 0;
+
+					var values = [];
+					for (var i=0; i<readings.length; i++){
+						var d = new Date(readings[i].time);
+						var t = d.getTime();
+						values[i] = t;
+					}
+
+				    values.sort( function(a,b) {return a - b;} );
+
+				    var half = Math.floor(values.length/2);
+				    var median = values[half];
+		        	var nearest_second = Math.round(median/1000);
+		        	var closest_ten_second = nearest_second - nearest_second % 10;
+		        	var nearMedian = closest_ten_second * 1000;
+					return ({v:values, n:nearMedian});	        	
+
+				}
+
+
+		        // function timeline_bounds (s) { // for seismograph s
+		        // 	var sum = 0;
+		        // 	var r = readings.filter(function(item){
+		        // 		return (item.s == s);
+		        // 	}); 
+		        // 	if (r.length == 0) return ({lower:-1, upper:-1});
+		        // 	for (var i=0; i<r.length; i++){
+		        // 		var t = new Date(r[i].time);
+		        // 		var time = t.getTime();
+		        // 		sum += time;
+		        // 	}; 
+		        // 	var mean = sum/r.length;
+		        // 	var nearest_second = Math.round(mean/1000);
+		        // 	var closest_ten_second = nearest_second - nearest_second % 10;
+		        // 	var near_mean = closest_ten_second * 1000;
+		        // 	var bounds = {lower: near_mean - 30*1000, upper: near_mean + 30*1000};
+		        // 	return (bounds);
+
+		        // }
 
 		  //       function trigger() {
 				// 	// Gather data
@@ -326,6 +475,8 @@
 					nutella.net.publish('set_readings',readings);
 					redrawRoom();
 				});
+
+
 			
 			});
 		});
@@ -412,7 +563,18 @@
 				<button hidden id="save">Save configuration</button>
 			</td>
 		</tr>
+		<tr>
+			<td>
+			</td>
+			<td colspan=2>
+					<canvas id="timeline" width="800" height="200" style="border:1px solid black;">
+							Your browser does not support the canvas element.
+					</canvas>
+			</td>
+		</tr>
+
 	</table>
+
 
 </body>
 </html>
