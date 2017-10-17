@@ -113,7 +113,7 @@
 					var s_amplitude = (ctx.canvas.height/2) * (magnitude/MAX_MAGNITUDE) * Math.pow(1 - distance/max_distance,.5); // hack
 					var p_amplitude = s_amplitude * .3; //hack
 					var buffer = []; 
-					var s_minus_p = distance * S_WAVE_VELOCITY/P_WAVE_VELOCITY;
+					var s_minus_p = distance * (1/S_WAVE_VELOCITY - 1/P_WAVE_VELOCITY);
 					var p_length = Math.floor(s_minus_p * SAMPLING_RESOLUTION); 
 					for (var i=0; i<p_length; i++) { 
 						buffer[i] = p_amplitude * randomPlusMinus();

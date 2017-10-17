@@ -50,12 +50,17 @@
 		     	$('#submit').click(function(){
 					// distance of an event from a seismograph
 					var max_distance =	Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2));
+					// alert($('#P_WAVE_VELOCITY').val() * max_distance / $('#S_WAVE_VELOCITY').val());
+						// alert(1 + Number($('#S_LENGTH_RATIO').val()));
+					var max_time = 
+						(max_distance/$('#S_WAVE_VELOCITY').val() - max_distance/$('#P_WAVE_VELOCITY').val())  *// 
+						(1 + Number($('#S_LENGTH_RATIO').val()));
+					;
+					// alert(max_time + '  ' + $('#WINDOW').val());
 
-					var max_time = ($('#S_WAVE_VELOCITY').val() * max_distance) / $('#P_WAVE_VELOCITY').val() * (1 + $('#S_LENGTH_RATIO').val());
-
-		     		if (max_time > $('#WINDOW').val()) {
+		     		if (max_time > .95 * $('#WINDOW').val()) {
 		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_LENGTH_RATIO, and WINDOW size will not allow a seismogram to be represented in the seismogram.');
-		     			return
+		     			return;
 		     		}
 
 		     		nutella.net.publish('set_seismogram',
