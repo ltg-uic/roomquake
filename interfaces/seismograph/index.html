@@ -135,7 +135,7 @@
 
 					var then = new Date(quake.time) ;
 					var now = new Date();
-					var delay = then.getTime() + distance*P_WAVE_VELOCITY*1000 - now.getTime();
+					var delay = then.getTime() + distance/P_WAVE_VELOCITY*1000 - now.getTime();
 					if (delay > ADVANCE_WINDOW_THRESHOLD){
 						setTimeout(function(){in_event = true; live=true; back_delay=true;}, delay);
 						setTimeout(function(){back_delay = false;}, delay + WINDOW*1000);
@@ -301,7 +301,7 @@
 				function drawPriorQuake(q){
 					var buffer=initializeNoiseBuffer();
 					var distance = Math.sqrt(Math.pow(this_seismograph.x - quakes[q].location.x,2) + Math.pow(this_seismograph.y - quakes[q].location.y,2));
-					var t_offset = distance * P_WAVE_VELOCITY*1000
+					var t_offset = distance / P_WAVE_VELOCITY*1000
 
 					var t = new Date(quakes[q].time);
 					var now = t.getTime() + WINDOW*1000 + t_offset - 2000;
