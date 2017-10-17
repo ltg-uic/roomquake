@@ -30,17 +30,19 @@
 
 
 
-	const WINDOW = 30; //number of seconds in seismograph window
-	const SAMPLING_RESOLUTION = 30; //number of data points per second
-	const ADVANCE_WINDOW_THRESHOLD = 0;
-	const P_WAVE_VELOCITY = 1; //meters per second
-	const S_WAVE_VELOCITY = P_WAVE_VELOCITY / 1.76; //meters per second
-	const MAX_DISPLACEMENT = 200;
-	const MAX_MAGNITUDE = 5;
-	const S_TAIL = .2; // proportion of S wave waveform devoted to decay
 
 
     $(function() {
+     nutella.net.request("get_seismogram",{},function(sg){
+     	var WINDOW = sg.WINDOW;
+     	var SAMPLING_RESOLUTION = sg.SAMPLING_RESOLUTION;
+     	var ADVANCE_WINDOW_THRESHOLD = sg.ADVANCE_WINDOW_THRESHOLD;
+     	var P_WAVE_VELOCITY = sg.P_WAVE_VELOCITY;
+     	var S_WAVE_VELOCITY = sg.S_WAVE_VELOCITY;
+     	var MAX_DISPLACEMENT = sg.MAX_DISPLACEMENT;
+     	var MAX_MAGNITUDE = sg.MAX_MAGNITUDE;
+     	var S_TAIL = sg.S_TAIL;
+     	var S_LENGTH_RATIO = sg.S_LENGTH_RATIO;
 
 		// var sound = document.getElementById("rumble"); alert(sound.src)
 		// sound.play();
@@ -53,6 +55,8 @@
 		//     alert("Can play through audio without stopping");
 		// };
 
+		nutella.net.subscribe("mode_update", function() {location.reload(true);});
+		nutella.net.subscribe("changed_seismogram", function() {location.reload(true);});
 
 
     	document.getElementById("seismogram").width=window.innerWidth;
@@ -63,12 +67,10 @@
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 
-		nutella.net.subscribe("mode_update", function() {location.reload(true);});
 
 
 		nutella.net.request("room_configuration", undefined, function(room) {
 			var max_distance = Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2)); // maximum distance of an event from a seismograph
-			var s_length_ratio = 2;
 				// 0.9 * ((P_WAVE_VELOCITY * WINDOW) / (S_WAVE_VELOCITY * Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2))) - 1);
 			var this_seismograph = room.seismographs.filter(function(item){
 				return (Number(item.id) == Number(top.instance.ID))
@@ -116,8 +118,8 @@
 					for (var i=0; i<p_length; i++) { 
 						buffer[i] = p_amplitude * randomPlusMinus();
 					}; 
-					var s_length = Math.round(p_length + s_length_ratio*p_length);
-					var s_body = Math.round(p_length + (1 - S_TAIL) * (s_length_ratio*p_length));
+					var s_length = Math.round(p_length + S_LENGTH_RATIO*p_length);
+					var s_body = Math.round(p_length + (1 - S_TAIL) * (S_LENGTH_RATIO*p_length));
 					for (var i=p_length; i < s_body; i++) {
 						buffer[i] = s_amplitude * randomPlusMinus(); 
 					}; 
@@ -317,7 +319,7 @@
 			}); // end quakes schedule request
 
 		}); // end room configuration request
-
+	 });
 	}); // end on load
 
 
