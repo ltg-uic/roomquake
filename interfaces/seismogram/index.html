@@ -51,9 +51,9 @@
 					// distance of an event from a seismograph
 					var max_distance =	Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2));
 
-					var max_time = (S_WAVE_VELOCITY * max_distance) / P_WAVE_VELOCITY * (1 + S_LENGTH_RATIO);
+					var max_time = ($('#S_WAVE_VELOCITY').val() * max_distance) / $('#P_WAVE_VELOCITY').val() * (1 + $('#S_LENGTH_RATIO').val());
 
-		     		if (max_time > WINDOW) {
+		     		if (max_time > $('#WINDOW').val()) {
 		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_LENGTH_RATIO, and WINDOW size will not allow a seismogram to be represented in the seismogram.');
 		     			return
 		     		}
