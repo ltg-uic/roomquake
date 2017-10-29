@@ -112,16 +112,17 @@
 		  		var e = 'X <input class="field" type=text size=6 maxlength=6>Y <input class="field" type=text size=6 maxlength=6>' +
 		  			'<button class="pick">pick</button>';
 
-		  		var g = '<select>';
+		  		var g = '<select hidden>';
 		  		for (var i=2; i<6; i++){
 		  			g += '<option value=' + i + '>' + i + '</option>';
 		  		};
 		  		g += '</select>';
 
 		  		return( '<tr>' + '<td>' +
-		  			'Date:' + m + d + y + '<br><br>' +
-		  			'Time:' + h + n + s + '<br><br>' + 
-		  			'Mag: ' + g + '</td>' +
+		  			'Date: ' + m + d + y + '<br><br>' +
+		  			'Time: ' + h + n + s + '<br><br>' + 
+		  			// 'Mag: ' + g + '</td>' +
+		  			 g + '</td>' +
 		  			'</tr>');
 			}
 

@@ -46,6 +46,8 @@
 		     	$('#MAX_MAGNITUDE').val(sg.MAX_MAGNITUDE);
 		     	$('#S_TAIL').val(sg.S_TAIL);
 		     	$('#S_LENGTH_RATIO').val(sg.S_LENGTH_RATIO);
+		     	$('#NOISE').val(sg.NOISE);
+
 
 		     	$('#submit').click(function(){
 					// distance of an event from a seismograph
@@ -59,9 +61,14 @@
 					// alert(max_time + '  ' + $('#WINDOW').val());
 
 		     		if (max_time > .95 * $('#WINDOW').val()) {
-		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_LENGTH_RATIO, and WINDOW size will not allow a seismogram to be represented in the seismogram.');
+		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_LENGTH_RATIO, and WINDOW size will not allow the allow the seismogram to fit in the stripchart window');
 		     			return;
-		     		}
+		     		};
+
+		     		if ($('#SAMPLING_RESOLUTION').val()<1) {
+		     			alert ('Pixels per data point must be at least 1');
+		     			return;
+	     			};
 
 		     		nutella.net.publish('set_seismogram',
 		     		{
@@ -73,7 +80,8 @@
 				     	MAX_DISPLACEMENT: $('#MAX_DISPLACEMENT').val(),
 				     	MAX_MAGNITUDE: $('#MAX_MAGNITUDE').val(),
 				     	S_TAIL: $('#S_TAIL').val(),
-				     	S_LENGTH_RATIO: $('#S_LENGTH_RATIO').val()
+				     	S_LENGTH_RATIO: $('#S_LENGTH_RATIO').val(),
+				     	NOISE: $('#NOISE').val()
 
 		     		});
 	     		});
@@ -85,8 +93,8 @@
 </head>
 <body>
 <b>Seismogram parameters (experts only!)</b><br><br>
-<table>
-	<tr>
+<table cellpadding=5>
+	<tr style="font-size:150%;">
 		<td>
 			<b>Parameter</b>
 		</td>
@@ -110,13 +118,13 @@
 	</tr>
 	<tr>
 		<td>
-			SAMPLING_RESOLUTION
+			WAVEFORM DENSITY
 		</td>
 		<td>
-			<input id="SAMPLING_RESOLUTION" size=6>
+			<input id="SAMPLING_RESOLUTION" size=6> 
 		</td>
 		<td>
-			Number of sample points per second
+			Number of pixels per data point. Minimum 1 (float).
 		</td>
 	</tr>
 	<tr>
@@ -182,7 +190,7 @@
 			<input id="S_TAIL" size=6>
 		</td>
 		<td>
-			raction of s-wave waveform devoted to logarithmic decay
+			Fraction of s-wave waveform devoted to logarithmic decay
 		</td>
 	</tr>
 	<tr>
@@ -194,6 +202,17 @@
 		</td>
 		<td>
 			Length of s-wave waveform relative to s-p interval (problematic? very short s-waveforms with proximate quakes)
+		</td>
+	</tr>
+	<tr>
+		<td>
+			NOISE
+		</td>
+		<td>
+			<input id="NOISE" size=6>
+		</td>
+		<td>
+			Noise (total displacement in pixels. Default 5.)
 		</td>
 	</tr>
 	<tr>

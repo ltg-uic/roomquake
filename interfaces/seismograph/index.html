@@ -30,19 +30,38 @@
 
 
 
-
-
     $(function() {
      nutella.net.request("get_seismogram",{},function(sg){
+
      	var WINDOW = sg.WINDOW;
      	var SAMPLING_RESOLUTION = sg.SAMPLING_RESOLUTION;
-     	var ADVANCE_WINDOW_THRESHOLD = sg.ADVANCE_WINDOW_THRESHOLD;
+     	// alert(window.innerWidth);
+     	var pixels_per_second = window.innerWidth/WINDOW;
+     	SAMPLING_RESOLUTION = Math.round(pixels_per_second / SAMPLING_RESOLUTION); 
      	var P_WAVE_VELOCITY = sg.P_WAVE_VELOCITY;
      	var S_WAVE_VELOCITY = sg.S_WAVE_VELOCITY;
+     	var ADVANCE_WINDOW_THRESHOLD = sg.ADVANCE_WINDOW_THRESHOLD;
      	var MAX_DISPLACEMENT = sg.MAX_DISPLACEMENT;
      	var MAX_MAGNITUDE = sg.MAX_MAGNITUDE;
      	var S_TAIL = sg.S_TAIL;
      	var S_LENGTH_RATIO = sg.S_LENGTH_RATIO;
+     	var NOISE = sg.NOISE; 
+     	var label_freq = 5;
+		if (window.innerWidth/WINDOW < 24) label_freq = 10;
+		if (window.innerWidth/WINDOW < 12) label_freq = 20;
+		if (window.innerWidth/WINDOW < 6) label_freq = 30;
+
+		function backgroundNoise () {
+			return (Math.random() - 0.5) * 2 * NOISE;
+		};
+
+		function randomPlusMinus () {
+			// return (gaussianRand() - 0.5) * 2;
+			return (Math.random() - 0.5) * 2;
+		}	
+
+
+
 
 		// var sound = document.getElementById("rumble"); alert(sound.src)
 		// sound.play();
@@ -89,9 +108,10 @@
 				var back_delay = false;
 
 				for (var i=0; i<quakes.length; i++) {
-					waveforms[i] = build_waveform(quakes[i]); 
-					schedule_quake(quakes[i]);
+					waveforms[i] = build_waveform(quakes[i]); 				
+					schedule_quake(quakes[i]); 				
 				}
+
 				liveBuffer = initializeNoiseBuffer(); 
 				setInterval(tick,1000/SAMPLING_RESOLUTION);
 
@@ -104,14 +124,17 @@
 
 				});
 
+
 				function build_waveform(quake){
 					var distance = Math.sqrt(Math.pow(this_seismograph.x - quake.location.x,2) + Math.pow(this_seismograph.y - quake.location.y,2));
 					 return(constructWaveform(distance,quake.magnitude));
 				}; // end stock_waveforms
 
 				function constructWaveform(distance,magnitude) { 
-					var s_amplitude = (ctx.canvas.height/2) * (magnitude/MAX_MAGNITUDE) * Math.pow(1 - distance/max_distance,.5); // hack
-					var p_amplitude = s_amplitude * .3; //hack
+					var s_amplitude = (ctx.canvas.height/2) * (magnitude/MAX_MAGNITUDE) * Math.pow(1 - distance/max_distance,.5);
+					 // hack
+					var p_amplitude = s_amplitude * .3; //hack 
+					if (p_amplitude < NOISE+5) p_amplitude +=5;
 					var buffer = []; 
 					var s_minus_p = distance * (1/S_WAVE_VELOCITY - 1/P_WAVE_VELOCITY);
 					var p_length = Math.floor(s_minus_p * SAMPLING_RESOLUTION); 
@@ -124,23 +147,23 @@
 						buffer[i] = s_amplitude * randomPlusMinus(); 
 					}; 
 					for (var i=s_body; i < s_length; i++) {
-						buffer[i] = s_amplitude * randomPlusMinus() * 
+						buffer[i] = (s_amplitude * randomPlusMinus()) * 
 							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body)))); 
 					};
 					return (buffer);
 				}; // end constructWaveform
 
 				function schedule_quake(quake){ //assumes quakes in proper time order
-					var distance = Math.sqrt(Math.pow(this_seismograph.x - quake.location.x,2) + Math.pow(this_seismograph.y - quake.location.y,2));
+					var distance = Math.sqrt(Math.pow(this_seismograph.x - quake.location.x,2) + Math.pow(this_seismograph.y - quake.location.y,2)); 
 
 					var then = new Date(quake.time) ;
 					var now = new Date();
-					var delay = then.getTime() + distance/P_WAVE_VELOCITY*1000 - now.getTime();
+					var delay = then.getTime() + distance/P_WAVE_VELOCITY*1000 - now.getTime(); 
 					if (delay > ADVANCE_WINDOW_THRESHOLD){
 						setTimeout(function(){in_event = true; live=true; back_delay=true;}, delay);
 						setTimeout(function(){back_delay = false;}, delay + WINDOW*1000);
 					}
-					else next_event_index++;
+					else next_event_index++; 				
 				}; // end schedule_quakes
 
 
@@ -194,6 +217,8 @@
 					var t_offset = t_right - integer_time; 
 					var line_x = t_offset/(WINDOW*1000) * ctx.canvas.width;
 					for (var i=0; i<WINDOW*1.07; i++){
+						ctx.strokeStyle='orange';
+						if (Math.round(integer_time/1000) % label_freq == 0) ctx.strokeStyle = 'brown';
 						ctx.beginPath();
 						var x_pos = ctx.canvas.width - line_x - i*ctx.canvas.width/WINDOW;
 						ctx.moveTo(x_pos,0);
@@ -201,7 +226,6 @@
 						ctx.stroke();
 						var label_time = new Date(integer_time);
 						var label = label_time.toGMTString();
-						var label_freq = 5 ; // this could be improved
 						if (Math.round(integer_time/1000) % label_freq == 0) {
 							ctx.save();
 							ctx.translate(x_pos-3, ctx.canvas.height-5);
@@ -210,9 +234,9 @@
 							ctx.fillText(label, 0, 0);
 							ctx.restore();
 						}
-						if (Math.round(integer_time/1000) % (label_freq * 2) == 7) {
+						if (Math.round(integer_time/1000) % (label_freq * 2) == 0) {
 							var y_offset = ctx.canvas.height/8;
-							var x_label = x_pos + 0;
+							var x_label = x_pos + 5;
 							var pos_offset = 15;
 							var neg_offset = -5;
 							ctx.fillText("200mm", x_label, 15);
@@ -234,6 +258,7 @@
 					var displacementLabelDelta = ctx.canvas.height/8;
 					for (var i=0; i<9; i++) {
 						ctx.strokeStyle="orange";
+						if (i == 4) ctx.strokeStyle="brown";
 						ctx.beginPath();
 						ctx.moveTo(0,i*displacementLabelDelta);
 						ctx.lineTo(ctx.canvas.width,i*displacementLabelDelta);
@@ -246,7 +271,8 @@
 					ctx.fillStyle = "black";
 					ctx.strokeStyle = 'black';
 					ctx.beginPath();
-					ctx.moveTo(0,ctx.canvas.height/2+ buffer[0]);
+					ctx.moveTo(0,ctx.canvas.height/2+ buffer[0]); 
+					// alert(SAMPLING_RESOLUTION);
 					for (var i=0; i<(.982*WINDOW * SAMPLING_RESOLUTION); i++)
 						ctx.lineTo (i*ctx.canvas.width/(WINDOW * SAMPLING_RESOLUTION),ctx.canvas.height/2 + buffer[i]);
 					ctx.stroke();
@@ -267,13 +293,6 @@
 
 				};
 
-				function backgroundNoise () {
-					return (Math.random() - 0.5)*5;
-				};
-
-				function randomPlusMinus () {
-					return (Math.random() - 0.5) * 2;
-				}
 
 				$('#back').click(function() {
 					if (back_delay) return;
@@ -281,7 +300,7 @@
 					if (live) { 
 						live=false; prior_quake = next_event_index-1;
 					} else {
-						if (prior_quake > 0) prior_quake--;
+						if (prior_quake > 0) prior_quake--; else return;
 					}
 					drawPriorQuake(prior_quake);
 				});
@@ -301,13 +320,12 @@
 				function drawPriorQuake(q){
 					var buffer=initializeNoiseBuffer();
 					var distance = Math.sqrt(Math.pow(this_seismograph.x - quakes[q].location.x,2) + Math.pow(this_seismograph.y - quakes[q].location.y,2));
-					var t_offset = distance / P_WAVE_VELOCITY*1000
-
+					var t_offset = distance / P_WAVE_VELOCITY*1000;
 					var t = new Date(quakes[q].time);
 					var now = t.getTime() + WINDOW*1000 + t_offset - 2000;
 					for (var i=2 * SAMPLING_RESOLUTION; i<2*SAMPLING_RESOLUTION + waveforms[q].length; i++){
 						buffer[i] = waveforms[q][i-2*SAMPLING_RESOLUTION];
-					}
+					};
 					drawSeismogram(buffer,now);
 					var oldfont = ctx.font;
 					ctx.font = "30px Arial";
@@ -321,7 +339,6 @@
 		}); // end room configuration request
 	 });
 	}); // end on load
-
 
 
 	// 		// Update model

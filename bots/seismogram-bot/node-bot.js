@@ -13,16 +13,17 @@ seismogram.load();
 if (!seismogram.hasOwnProperty('data')){
     seismogram = {data:{
         WINDOW:30, //number of seconds in seismograph window
-        SAMPLING_RESOLUTION:40, //number of data points per second
+        SAMPLING_RESOLUTION:1, //number of data points per second
         ADVANCE_WINDOW_THRESHOLD:0,
         P_WAVE_VELOCITY:1, //meters per second
         S_WAVE_VELOCITY:.57, //meters per second
         MAX_DISPLACEMENT:200,
         MAX_MAGNITUDE:5,
         S_TAIL:.2, // proportion of S wave waveform devoted to decay
-        S_LENGTH_RATIO:2
+        S_LENGTH_RATIO:2,
+        NOISE: 5
     }}
-    seismogram.data.S_WAVE_VELOCITY = seismogram.data.P_WAVE_VELOCITY / 1.76;
+    // seismogram.data.S_WAVE_VELOCITY = seismogram.data.P_WAVE_VELOCITY / 1.76;
     seismogram.save();
 }
 
