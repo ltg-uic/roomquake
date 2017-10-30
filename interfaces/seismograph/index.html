@@ -240,14 +240,15 @@
 							var x_label = x_pos + 5;
 							var pos_offset = 15;
 							var neg_offset = -5;
-							ctx.fillText("200mm", x_label, 15);
-							ctx.fillText("150", x_label, y_offset+pos_offset);
-							ctx.fillText("100", x_label, 2*y_offset+pos_offset);
-							ctx.fillText("50", x_label, 3*y_offset+pos_offset);
-							ctx.fillText("-50", x_label, 5*y_offset+neg_offset);
-							ctx.fillText("-100", x_label, 6*y_offset+neg_offset);
-							ctx.fillText("-150", x_label, 7*y_offset+neg_offset);
-							ctx.fillText("-200", x_label, 8*y_offset+neg_offset);
+
+							ctx.fillText( MAX_DISPLACEMENT + "mm", x_label, 15);
+							ctx.fillText(Math.round(3/4*MAX_DISPLACEMENT), x_label, y_offset+pos_offset);
+							ctx.fillText(Math.round(1/2*MAX_DISPLACEMENT), x_label, 2*y_offset+pos_offset);
+							ctx.fillText(Math.round(1/4*MAX_DISPLACEMENT), x_label, 3*y_offset+pos_offset);
+							ctx.fillText(Math.round(-1/4*MAX_DISPLACEMENT), x_label, 5*y_offset+neg_offset);
+							ctx.fillText(Math.round(-1/2*MAX_DISPLACEMENT), x_label, 6*y_offset+neg_offset);
+							ctx.fillText(Math.round(-3/4*MAX_DISPLACEMENT), x_label, 7*y_offset+neg_offset);
+							ctx.fillText(-MAX_DISPLACEMENT, x_label, 8*y_offset+neg_offset);
 						}
 
 						integer_time -= 1000;
