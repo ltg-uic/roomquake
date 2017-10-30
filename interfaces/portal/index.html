@@ -9,6 +9,12 @@
  
   <style type="text/css">
 
+    body {
+        font-family: "Arial";
+        overflow: hidden;
+    }
+
+
     .inactiveLink {
        pointer-events: none;
        cursor: default;
@@ -20,7 +26,7 @@
 
 
     li {
-      font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
+      font: 200 20px/1.5 Arial, sans-serif;
       border-bottom: 1px solid #ccc;
       padding:5px 5px 5px 5px;
       background-color:white;
@@ -195,6 +201,9 @@
     	// if a portal is selected, highlight it
 
   		$( "#portals li a" ).on( "click", function( event, ui ) { 
+// alert(1);
+// throw new Error("Something went badly wrong!");
+
   			$( "#portals li" ).removeClass('ui-selected'); 
   			$( "#portals li a" ).removeClass('ui-selected');
   			var p = event.currentTarget;
@@ -230,7 +239,6 @@
         }
 
         $( "#instances li a" ).unbind( "click");
-
         $( "#instances li a" ).on( "click", function( event, ui ) { 
           $( "#instances li" ).removeClass('ui-selected'); 
           $( "#instances li a" ).removeClass('ui-selected');

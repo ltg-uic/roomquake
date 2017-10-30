@@ -18,6 +18,24 @@
 	    	font-family: "Arial";
 	    	overflow: hidden;
 		}
+		button {
+		  -webkit-border-radius: 6;
+		  -moz-border-radius: 6;
+		  border-radius: 6px;
+		  font-family: Arial;
+		  font-size: 18px;
+		  background: lightyellow;
+		  color: brown;
+		  padding: 5px 10px 5px 10px;
+		  text-decoration: none;
+		}
+
+		button:hover {
+		  background: brown;
+		  color: lightyellow;
+		  text-decoration: none;
+		}
+
 	</style>
 
 	<script type="text/javascript">
@@ -138,18 +156,22 @@
 					if (p_amplitude < NOISE+5) p_amplitude +=5;
 					var buffer = []; 
 					var s_minus_p = distance * (1/S_WAVE_VELOCITY - 1/P_WAVE_VELOCITY);
-					var p_length = Math.floor(s_minus_p * SAMPLING_RESOLUTION); 
+					var p_length = Math.floor(s_minus_p * SAMPLING_RESOLUTION);
+					var mult = 1; 
 					for (var i=0; i<p_length; i++) { 
-						buffer[i] = p_amplitude * randomPlusMinus();
+						buffer[i] = p_amplitude * Math.abs(randomPlusMinus()) * mult;
+						mult = -mult;
 					}; 
 					var s_length = Math.round(p_length + S_TO_P_LENGTH_RATIO*p_length);
 					var s_body = Math.round(p_length + (1 - S_TAIL) * (S_TO_P_LENGTH_RATIO*p_length));
 					for (var i=p_length; i < s_body; i++) {
-						buffer[i] = s_amplitude * randomPlusMinus(); 
+						buffer[i] = s_amplitude * Math.abs(randomPlusMinus()) * mult; 
+						mult = -mult;
 					}; 
 					for (var i=s_body; i < s_length; i++) {
-						buffer[i] = (s_amplitude * randomPlusMinus()) * 
-							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body))))+ backgroundNoise(); 
+						buffer[i] = (s_amplitude * Math.abs(randomPlusMinus()) * mult * 
+							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body)))))+ backgroundNoise(); 
+							mult = -mult;
 					};
 					return (buffer);
 				}; // end constructWaveform
@@ -217,14 +239,16 @@
 					var integer_time = Math.ceil(t_right/1000)*1000;
 					var t_offset = t_right - integer_time; 
 					var line_x = t_offset/(WINDOW*1000) * ctx.canvas.width;
-					for (var i=0; i<WINDOW*1.07; i++){
+					for (var i=0; i<WINDOW*1.07; i++){					
+						ctx.lineWidth=1;
 						ctx.strokeStyle='orange';
-						if (Math.round(integer_time/1000) % label_freq == 0) ctx.strokeStyle = 'brown';
+						if (Math.round(integer_time/1000) % label_freq == 0) {ctx.lineWidth=2; ctx.strokeStyle = 'brown';}
 						ctx.beginPath();
 						var x_pos = ctx.canvas.width - line_x - i*ctx.canvas.width/WINDOW;
 						ctx.moveTo(x_pos,0);
 						ctx.lineTo(x_pos,ctx.canvas.height);
 						ctx.stroke();
+						ctx.lineWidth=1;
 						var label_time = new Date(integer_time);
 						var label = label_time.toGMTString();
 						if (Math.round(integer_time/1000) % label_freq == 0) {

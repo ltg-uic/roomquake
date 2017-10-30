@@ -18,7 +18,8 @@ iframe {
 border: none; 
 }
 body {
-    overflow:hidden ;
+    font-family: "Arial";
+    overflow: hidden;
 }
 
 .blankpage {
@@ -110,6 +111,7 @@ $(function() {
   bottomOfHeader = 135; //hard-wired hack
   bottomOfVisibleWindow = $(window).height(); 
   h = bottomOfVisibleWindow - bottomOfHeader; 
+  $("iframe").attr("height",h);
   $( window ).resize(function() {
     bottomOfVisibleWindow = $(window).height(); 
     h = bottomOfVisibleWindow - bottomOfHeader;
