@@ -43,8 +43,9 @@
      	var ADVANCE_WINDOW_THRESHOLD = sg.ADVANCE_WINDOW_THRESHOLD;
      	var MAX_DISPLACEMENT = sg.MAX_DISPLACEMENT;
      	var MAX_MAGNITUDE = sg.MAX_MAGNITUDE;
+     	var P_TO_S_AMPLITUDE_RATIO = sg.P_TO_S_AMPLITUDE_RATIO;
      	var S_TAIL = sg.S_TAIL;
-     	var S_LENGTH_RATIO = sg.S_LENGTH_RATIO;
+     	var S_TO_P_LENGTH_RATIO = sg.S_TO_P_LENGTH_RATIO;
      	var NOISE = sg.NOISE; 
      	var label_freq = 5;
 		if (window.innerWidth/WINDOW < 24) label_freq = 10;
@@ -133,7 +134,7 @@
 				function constructWaveform(distance,magnitude) { 
 					var s_amplitude = (ctx.canvas.height/2) * (magnitude/MAX_MAGNITUDE) * Math.pow(1 - distance/max_distance,.5);
 					 // hack
-					var p_amplitude = s_amplitude * .3; //hack 
+					var p_amplitude = s_amplitude * P_TO_S_AMPLITUDE_RATIO;  
 					if (p_amplitude < NOISE+5) p_amplitude +=5;
 					var buffer = []; 
 					var s_minus_p = distance * (1/S_WAVE_VELOCITY - 1/P_WAVE_VELOCITY);
@@ -141,14 +142,14 @@
 					for (var i=0; i<p_length; i++) { 
 						buffer[i] = p_amplitude * randomPlusMinus();
 					}; 
-					var s_length = Math.round(p_length + S_LENGTH_RATIO*p_length);
-					var s_body = Math.round(p_length + (1 - S_TAIL) * (S_LENGTH_RATIO*p_length));
+					var s_length = Math.round(p_length + S_TO_P_LENGTH_RATIO*p_length);
+					var s_body = Math.round(p_length + (1 - S_TAIL) * (S_TO_P_LENGTH_RATIO*p_length));
 					for (var i=p_length; i < s_body; i++) {
 						buffer[i] = s_amplitude * randomPlusMinus(); 
 					}; 
 					for (var i=s_body; i < s_length; i++) {
 						buffer[i] = (s_amplitude * randomPlusMinus()) * 
-							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body)))); 
+							(1 - Math.log10(1+10*((i-s_body)/(s_length-s_body))))+ backgroundNoise(); 
 					};
 					return (buffer);
 				}; // end constructWaveform
@@ -270,12 +271,14 @@
 
 					ctx.fillStyle = "black";
 					ctx.strokeStyle = 'black';
+					ctx.lineWidth=2;
 					ctx.beginPath();
 					ctx.moveTo(0,ctx.canvas.height/2+ buffer[0]); 
 					// alert(SAMPLING_RESOLUTION);
 					for (var i=0; i<(.982*WINDOW * SAMPLING_RESOLUTION); i++)
 						ctx.lineTo (i*ctx.canvas.width/(WINDOW * SAMPLING_RESOLUTION),ctx.canvas.height/2 + buffer[i]);
 					ctx.stroke();
+					ctx.lineWidth=1;
 
 					//draw pen
 

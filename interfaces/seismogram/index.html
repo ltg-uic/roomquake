@@ -44,8 +44,9 @@
 		     	$('#S_WAVE_VELOCITY').val(sg.S_WAVE_VELOCITY);
 		     	$('#MAX_DISPLACEMENT').val(sg.MAX_DISPLACEMENT);
 		     	$('#MAX_MAGNITUDE').val(sg.MAX_MAGNITUDE);
+		     	$('#P_TO_S_AMPLITUDE_RATIO').val(sg.P_TO_S_AMPLITUDE_RATIO);
 		     	$('#S_TAIL').val(sg.S_TAIL);
-		     	$('#S_LENGTH_RATIO').val(sg.S_LENGTH_RATIO);
+		     	$('#S_TO_P_LENGTH_RATIO').val(sg.S_TO_P_LENGTH_RATIO);
 		     	$('#NOISE').val(sg.NOISE);
 
 
@@ -56,12 +57,12 @@
 						// alert(1 + Number($('#S_LENGTH_RATIO').val()));
 					var max_time = 
 						(max_distance/$('#S_WAVE_VELOCITY').val() - max_distance/$('#P_WAVE_VELOCITY').val())  *// 
-						(1 + Number($('#S_LENGTH_RATIO').val()));
+						(1 + Number($('#S_TO_P_LENGTH_RATIO').val()));
 					;
 					// alert(max_time + '  ' + $('#WINDOW').val());
 
 		     		if (max_time > .95 * $('#WINDOW').val()) {
-		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_LENGTH_RATIO, and WINDOW size will not allow the allow the seismogram to fit in the stripchart window');
+		     			alert ('This combination of room size, P_WAVE_VELOCITY, S_WAVE_VELOCITY,  S_TO_P_LENGTH_RATIO, and WINDOW size will not allow the allow the seismogram to fit in the stripchart window');
 		     			return;
 		     		};
 
@@ -79,8 +80,9 @@
 				     	S_WAVE_VELOCITY: $('#S_WAVE_VELOCITY').val(),
 				     	MAX_DISPLACEMENT: $('#MAX_DISPLACEMENT').val(),
 				     	MAX_MAGNITUDE: $('#MAX_MAGNITUDE').val(),
+				     	P_TO_S_AMPLITUDE_RATIO: $('#P_TO_S_AMPLITUDE_RATIO').val(),
 				     	S_TAIL: $('#S_TAIL').val(),
-				     	S_LENGTH_RATIO: $('#S_LENGTH_RATIO').val(),
+				     	S_TO_P_LENGTH_RATIO: $('#S_TO_P_LENGTH_RATIO').val(),
 				     	NOISE: $('#NOISE').val()
 
 		     		});
@@ -184,6 +186,17 @@
 	</tr>
 	<tr>
 		<td>
+			P_TO_S_AMPLITUDE_RATIO
+		</td>
+		<td>
+			<input id="P_TO_S_AMPLITUDE_RATIO" size=6>
+		</td>
+		<td>
+			Ratio of P-wave amplitude to S-wave amplitude
+		</td>
+	</tr>
+	<tr>
+		<td>
 			S_TAIL
 		</td>
 		<td>
@@ -195,13 +208,13 @@
 	</tr>
 	<tr>
 		<td>
-			S_LENGTH_RATIO
+	        S_TO_P_LENGTH_RATIO
 		</td>
 		<td>
-			<input id="S_LENGTH_RATIO" size=6>
+			<input id="S_TO_P_LENGTH_RATIO" size=6>
 		</td>
 		<td>
-			Length of s-wave waveform relative to s-p interval (problematic? very short s-waveforms with proximate quakes)
+			Ratio of s-wave duration to p-wave duration
 		</td>
 	</tr>
 	<tr>
@@ -212,7 +225,7 @@
 			<input id="NOISE" size=6>
 		</td>
 		<td>
-			Noise (total displacement in pixels. Default 5.)
+			Noise (total displacement in pixels. Default 3.)
 		</td>
 	</tr>
 	<tr>
