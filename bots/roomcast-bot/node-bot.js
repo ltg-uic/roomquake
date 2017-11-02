@@ -157,6 +157,14 @@ if (!unitname.hasOwnProperty('name')){
     unitname.save();
 };
 
+//======================
+// keep clients alive
+var pingcount = 0;
+setInterval(ping, 60*1000); //ping every minute
+function ping () {
+ nutella.net.publish('ping',pingcount++);
+}
+//======================
 
 
 console.log ('Completed initialization. Read Portals, Activities, Resources, Design, Activity, and Unit name');

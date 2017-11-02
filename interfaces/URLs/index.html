@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<!-- <meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; frame-src *;">
+ -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="roomCast">
+  <title>roomcast</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="nutella_lib.js" type="text/javascript"></script>
+  <style>
+
+iframe { 
+border: none; 
+}
+body {
+    font-family: "Arial";
+    overflow: hidden;
+}
+
+.blankpage {
+  background: orange;
+}
+p {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 3px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#tabs .ui-tabs-active {
+  background: orange;
+  border-style: none;
+}
+
+    .ui-tabs .ui-tabs-tab
+    {
+      background: lightyellow;       /* color of the little rim outide the tabs */
+      cursor: pointer;
+
+    }
+
+    .ui-tabs
+    {
+      background: brown; /* color of the little rim outide the iframe */
+      border: none;
+    }
+
+    .ui-tabs .ui-tabs-nav
+    {
+    background: brown; /* this is the background color of the tabs bar */
+    border: none;
+    }
+
+    .ui-tabs .ui-tabs-panel 
+    {
+    background: orange; /* this is the background color of all the iframes */
+    }
+
+
+  </style>
+
+<script type="text/javascript">
+
+  // var p = document.getElementById("tabs").parentNode;
+  // var elmNewContent = document.createElement('<div id="tabs2"><ul id="resources2"></ul></div>');
+  // p.appendChild(elmNewContent);
+//   var elmDeleted = document.getElementById("tabs");
+//   elmDeleted.parentNode.removeChild(elmDeleted);
+
+
+//   var elmNewContent = document.createElement('<div id="tabs"><ul id="resources"></ul></div>');
+//   elmNewContent.appendChild(document.createTextNode('Replaced!'));
+//   var elmExtra = document.getElementById('extra');
+//   elmExtra.parentNode.replaceChild(elmNewContent, elmExtra);
+
+// var p = $(document).data("initialWizard", $("#tabs").clone(true));
+// console.log(p); alert(initialWizard);
+
+// function zap () {
+//   $(document).data("initialWizard").replaceAll("#tabs");
+// }
+    
+
+var portals,instances,activities,resources,design,activity,unitname;
+var portal, instance;
+var query_parameters, nutella;
+var h, bottomOfHeader,bottomOfVisibleWindow;
+var currentTab;
+var r = [];
+
+  // initialize nutella 
+
+  query_parameters = NUTELLA.parseURLParameters();
+  nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
+
+$(function() {
+
+  var baseURL = top.location;
+  $('#designer').html(baseURL + '&portal=1'); 
+  $('#manager').html(baseURL + '&portal=2'); 
+  $('#teacher').html(baseURL + '&portal=10');
+  $('#student').html(baseURL + '&portal=20');
+  $('#group').html(baseURL + '&portal=21');
+  $('#public').html(baseURL + '&portal=31');
+
+});
+
+
+
+</script>
+</head>
+<body>
+  Custom URLs:<br><br>
+
+  Designer: <span id='designer'></span><br><br>
+  Manager: <span id='manager'></span><br><br>
+  Teacher: <span id='teacher'></span><br><br>
+  Student: <span id='student'></span><br><br>
+  Group: <span id='group'></span><br><br>
+  Public devices: <span id='public'></span><br><br>
+
+</body>
+</html>
