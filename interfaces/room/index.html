@@ -55,9 +55,13 @@
 
 
 		nutella.net.request("room_configuration", undefined, function(response) {
-			// Update model
-			document.getElementById('maxRoomX').value = response.room_width_meters;
-			document.getElementById('maxRoomY').value = response.room_height_meters;
+			if (!response.hasOwnProperty('maxRoomX')) {
+				document.getElementById('maxRoomX').value = 10; 
+				document.getElementById('maxRoomY').value = 10; 
+			} else {
+				document.getElementById('maxRoomX').value = response.room_width_meters;
+				document.getElementById('maxRoomY').value = response.room_height_meters;
+			}
 			for (var i=0; i<response.seismographs.length; i++){ 
 				document.getElementById('x' + response.seismographs[i].id).value = response.seismographs[i].x;
 				document.getElementById('y' + response.seismographs[i].id).value = response.seismographs[i].y;
