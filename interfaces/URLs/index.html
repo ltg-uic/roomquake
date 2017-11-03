@@ -67,63 +67,37 @@ p {
 
 <script type="text/javascript">
 
-  // var p = document.getElementById("tabs").parentNode;
-  // var elmNewContent = document.createElement('<div id="tabs2"><ul id="resources2"></ul></div>');
-  // p.appendChild(elmNewContent);
-//   var elmDeleted = document.getElementById("tabs");
-//   elmDeleted.parentNode.removeChild(elmDeleted);
-
-
-//   var elmNewContent = document.createElement('<div id="tabs"><ul id="resources"></ul></div>');
-//   elmNewContent.appendChild(document.createTextNode('Replaced!'));
-//   var elmExtra = document.getElementById('extra');
-//   elmExtra.parentNode.replaceChild(elmNewContent, elmExtra);
-
-// var p = $(document).data("initialWizard", $("#tabs").clone(true));
-// console.log(p); alert(initialWizard);
-
-// function zap () {
-//   $(document).data("initialWizard").replaceAll("#tabs");
-// }
-    
-
-var portals,instances,activities,resources,design,activity,unitname;
-var portal, instance;
-var query_parameters, nutella;
-var h, bottomOfHeader,bottomOfVisibleWindow;
-var currentTab;
-var r = [];
-
   // initialize nutella 
 
   query_parameters = NUTELLA.parseURLParameters();
   nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
 
 $(function() {
-
-  var baseURL = top.location;
+  var baseURL = top.location.href; 
+  if(baseURL.substr(-1) == "#") baseURL.slice(0,-1);
   $('#designer').html(baseURL + '&portal=1'); 
   $('#manager').html(baseURL + '&portal=2'); 
   $('#teacher').html(baseURL + '&portal=10');
   $('#student').html(baseURL + '&portal=20');
   $('#group').html(baseURL + '&portal=21');
   $('#public').html(baseURL + '&portal=31');
-
 });
-
 
 
 </script>
 </head>
 <body>
-  Custom URLs:<br><br>
+  <span style="text-size:150%;">Custom URLs</span><br><br>
 
-  Designer: <span id='designer'></span><br><br>
-  Manager: <span id='manager'></span><br><br>
-  Teacher: <span id='teacher'></span><br><br>
-  Student: <span id='student'></span><br><br>
-  Group: <span id='group'></span><br><br>
-  Public devices: <span id='public'></span><br><br>
+
+
+designer: <span id='designer'></span><br><br>
+manager : <span id='manager'></span><br><br>
+teacher : <span id='teacher'></span><br><br>
+student : <span id='student'></span><br><br>
+group   : <span id='group'></span><br><br>
+public  : <span id='public'></span><br><br>
+ 
 
 </body>
 </html>
