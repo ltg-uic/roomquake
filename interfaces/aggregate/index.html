@@ -66,7 +66,7 @@
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 
-  		nutella.net.publish( 'mode_update', {rq_mode : "demo"} );
+  		// nutella.net.publish( 'mode_update', {rq_mode : "demo"} );
 
 		nutella.net.request("room_configuration", undefined, function(room) {
 			for (var i=0; i<room.seismographs.length; i++)
@@ -194,6 +194,8 @@
 
 		        function redrawRoom(){ 
 		        	var seismoSymbols = ["","①","②","③","④","⑤"];
+		        	$('#maxRoomX').val(room.room_width_meters);
+		        	$('#maxRoomY').val(room.room_height_meters);
 		        	var maxX = room.room_width_meters;
 		        	var maxY = room.room_height_meters;
 		        	if (maxX <= 0 || maxY <= 0) return;
