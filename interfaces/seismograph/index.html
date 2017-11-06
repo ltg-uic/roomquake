@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<!-- Your interface name here-->
-	<title></title>
+	<title>seismograph</title>
 	<!-- The description of this interfaces here -->
 	<meta name="description" content="">
 	<!-- Your CSS here -->
@@ -59,7 +59,7 @@
 	function reconnect(){
 		var timeNow = (new Date).getTime();
 		if ((timeNow - lastping) > 70*1000){
-			console.log('reconnected at ' + timeNow);
+			console.log('seismograph reconnected at ' + timeNow);
 			location.reload(true);
 		}	
 	}
@@ -98,8 +98,6 @@
 		}	
 
 
-
-
 		// var sound = document.getElementById("rumble"); alert(sound.src)
 		// sound.play();
 		// sound.oncanplaythrough = function() { alert('yo');
@@ -118,13 +116,16 @@
     	document.getElementById("seismogram").width=window.innerWidth;
     	document.getElementById("seismogram").height=Math.round(window.innerHeight*.9);
 		var canvas = document.getElementById("seismogram");
-		var ctx = canvas.getContext("2d");
+		var ctx = canvas.getContext("2d"); 
 		// redrawRoom();
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 
 
-		nutella.net.request("room_configuration", undefined, function(room) {
+		nutella.net.request("room_configuration", undefined, function(room) { 
+
+
+
 			var max_distance = Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2)); // maximum distance of an event from a seismograph
 				// 0.9 * ((P_WAVE_VELOCITY * WINDOW) / (S_WAVE_VELOCITY * Math.sqrt(Math.pow(room.room_height_meters,2) + Math.pow(room.room_width_meters,2))) - 1);
 			var this_seismograph = room.seismographs.filter(function(item){
@@ -363,14 +364,19 @@
 				});
 
 
+
 				function drawPriorQuake(q){
 					var buffer=initializeNoiseBuffer();
 					var distance = Math.sqrt(Math.pow(this_seismograph.x - quakes[q].location.x,2) + Math.pow(this_seismograph.y - quakes[q].location.y,2));
 					var t_offset = distance / P_WAVE_VELOCITY*1000;
 					var t = new Date(quakes[q].time);
-					var now = t.getTime() + WINDOW*1000 + t_offset - 2000;
-					for (var i=2 * SAMPLING_RESOLUTION; i<2*SAMPLING_RESOLUTION + waveforms[q].length; i++){
-						buffer[i] = waveforms[q][i-2*SAMPLING_RESOLUTION];
+					// var now = (WINDOW*1000 -(t.getTime() + t_offset + waveforms[q].length*SAMPLING_RESOLUTION))/2;
+					var duration = Math.round(t_offset + waveforms[q].length/buffer.length * WINDOW * 1000);
+					var R = Math.round((WINDOW*1000 - duration)/2);
+					var now = t.getTime() + duration + R;
+					var start = Math.floor((R+t_offset)/(WINDOW*1000)*buffer.length);
+					for (var i= 0; i<waveforms[q].length; i++){
+						buffer[i+start] = waveforms[q][i];
 					};
 					drawSeismogram(buffer,now);
 					var oldfont = ctx.font;
@@ -379,6 +385,25 @@
 					ctx.font = oldfont;
 
 				}
+
+
+
+				// function drawPriorQuake(q){
+				// 	var buffer=initializeNoiseBuffer();
+				// 	var distance = Math.sqrt(Math.pow(this_seismograph.x - quakes[q].location.x,2) + Math.pow(this_seismograph.y - quakes[q].location.y,2));
+				// 	var t_offset = distance / P_WAVE_VELOCITY*1000;
+				// 	var t = new Date(quakes[q].time);
+				// 	var now = t.getTime() + WINDOW*1000 + t_offset - 2000;
+				// 	for (var i=2 * SAMPLING_RESOLUTION; i<2*SAMPLING_RESOLUTION + waveforms[q].length; i++){
+				// 		buffer[i] = waveforms[q][i-2*SAMPLING_RESOLUTION];
+				// 	};
+				// 	drawSeismogram(buffer,now);
+				// 	var oldfont = ctx.font;
+				// 	ctx.font = "30px Arial";
+				// 	ctx.fillText("RoomQuake " + (q+1), 50, 50);
+				// 	ctx.font = oldfont;
+
+				// }
 
 			}); // end quakes schedule request
 

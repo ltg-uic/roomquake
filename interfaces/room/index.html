@@ -55,13 +55,8 @@
 
 
 		nutella.net.request("room_configuration", undefined, function(response) {
-			if (!response.hasOwnProperty('maxRoomX')) {
-				document.getElementById('maxRoomX').value = 10; 
-				document.getElementById('maxRoomY').value = 10; 
-			} else {
-				document.getElementById('maxRoomX').value = response.room_width_meters;
-				document.getElementById('maxRoomY').value = response.room_height_meters;
-			}
+			document.getElementById('maxRoomX').value = response.room_width_meters;
+			document.getElementById('maxRoomY').value = response.room_height_meters;
 			for (var i=0; i<response.seismographs.length; i++){ 
 				document.getElementById('x' + response.seismographs[i].id).value = response.seismographs[i].x;
 				document.getElementById('y' + response.seismographs[i].id).value = response.seismographs[i].y;
@@ -119,7 +114,7 @@
 	        function redrawRoom(){ 
 	        	var seismoSymbols = ["①","②","③","④","⑤"];
 	        	var maxX = Number(document.getElementById("maxRoomX").value);
-	        	var maxY = Number(document.getElementById("maxRoomY").value);
+	        	var maxY = Number(document.getElementById("maxRoomY").value); 
 	        	if (maxX <= 0 || maxY <= 0) return;
 	        	if (maxX >= maxY) {
 	        		ctx.canvas.width = 500;
@@ -138,8 +133,8 @@
 	    		for (var i=0; i<5; i++){
 	    			var sX = Number(document.getElementById("x" + (i+1)).value);
 	    			var sY = Number(document.getElementById("y" + (i+1)).value);
-	    			if (sX <= 0 || sY <= 0) continue;
-		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
+	    			if (sX <= 0 || sY <= 0) continue; 
+		    		ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
 	    		}
 	        }
 	    });
@@ -157,12 +152,12 @@
   					<input type="radio" name="system" value="Metric"> Metric
  -->		</td>
 			<td align=center>
-				<input id="maxRoomX" class="field" type=text size=6 maxlength=6 value=10>
+				<input id="maxRoomX" class="field" type=text size=6 maxlength=6 >
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<input id="maxRoomY" class="field" type=text size=6 maxlength=6 value=10 style="transform:rotate(270deg);">
+				<input id="maxRoomY" class="field" type=text size=6 maxlength=6 style="transform:rotate(270deg);">
 			</td>
 			<td>
 				<canvas id="myCanvas" width="500" height="500" style="border:1px solid black;">
