@@ -1,5 +1,7 @@
 # nutella
-bots/*/data
+#bots/roomcast-bot/data/**
+#bots/roomquake-bot/data/**
+
 
 
 # Intellij

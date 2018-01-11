@@ -213,7 +213,7 @@
               top.portals.portalList.splice(i,1);
               tentativePortalID = -1;
               top.update_portals();
-              top.update_design();
+              top.set_design();
               build_portals_list();
               return;
             }
@@ -265,7 +265,7 @@
               $("#renameDialog").dialog("open");
               tentativePortalID = -1;
               top.update_portals();
-              top.update_design();
+              top.set_design();
               build_portals_list();
               // build_portals_list();
             };
@@ -299,7 +299,7 @@
           top.portals.portalList.push({ID:top.portals.topID,name:document.getElementById('newname').value,type:portal_type});
           top.instances.data.push({"portalID":top.portals.topID,"topID":1,"instanceList":[{"ID":1,"name":"1"}]}); 
               top.update_portals();
-              top.update_design();
+              top.set_design(); 
               build_portals_list();
         });
 
