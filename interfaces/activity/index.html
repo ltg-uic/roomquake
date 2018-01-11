@@ -9,6 +9,8 @@
  
   <style type="text/css">
 
+    body{color:white;}
+
     .inactiveLink {
        pointer-events: none;
        cursor: default;
@@ -145,7 +147,7 @@
   <script>
     var query_parameters = NUTELLA.parseURLParameters();
     var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
-    // nutella.net.subscribe('activities_set',function() {location.reload(true);});
+    nutella.net.subscribe('fix_activity',function() {location.reload(true);});
 
     $(function() {
 
@@ -169,12 +171,12 @@
   			$( "#activities li" ).removeClass('ui-selected'); 
   			$( "#activities li a" ).removeClass('ui-selected');
   			var p = event.currentTarget;
-  			top.activity.name = p.innerHTML;
+  			var name = p.innerHTML;
   			p = $(p);
   			p.addClass('ui-selected');
-  			top.activity.ID = p.parent()[0].value;
-  			top.set_activity();
-        if (top.portal.ID == 1) top.build_page();
+  			top.activity = {ID:p.parent()[0].value,name:name};
+  			top.set_activity({ID:p.parent()[0].value,name:name});
+        // if (top.portal.ID == 1) top.build_page(); 
   		});
 
 });

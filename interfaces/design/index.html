@@ -15,7 +15,7 @@
     }
 
     body {
-    	background: orange;
+    	     color:white;
     }
 
     td {
@@ -158,24 +158,61 @@
     var query_parameters = NUTELLA.parseURLParameters();
     var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, NUTELLA.parseComponentId());
 
+
+    nutella.net.subscribe('fix_design', function(parm,from){ 
+      location.reload(true);
+    })
+
     var tentativePortalID = -1;
     var tentativePortalName;
     var tentativeActivityID = -1
     var tentativeActivityName;
+    var preactivity;
+    var preportal;
+    var preportalIndex = -1;
+    var preactivityIndex = -1;
+
+    preportal = query_parameters.hasOwnProperty('preportal')? query_parameters.preportal : -1;
+    preactivity = query_parameters.hasOwnProperty('preactivity')? query_parameters.preactivity : -1;
+
+
+    // nutella.net.subscribe('design_set',function(dummy){ 
+    //   location.reload(true);
+    // });
 
     $(function() {
 
-    	// build the portals menu
-    	function build_portals_list() {
-    		$('#portals').empty();
-	    	for (var i=0; i<top.portals.portalList.length; i++) {
-	    		var item = top.portals.portalList[i];
-	    		if (item.ID != 1) {
-		    	    var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
-				    $('#portals').append(li);
-				  };
-	    	};
-	    };
+
+      // build the portals menu
+      function build_portals_list() {
+        var count=0;
+        $('#portals').empty();
+        for (var i=0; i<top.portals.portalList.length; i++) {
+          var item = top.portals.portalList[i];
+          // if (item.ID == 1 || item.ID == 2) continue;
+          if ((top.portal.ID == 1) || // 
+              (top.portal.ID == 2 && item.type != 'administrative') ||
+              (top.portal.ID > 2 && top.portal.type == "administrative" && item.ID != 1)) {
+                var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
+                $('#portals').append(li);
+                if (preportal == item.ID) preportalIndex = count;
+                count++;
+          }
+        }
+      }
+
+
+    	// // build the portals menu
+    	// function build_portals_list() {
+    	// 	$('#portals').empty();
+	    // 	for (var i=0; i<top.portals.portalList.length; i++) {
+	    // 		var item = top.portals.portalList[i];
+	    // 		if (item.ID != 1) {
+		   //  	    var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
+				 //    $('#portals').append(li);
+				 //  };
+	    // 	};
+	    // };
 
 	    build_portals_list();
 
@@ -187,31 +224,41 @@
         p = $(p);
         p.addClass('ui-selected');
         tentativePortalID = p.parent()[0].value;
-        if (tentativePortalID < 10) $('#activities').hide(); else $('#activities').show();
+        var temp2 = top.portals.portalList.filter(function(item){
+          return (item.ID == tentativePortalID);
+        })[0];
+        if (temp2.type == "administrative") $('#activities').hide(); else $('#activities').show();
         refresh_resources_list();
       });
 
 
       function build_activities_list() {
+        var count = 0;
         $('#activities').empty();
         for (var i=0; i<top.activities.activityList.length; i++) {
           var item = top.activities.activityList[i];
           if (item.ID > 0) {
               var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
             $('#activities').append(li);
+            if (preactivity = item.ID) preactivityIndex = count;
+            count++;
           };
         };
       };
 
       build_activities_list();
+      console.log($( "#activities li a:eq(0)" ));
+      // $( "#activities li a:eq(0)" ).addClass('ui-selected');
+      // $( "#portals li a:eq(0)" ).addClass('ui-selected');
+
 
       $( "#activities li a" ).on( "click", function( event, ui ) { 
         $( "#activities li" ).removeClass('ui-selected'); 
         $( "#activities li a" ).removeClass('ui-selected');
-        var p = event.currentTarget;
+        var p = event.currentTarget; //console.log(p);
         tentativeActivityName = p.innerHTML;
         p = $(p);
-        p.addClass('ui-selected');
+        p.addClass('ui-selected'); //console.log($( "#activities li" ));
         tentativeActivityID = p.parent()[0].value;
         refresh_resources_list();
       });
@@ -221,10 +268,12 @@
         $('#resources').empty();
         for (var i=0; i<top.resources.resourceList.length; i++) {
           var item = top.resources.resourceList[i];
-          if (item.ID >= 200) {
-            var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
+          if (item.ID == 1) continue; //don't show portal interface as a resource
+          var extra = (item.query == '') ? '' : ' [' + item.query + ']';
+          if (top.portal.type == "administrative" || item.type == "participant") {
+            var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + extra + '</a></li>';
+            $('#resources').append(li);
           };
-          $('#resources').append(li);
         };
       };
 
@@ -244,16 +293,41 @@
           if (match > 0) { resource.children[0].className += "ui-selected";}
         };
       };
+      if (preportalIndex >= 0) {
+        $( "#portals li a:eq(" + preportalIndex + ")" ).click();
+        if (preactivityIndex >= 0) $( "#activities li a:eq(" + preactivityIndex + ")" ).click();
+      };
 
-      $( "#resources li a" ).on( "click", function( event, ui ) { 
+
+      $("#resources li a" ).on( "click", function( event, ui ) { 
         // $( "#resources li" ).removeClass('ui-selected'); 
         // $( "#resources li a" ).removeClass('ui-selected');
         var p = event.currentTarget;
         tentativeResourceName = p.innerHTML;
         p = $(p);
         tentativeResourceID = p.parent()[0].value;
+        if (tentativePortalID == -1) { 
+          alert('Please select a portal first');
+          return;
+        };
+        var temp = top.portals.portalList.filter(function(item){
+          return (item.ID == tentativePortalID);
+        })[0];
+        if (temp.type == 'participant' && tentativeActivityID == -1) {
+          alert('Please select an activity first');
+          return;          
+        };
+
+        if (tentativePortalID == 1 && tentativeResourceID <= 10) { //hack
+          alert('You cannot delete core designer services');
+          return;
+        };
         var tActivityID = tentativeActivityID;
-        if (tentativePortalID < 10) tActivityID = 0;
+        // var temp3 = top.portals.portalList.filter(function(item){
+        //   return (item.ID == tentativePortalID);
+        // })[0]; 
+        // if (temp3.type == "administrative") tActivityID = 0;
+        if (!$('#activities').is(":visible")) tActivityID = 0;
         if (tentativePortalID != -1 && tActivityID != -1) {
           if (p.hasClass('ui-selected')) {
             p.removeClass('ui-selected');
@@ -267,13 +341,25 @@
             top.design.data.push({portalID: tentativePortalID, activityID: tActivityID, resourceID: tentativeResourceID});
           };
         };
-	     });
 
-       $( "#distribute" ).on( "click", function( event, ui ) {
-          top.update_design();
-       });
+        if (tentativePortalID != top.portal.ID) top.design_flag = false;
+        top.set_design();
+        // top.update_design(); 
+       //  if (tentativePortalID < 2) {   //nutella.net.publish('fix_design',{});
+
+       //    top.location.href += '&preselect=6&preportal=' + tentativePortalID + '&preactivity=' + tentativeActivityID;;
+	      // };
+
+      
+
+
+
+       // $( "#distribute" ).on( "click", function( event, ui ) {
+       //    top.update_design();
+       // });
 
     });
+  });
 
 </script>
 
@@ -293,7 +379,7 @@
         <span class="header"  id="open">resources</span><br>
         <ul id="resources" class="list"></ul>
       </td>
-       <td valign=top align=middle>
+       <td hidden valign=top align=middle>
         <span class="header"  id="open">action</span><br><br>
         <button id="distribute">distribute</button>
       </td>

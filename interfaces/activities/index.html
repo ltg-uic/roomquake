@@ -15,7 +15,7 @@
     }
 
     body {
-    	background: orange;
+    	     color:white;
     }
 
     td {
@@ -171,8 +171,105 @@
 	    		if (item.ID != 1) { // you can't delete the planning activity. not ever.
 		    	    var li = '<li class="ui-widget-content" value=' + item.ID + ' name="' + item.name + '"><a href="#">' + item.name + '</a></li>';
 				    $('#activities').append(li);
-				}
+				  }
 	    	}
+        // if a activity is selected, highlight it
+        $( "#activities li a" ).off();
+        $('button').off();
+
+        $( "#activities li a" ).on( "click", function( event, ui ) { 
+          $( "#activities li" ).removeClass('ui-selected'); 
+          $( "#activities li a" ).removeClass('ui-selected');
+          var p = event.currentTarget;
+          tentativeActivityName = p.innerHTML;
+          p = $(p);
+          p.addClass('ui-selected');
+          tentativeActivityID = p.parent()[0].value;
+          });
+
+        $('#delete').on("click", function (event, ui){
+          for (var i=0; i<top.activities.activityList.length; i++)
+            if (top.activities.activityList[i].ID == tentativeActivityID){
+              if (tentativeActivityID == top.activity.ID){
+                alert("You cannot delete the current activity."); return;
+              }
+              top.design.data = top.design.data.filter(function(item){
+                return (item.activityID != tentativeActivityID);
+              });
+              top.activities.activityList.splice(i,1);
+              tentativeActivityID = -1;
+              top.set_activities();
+              top.set_design();
+              build_activities_list();
+              // location.reload(true);
+              return;
+            };
+          alert ('You must select a activity first, then click Delete')
+        });
+
+        $("#renameDialog").dialog({
+          autoOpen : false,
+          width: 500 //, modal : false ,show : "blind", hide : "blind"
+        });
+
+        $('#rename').on("click", function (event, ui){
+          if (tentativeActivityID == -1) {
+            alert ('You must select a activity first, then click Rename');
+            return;
+          }
+          document.getElementById('revisedname').value = tentativeActivityName;
+          $("#renameDialog").dialog("open");
+          document.getElementById('revisedname').select();
+          // return false;
+        });
+
+        $('#cancelRename').on("click", function(){
+          document.getElementById('revisedname').value = '';
+          $("#renameDialog").dialog("close");
+        })
+
+        $('#saveRename').on("click", function(){
+          $("#renameDialog").dialog("close");
+          for (var i=0; i<top.activities.activityList.length; i++)
+            if (top.activities.activityList[i].ID == tentativeActivityID){
+              top.activities.activityList[i].name = document.getElementById('revisedname').value;
+              tentativeActivityID = -1;
+              top.set_activities();
+              top.set_design();
+              build_activities_list();
+              // location.reload(true);
+              return;
+            };
+        });
+
+
+        $("#newnameDialog").dialog({
+          autoOpen : false,
+          width: 500 //, modal : false ,show : "blind", hide : "blind"
+        });
+
+        $('#new').on("click", function (event, ui){
+          document.getElementById('newname').value = "New activity";
+          $("#newnameDialog").dialog("open");
+          document.getElementById('newname').select();
+          // return false;
+        });
+
+         $('#cancelNew').on("click", function(){
+          document.getElementById('newname').value = '';
+          $("#newnameDialog").dialog("close");
+        })
+
+        $('#saveNew').on("click", function(){
+          $("#newnameDialog").dialog("close");
+          top.activities.topID++;
+          top.activities.activityList.push({ID:top.activities.topID,name:document.getElementById('newname').value});
+          top.set_activities();
+          top.set_design();
+          build_activities_list();
+          // location.reload(true);
+        });
+
 	    }
 
 	    build_activities_list();
@@ -180,83 +277,6 @@
 	    // {"topID":2,"activityList":[{"ID":1,"name":"designer"},{"ID":2,"name":"other"}]}
 	    // {"data":[{"activityID":1,"topID":2,"instanceList":[{"ID":1,"name":"designer1"},{"ID":2,"name":"designer2"}]},{"activityID":2,"topID":2,"instanceList":[{"ID":1,"name":"other1"},{"ID":2,"name":"other2"}]}]}
 
-    	// if a activity is selected, highlight it
-
-  		$( "#activities li a" ).on( "click", function( event, ui ) { 
-  			$( "#activities li" ).removeClass('ui-selected'); 
-  			$( "#activities li a" ).removeClass('ui-selected');
-  			var p = event.currentTarget;
-  			tentativeActivityName = p.innerHTML;
-  			p = $(p);
-  			p.addClass('ui-selected');
-  			tentativeActivityID = p.parent()[0].value;
-        });
-
-    	$('#delete').on("click", function (event, ui){
-    		for (var i=0; i<top.activities.activityList.length; i++)
-    			if (top.activities.activityList[i].ID == tentativeActivityID){
-    				top.activities.activityList.splice(i,1);
-    				tentativeActivityID = -1;
-    				top.update_activities();
-    				return;
-    			}
-    		alert ('You must select a activity first, then click Delete')
-    	});
-
-    	$("#renameDialog").dialog({
-    		autoOpen : false, modal : true, show : "blind", hide : "blind"
-  		});
-
-    	$('#rename').on("click", function (event, ui){
-    		if (tentativeActivityID == -1) {
-    			alert ('You must select a activity first, then click Rename');
-    			return;
-    		}
-    		document.getElementById('revisedname').value = tentativeActivityName;
-    		$("#renameDialog").dialog("open");
-    		document.getElementById('revisedname').select();
-    		// return false;
-    	});
-
-    	$('#cancelRename').on("click", function(){
-    		document.getElementById('revisedname').value = '';
-    		$("#renameDialog").dialog("close");
-    	})
-
-    	$('#saveRename').on("click", function(){
-    		$("#renameDialog").dialog("close");
-    		for (var i=0; i<top.activities.activityList.length; i++)
-    			if (top.activities.activityList[i].ID == tentativeActivityID){
-    				top.activities.activityList[i].name = document.getElementById('revisedname').value;
-    				tentativeActivityID = -1;
-    				top.update_activities();
-    				return;
-    			};
-    	});
-
-
-    	$("#newnameDialog").dialog({
-    		autoOpen : false, modal : true, show : "blind", hide : "blind"
-  		});
-
-    	$('#new').on("click", function (event, ui){
-    		document.getElementById('newname').value = "New activity";
-    		$("#newnameDialog").dialog("open");
-    		document.getElementById('newname').select();
-    		// return false;
-    	});
-
-    	$('#cancelNew').on("click", function(){
-    		document.getElementById('newname').value = '';
-    		$("#newnameDialog").dialog("close");
-    	})
-
-    	$('#saveNew').on("click", function(){
-    		$("#newnameDialog").dialog("close");
-    		top.activities.topID++;
-    		top.activities.activityList.push({ID:top.activities.topID,name:document.getElementById('newname').value});
-    		top.update_activities();
-    	});
 
 	});
 
@@ -267,7 +287,7 @@
   <table>
     <tr>
       <td valign=top align=middle>
-        <span class="header"  id="open">activity</span><br>
+        <span class="header"  id="open">activities</span><br>
         <ul id="activities" class="list"></ul>
         <button id="new">New activity</button><br>
         <button id="delete">Delete activity</button><br>

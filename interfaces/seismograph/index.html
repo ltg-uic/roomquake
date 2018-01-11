@@ -17,6 +17,7 @@
 		body {
 	    	font-family: "Arial";
 	    	overflow: hidden;
+	    	background: orange;
 		}
 		button {
 		  -webkit-border-radius: 6;
@@ -66,6 +67,16 @@
 
 //end keep alive
 
+    var windowWidth = $(window).width();
+
+    /* Resize Event */
+    $(window).resize(function(){
+        // Check if the window width has actually changed and it's not just iOS triggering a resize event on scroll
+        if ($(window).width() != windowWidth) {location.reload(true)};
+    });
+
+
+
     $(function() {
      nutella.net.request("get_seismogram",{},function(sg){ 
 
@@ -109,12 +120,12 @@
 		//     alert("Can play through audio without stopping");
 		// };
 
-		nutella.net.subscribe("mode_update", function() {location.reload(true);});
+		// nutella.net.subscribe("mode_update", function() {alert(3);location.reload(true);});
 		nutella.net.subscribe("changed_seismogram", function() {location.reload(true);});
 
 
-    	document.getElementById("seismogram").width=window.innerWidth;
-    	document.getElementById("seismogram").height=Math.round(window.innerHeight*.9);
+    	document.getElementById("seismogram").width=window.innerWidth-20;
+    	document.getElementById("seismogram").height=Math.round(window.innerHeight)-60;
 		var canvas = document.getElementById("seismogram");
 		var ctx = canvas.getContext("2d"); 
 		// redrawRoom();
@@ -501,7 +512,8 @@
     </script>
 
 </head>
-<body onresize="location.reload(true);">
+<!-- <body> -->
+<body id="bod">
 	
 	<canvas id="seismogram" width="10" height="10" style="border:1px solid black;"></canvas>
 	<br><button id="back">Back</button><button id="forward">Forward</button><button id="live">Live</button>

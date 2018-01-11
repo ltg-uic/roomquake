@@ -1,4 +1,0 @@
-#!/bin/sh
-
-BASEDIR=$(dirname $0)
-ruby $BASEDIR/rq-backend-bot.rb $1 $2 $3

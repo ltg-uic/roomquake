@@ -15,6 +15,7 @@
 	<style>
 		body {
 	    	font-family: "Arial";
+	    	background: orange;
 		}
 		button {
 		  -webkit-border-radius: 6;
@@ -165,7 +166,7 @@
 
 
 		        function redrawRoom(){ 
-		        	var seismoSymbols = ["①","②","③","④","⑤"];
+		        	var seismoSymbols = ["①","②","③","④","⑤","⑥"];
 		        	var maxX = Number(document.getElementById("maxRoomX").value);
 		        	var maxY = Number(document.getElementById("maxRoomY").value);
 		        	if (maxX <= 0 || maxY <= 0) return;
@@ -282,7 +283,8 @@
 				Seismograph 2: X <input readonly class="field" id="x2" size=6 maxlength=6 type=text> Y <input readonly class="field" id="y2" size=6 maxlength=6 type=text><br>
 				Seismograph 3: X <input readonly class="field" id="x3" size=6 maxlength=6 type=text> Y <input readonly class="field" id="y3" size=6 maxlength=6 type=text><br>
 				Seismograph 4: X <input readonly class="field" id="x4" size=6 maxlength=6 type=text> Y <input readonly class="field" id="y4" size=6 maxlength=6 type=text><br>
-				Seismograph 5: X <input readonly class="field" id="x5" size=6 maxlength=6 type=text> Y <input readonly  class="field" id="y5" size=6 maxlength=6 type=text><br><br>
+				Seismograph 5: X <input readonly class="field" id="x5" size=6 maxlength=6 type=text> Y <input readonly  class="field" id="y5" size=6 maxlength=6 type=text><br>
+				Seismograph 6: X <input readonly class="field" id="x6" size=6 maxlength=6 type=text> Y <input readonly  class="field" id="y6" size=6 maxlength=6 type=text><br><br>
 				<button hidden id="save">Save configuration</button>
 			</td>
 		</tr>

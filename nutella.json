@@ -1,7 +1,7 @@
 {
-  "name": "roomquake",
-  "version": "1.0.0",
+  "name": "roomcast",
+  "version": "3.0.0",
   "nutella_version": "0.6.0",
   "type": "project",
-  "description": "A classroom simulation of earthquakes"
+  "description": "Controls for the Classroom of Things"
 }

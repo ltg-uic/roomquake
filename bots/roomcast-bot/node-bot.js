@@ -5,34 +5,27 @@ var NUTELLA = require('nutella_lib');
 var cliArgs = NUTELLA.parseArgs();
 var componentId = NUTELLA.parseComponentId();
 var nutella = NUTELLA.init(cliArgs.broker, cliArgs.app_id, cliArgs.run_id, componentId);
-// Optionally you can set the resource Id
-//nutella.setResourceId('my_resource_id');
+
+var PING_INTERVAL = 60; //number of seconds between pings to keep clients alive
+
+//======================
+// keep clients alive
+var pingcount = 0;
+setInterval(ping, PING_INTERVAL*1000); //ping every minute
+function ping () {
+ nutella.net.publish('ping',pingcount++);
+}
+//======================
+
 
 var portals = nutella.persist.getJsonObjectStore('portals');
 portals.load();
 if (!portals.hasOwnProperty('topID')){
-    portals = {topID: 30, portalList: 
+    portals = {topID: 10, portalList: 
         [
 
-            // ID < 10 reserved for administrative (activity-independent) portals
-            // ID = 1 reserved for designer
-
-            {ID:1,name:"designer"},
-            {ID:2,name:"manager"},
-            {ID:3,name:"developer"},
-            {ID:4,name:"researcher"},
-
-            // 10 <= ID < 20 reserved for instructor portals
-
-            {ID:10,name:"teacher"},
-
-            // 20 <= ID < 30 reserved for learner portals
-
-
-            {ID:20,name:"student"},
-            {ID:21,name:"group"}
-
-            // 30 <= ID reserved for public portals
+            {ID:1,name:"designer",type:"administrative"},
+            {ID:2,name:"educator",type:"participant"}
 
         ]
     };
@@ -45,14 +38,7 @@ if (!instances.hasOwnProperty('data')){
     instances = {
         data:[
             {portalID:1,topID:1,instanceList:[{ID:1,name:'designer'}]},
-            {portalID:2,topID:1,instanceList:[{ID:1,name:'manager'}]},
-            {portalID:3,topID:1,instanceList:[{ID:1,name:'developer'}]},
-            {portalID:4,topID:1,instanceList:[{ID:1,name:'researcher'}]},
-
-            {portalID:10,topID:1,instanceList:[{ID:1,name:'teacher name'}]},
-
-            {portalID:20,topID:1,instanceList:[{ID:1,name:'student name'}]},
-            {portalID:21,topID:1,instanceList:[{ID:1,name:'group name'}]}
+            {portalID:2,topID:1,instanceList:[{ID:1,name:'educator'}]}
         ]
     };
     instances.save();
@@ -71,30 +57,17 @@ resources.load();
 if (!resources.hasOwnProperty('topID')){
     resources = {topID: 300, resourceList: [
 
-        // ID < 100 reserved for designer, unavailable for editing
+        {ID:1,name:'portal',description:'portal',link:'portal',query:'',type:"administrative"}, 
+        {ID:2,name:'activity',description:'activity',link:'activity',query:'',type:"administrative"},
+        {ID:3,name:'portals',description:'portals',link:'portals',query:'',type:"administrative"},
+        {ID:4,name:'activities',description:'activities',link:'activities',query:'',type:"administrative"},
+        {ID:5,name:'resources',description:'resources',link:'resources',query:'',type:"administrative"},
+        {ID:6,name:'design',description:'design',link:'design',query:'',type:"administrative"},
+        {ID:7,name:'instances',description:'instances',link:'instances',query:'',type:"administrative"},
+        {ID:8,name:'unitname',description:'unitname',link:'unitname',query:'',type:"administrative"},
+        {ID:9,name:'URLs',description:'URLs',link:'URLs',query:'',type:"administrative"}
 
-        {ID:1,name:'portals',description:'portals',link:'portals',query:''},
-        {ID:2,name:'resources',description:'resources',link:'resources',query:''},
-        {ID:3,name:'activities',description:'activities',link:'activities',query:''},
-        {ID:4,name:'design',description:'design',link:'design',query:''},
-        {ID:5,name:'instances',description:'instances',link:'instances',query:''},
-        {ID:6,name:'unitname',description:'unitname',link:'unitname',query:''},
 
-        // 100 <= ID <200 reserved for administrators and teacher, unavailable for editing
-
-        {ID:100,name:'portal',description:'portal',link:'portal',query:'&version=0'}, // portal selector for developer
-        {ID:101,name:'portal',description:'portal',link:'portal',query:'&version=1'}, // portal selector for managers
-        {ID:102,name:'portal',description:'portal',link:'portal',query:'&version=2'}, // portal selector for developers
-        {ID:103,name:'portal',description:'portal',link:'portal',query:'&version=3'}, // portal selector for researchers
-        {ID:104,name:'portal',description:'portal',link:'portal',query:'&version=4'}, // portal selector for teachers
-        {ID:105,name:'portal',description:'portal',link:'portal',query:'&version=5'}, // portal selector for students
-        {ID:106,name:'portal',description:'portal',link:'portal',query:'&version=6'}, // portal selector for groups
-        {ID:107,name:'portal',description:'portal',link:'portal',query:'&version=7'}, // portal selector for students and groups
-        {ID:108,name:'portal',description:'portal',link:'portal',query:'&version=8'}, // public selector for public portals
-
-        // 200 <= ID < 300 for specialized portals
-
-        {ID:200,name:'activity',description:'activity',link:'activity',query:''}
 
     ]};
 
@@ -109,34 +82,25 @@ if (!design.hasOwnProperty('data')){
 
         // designer 
 
-        {portalID:1,activityID:0,resourceID:1},
+        // {portalID:1,activityID:0,resourceID:1},
         {portalID:1,activityID:0,resourceID:2},
         {portalID:1,activityID:0,resourceID:3},
         {portalID:1,activityID:0,resourceID:4},
         {portalID:1,activityID:0,resourceID:5},
         {portalID:1,activityID:0,resourceID:6},
-        {portalID:1,activityID:0,resourceID:200},
+        {portalID:1,activityID:0,resourceID:7},
+        {portalID:1,activityID:0,resourceID:8},
+        {portalID:1,activityID:0,resourceID:9},
 
-        // manager 
+        // educator
 
-        {portalID:2,activityID:0,resourceID:200},
-
-        // developer 
-
-        {portalID:3,activityID:0,resourceID:200},
-
-        // researcher 
-
-
-        // teacher 
-
-        {portalID:10,activityID:1,resourceID:200},
-
-        // student 
-
-
-        // group 
-
+        // {portalID:2,activityID:1,resourceID:1},
+        {portalID:2,activityID:1,resourceID:2},
+        {portalID:2,activityID:1,resourceID:3},
+        {portalID:2,activityID:1,resourceID:5},
+        {portalID:2,activityID:1,resourceID:7},
+        {portalID:2,activityID:1,resourceID:8},
+        {portalID:2,activityID:1,resourceID:9}
 
     ]};
     design.save();
@@ -157,14 +121,6 @@ if (!unitname.hasOwnProperty('name')){
     unitname.save();
 };
 
-//======================
-// keep clients alive
-var pingcount = 0;
-setInterval(ping, 60*1000); //ping every minute
-function ping () {
- nutella.net.publish('ping',pingcount++);
-}
-//======================
 
 
 console.log ('Completed initialization. Read Portals, Activities, Resources, Design, Activity, and Unit name');
@@ -212,7 +168,7 @@ nutella.net.subscribe('set_portals', function (message, from){
     instances.load();
     instances = message.instances;
     instances.save();
-    nutella.net.publish('portals_set',portals);
+    // nutella.net.publish('portals_set',portals);
     // nutella.net.publish('portals_set',message);
 });
 
@@ -221,7 +177,7 @@ nutella.net.subscribe('set_instances', function (message, from){
     instances.load();
     instances = message;
     instances.save();
-    nutella.net.publish('instances_set',instances);
+    // nutella.net.publish('instances_set',instances);
     // nutella.net.publish('portals_set',message);
 });
 nutella.net.subscribe('set_activities', function (message, from){
@@ -229,7 +185,8 @@ nutella.net.subscribe('set_activities', function (message, from){
     activities.load();
     activities = message;
     activities.save();
-    nutella.net.publish('activities_set',activities);
+    nutella.net.publish('activities_set',message);
+    // nutella.net.publish('activities_set',activities);
 
     // nutella.net.publish('activities_set',message);
 });
@@ -238,7 +195,8 @@ nutella.net.subscribe('set_resources', function (message, from){
     resources.load();
     resources = message;
     resources.save();
-    nutella.net.publish('resources_set',resources);
+    nutella.net.publish('resources_set',message);
+    // nutella.net.publish('resources_set',resources);
     // nutella.net.publish('resources_set',message);
 });
 nutella.net.subscribe('set_design', function (message, from){
@@ -246,7 +204,8 @@ nutella.net.subscribe('set_design', function (message, from){
     design.load();
     design = message;
     design.save();
-    nutella.net.publish('design_set',design);
+    nutella.net.publish('design_set',message);
+    // nutella.net.publish('design_set',design);
     // nutella.net.publish('design_set',message);
 });
 nutella.net.subscribe('set_activity', function (message, from){
@@ -254,14 +213,15 @@ nutella.net.subscribe('set_activity', function (message, from){
     activity.load();
     activity = message;
     activity.save();
-    nutella.net.publish('activity_set',activity);
+    nutella.net.publish('activity_set',message);
+    // nutella.net.publish('activity_set',activity);
 });
 nutella.net.subscribe('set_unitname', function (message, from){
     unitname = nutella.persist.getJsonObjectStore('unitname');
     unitname.load();
     unitname = message;
     unitname.save();
-    nutella.net.publish('unitname_set',unitname);
+    // nutella.net.publish('unitname_set',unitname);
     // nutella.net.publish('unitname_set',message);
 });
 

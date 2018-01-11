@@ -15,6 +15,7 @@
 	<style>
 		body {
 	    	font-family: "Arial";
+	    	background: orange;
 		}
 		button {
 		  -webkit-border-radius: 6;
@@ -193,7 +194,7 @@
 
 
 		        function redrawRoom(){ 
-		        	var seismoSymbols = ["","①","②","③","④","⑤"];
+		        	var seismoSymbols = ["","①","②","③","④","⑤","⑥"];
 		        	$('#maxRoomX').val(room.room_width_meters);
 		        	$('#maxRoomY').val(room.room_height_meters);
 		        	var maxX = room.room_width_meters;
@@ -525,7 +526,8 @@
 				 	2&nbsp<input type="radio" name="s_sel" value="2"> &nbsp
 				 	3&nbsp<input type="radio" name="s_sel" value="3"> &nbsp
 				 	4&nbsp<input type="radio" name="s_sel" value="4"> &nbsp
-				 	5&nbsp<input type="radio" name="s_sel" value="5"> &nbsp&nbsp&nbsp
+				 	5&nbsp<input type="radio" name="s_sel" value="5"> &nbsp
+				 	6&nbsp<input type="radio" name="s_sel" value="6"> &nbsp&nbsp&nbsp
 				 <br><br>
 				</div>
 				<div align=center id="filterDiv">
@@ -581,6 +583,7 @@
 				Seismograph 4: X <input readonly class="field" id="x4" size=6 maxlength=6 type=text> Y <input readonly class="field" id="y4" size=6 maxlength=6 type=text><br>
 				Seismograph 5: X <input readonly class="field" id="x5" size=6 maxlength=6 type=text> Y <input readonly  class="field" id="y5" size=6 maxlength=6 type=text><br><br>
 				<button hidden id="save">Save configuration</button>
+				Seismograph 6: X <input class="field" id="6" size=6 maxlength=6 type=text> Y <input class="field" id="y6" size=6 maxlength=6 type=text><br><br>
 			</td>
 		</tr>
 		<tr>
