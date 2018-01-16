@@ -20,6 +20,7 @@ body {
     font-family: "Arial";
     overflow: hidden;
      color:white;
+     font-size: 150%;
 }
 
 
@@ -49,10 +50,10 @@ $(function() {
   var baseURL = top.location.href; 
   if(baseURL.substr(-1) == "#") baseURL.slice(0,-1);
 
-  buildURL('designer',baseURL,1);
+  if (top.portal.ID == 1) buildURL('designer',baseURL,1);
   buildURL('educator',baseURL,2);
 
-  buildURL('administrative',baseURL,find_portal('administrative'));
+  if (top.portal.ID == 1) buildURL('administrative',baseURL,find_portal('administrative'));
   buildURL('participant',baseURL,find_portal('participant'));
   buildURL('public',baseURL,find_portal('public'));
 

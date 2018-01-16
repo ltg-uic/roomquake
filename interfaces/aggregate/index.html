@@ -48,9 +48,9 @@
 	nutella.net.subscribe("room_config_update", function(m){
 		location.reload(true);
 	});
-	var S = 0; //currently selected seismograph range 0 (all) through 5
+	var S = 0; //currently selected seismograph range 0 (all) through 6
 	var readings = [];
-	var d_filters = [{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100}];
+	var d_filters = [{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100},{min:0,max:100}];
 	var instantX = -1;
 	var instantY = -1;
 	var seismographs=[{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}];
@@ -250,8 +250,8 @@
 					});
 
 					var mean_distance = [];
-					var sum = [0,0,0,0,0,0];
-					var count = [0,0,0,0,0,0];
+					var sum = [0,0,0,0,0,0,0];
+					var count = [0,0,0,0,0,0,0];
 
 					for (var i=0; i<r.length; i++){
 						var x = m_to_screenX(seismographs[r[i].s].x);
@@ -273,7 +273,7 @@
 				        	drawCircle (m_to_screenX(seismographs[S].x), m_to_screenY(seismographs[S].y), md*unit(),"brown");
 			        	}
 			        } else {
-				        	for (i=1; i<=5; i++) {
+				        	for (i=1; i<=6; i++) {
 					        	if (count[i] > 0) {
 						        	var md = Math.round(sum[i]/count[i] * 1000)/1000;
 						        	$('#mean_distance').html(md);
@@ -583,7 +583,7 @@
 				Seismograph 4: X <input readonly class="field" id="x4" size=6 maxlength=6 type=text> Y <input readonly class="field" id="y4" size=6 maxlength=6 type=text><br>
 				Seismograph 5: X <input readonly class="field" id="x5" size=6 maxlength=6 type=text> Y <input readonly  class="field" id="y5" size=6 maxlength=6 type=text><br><br>
 				<button hidden id="save">Save configuration</button>
-				Seismograph 6: X <input class="field" id="6" size=6 maxlength=6 type=text> Y <input class="field" id="y6" size=6 maxlength=6 type=text><br><br>
+				Seismograph 6: X <input class="field" id="x6" size=6 maxlength=6 type=text> Y <input class="field" id="y6" size=6 maxlength=6 type=text><br><br>
 			</td>
 		</tr>
 		<tr>
