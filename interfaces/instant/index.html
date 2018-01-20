@@ -153,7 +153,7 @@
 					m.room_width_meters = Number(document.getElementById("maxRoomX").value);
 					m.room_height_meters = Number(document.getElementById("maxRoomY").value);
 					m.seismographs = [];
-					for (var i=0; i<5; i++) {
+					for (var i=0; i<6; i++) {
 		    			var sX = Number(document.getElementById("x" + (i+1)).value);
 		    			var sY = Number(document.getElementById("y" + (i+1)).value);
 		    			if (sX <= 0 || sY <= 0) continue;
@@ -184,7 +184,7 @@
 		    		ctx.drawImage(Yarrow,10,ctx.canvas.height-160);
 		    		ctx.fillStyle = "orange";
 		    		ctx.font = "30px Arial";
-		    		for (var i=0; i<5; i++){
+		    		for (var i=0; i<6; i++){
 		    			var sX = Number(document.getElementById("x" + (i+1)).value);
 		    			var sY = Number(document.getElementById("y" + (i+1)).value);
 		    			if (sX <= 0 || sY <= 0) continue;
