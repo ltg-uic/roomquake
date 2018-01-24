@@ -3,5 +3,6 @@
   "version": "3.0.0",
   "nutella_version": "0.6.0",
   "type": "project",
-  "description": "classroom earthquake simulation"
+  "description": "classroom earthquake simulation",
+  "app_bots": ["class-bot"]
 }

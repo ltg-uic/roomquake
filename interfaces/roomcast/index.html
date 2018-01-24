@@ -55,6 +55,8 @@ var preportal;
 var preactivity;
 var match;
 var design_flag = true;
+var currentClass;
+var classes = [];
 
 
   // initialize nutella 
@@ -72,6 +74,20 @@ var design_flag = true;
  
  // alert (preselect);
 
+// nutella.net.publish('set_current_class',{ID:1,name:'default'});
+
+// nutella.net.subscribe('current_class_set',function(message){
+//   if (message != query_parameters.run_id){
+//         var str = location.href;
+//         str = str.replace(query_parameters.run_id,currentClass.name);
+//         str = str.replace(query_parameters.run_id,currentClass.name); 
+//         location.href = str;
+//   };
+// });
+
+nutella.net.subscribe('current_class_set',function(message){
+  if(message != 'none' && message != query_parameters.run_id) location.reload(true);
+});
 
 
 $(function() { 
@@ -100,189 +116,201 @@ $(function() {
   });
 
 
+
   //grab all the configuration data
+  nutella.net.request('get_current_class',{},function(message,from){
+    currentClass = message; 
+    if ((currentClass.name != query_parameters.run_id) && (currentClass.name != 'none')){ 
+          var str = location.href;
+          str = str.replace(query_parameters.run_id,currentClass.name);
+          str = str.replace(query_parameters.run_id,currentClass.name);
+          location.replace(str);
+    };
+    nutella.net.request('get_classes',{},function(message,from){
+      classes = message;
+      // alert(classes.classList[0].name);
+      nutella.net.request('get_portals',{},function(message,from){ 
+        portals = message;
+        nutella.net.request('get_instances',{},function(message,from){
+          instances = message; 
+          nutella.net.request('get_activities',{},function(message,from){
+            activities = message;
+            nutella.net.request('get_resources',{},function(message,from){
+              resources = message;
+              nutella.net.request('get_design',{},function(message,from){
+                design = message;
+                nutella.net.request('get_activity',{},function(message,from){
+                  activity = message; 
+                  nutella.net.request('get_unitname',{},function(message,from){
+                    unitname = message; 
 
 
-  nutella.net.request('get_portals',{},function(message,from){ 
-    portals = message;
-    nutella.net.request('get_instances',{},function(message,from){
-      instances = message; 
-      nutella.net.request('get_activities',{},function(message,from){
-        activities = message;
-        nutella.net.request('get_resources',{},function(message,from){
-          resources = message;
-          nutella.net.request('get_design',{},function(message,from){
-            design = message;
-            nutella.net.request('get_activity',{},function(message,from){
-              activity = message; 
-              nutella.net.request('get_unitname',{},function(message,from){
-                unitname = message; 
+
+                    // portal specified in URL? else default to designer.
+
+                    portalID = query_parameters.hasOwnProperty('portal')? query_parameters.portal : 1;
+
+                    // is there such a portal?
+
+                    var p = portals.portalList.filter(function(item){
+                      return (item.ID == portalID);
+                    });
+
+                    // no such portal. bail.
+
+                    if (p.length == 0) {alert('Invalid RoomCast portal.'); return;};
+
+                    // if this is the designer portal, prompt for password
+
+                    if (portalID == 1) {
+                      var pw = prompt("Password:", "");
+
+                      // wrong password, bail.
+
+                      if (!(pw == 'd' || pw == 'D')) {alert('Invalid password. Reload to try again.'); return;};
+
+                    }
+
+                    // if this is the educator portal, prompt for password
+
+                    if (portalID == 2) {
+                      var pw = prompt("Password:", "");
+
+                      // wrong password, bail.
+
+                      if (!(pw == 'e' || pw == 'E')) {alert('Invalid password. Reload to try again.'); return;};
+
+                    }
+
+                    // legitimate portal, access privileges confirmed
+
+                    portal = {ID: p[0].ID, name: p[0].name, type: p[0].type};
+
+                    // find the record for this portal in the instances file 
+
+                    var pi = instances.data.filter(function(item){
+                      return (item.portalID == portalID);
+                    })[0];
+
+                    // did the URL specify an instance?
+
+                    instanceID = query_parameters.hasOwnProperty('instance')? query_parameters.portal : 0;
+
+                    // if an instance is specified, see if it exists. if not, bail.
+
+                    if (instanceID != 0) {
+
+                      // is this instanceID in the instanceList for this portal?
+
+                      var ins = pi.instanceList.filter(function(item){
+                        return (item.ID == instanceID);
+                      });
+
+                      // if not, bail
+
+                      if (ins.length == 0) {alert('Invalid RoomCast instance.'); return;};
+
+                      // okay, we have a match. this is a legitimate instance for this portal
+
+                      instance = {ID:ins[0].ID,name:ins[0].name};
+
+                    } else {
+
+                      // no instance parameter. but if this portal only has one
+                      // instance, go ahead and use that
+
+                      if (pi.instanceList.length == 1) {
+                        instance = {ID: pi.instanceList[0].ID, name: pi.instanceList[0].name};
+                      } else {
+                        instance = {ID:0,name:""};
+                      }
+
+                    };
+
+
+                    build_page();
+
+                    nutella.net.subscribe('activity_set', function(message){ 
+                        // $( window ).resize(function() { 
+                        //   bottomOfVisibleWindow = $(window).height(); 
+                        //   h = bottomOfVisibleWindow - bottomOfHeader;
+                        //   $("iframe").attr("height",h);
+                        // });
+
+                      // find activity name
+                      activity = {ID: message.ID, name: message.name};
+                      if (top.portal.type != "administrative") build_page();
+
+                    });
+
+                    nutella.net.subscribe('design_set', function(message){
+                      design = message;
+                      if (design_flag) build_page(); else design_flag = true;
+                    });
+
+                    nutella.net.subscribe('activities_set', function(message){
+                      activities = message;
+                    });
+
+                    nutella.net.subscribe('resources_set', function(message){
+                      resources = message;
+                    });
 
 
 
-                // portal specified in URL? else default to designer.
 
-                portalID = query_parameters.hasOwnProperty('portal')? query_parameters.portal : 1;
-
-                // is there such a portal?
-
-                var p = portals.portalList.filter(function(item){
-                  return (item.ID == portalID);
-                });
-
-                // no such portal. bail.
-
-                if (p.length == 0) {alert('Invalid RoomCast portal.'); return;};
-
-                // if this is the designer portal, prompt for password
-
-                if (portalID == 1) {
-                  var pw = prompt("Password:", "");
-
-                  // wrong password, bail.
-
-                  if (!(pw == 'd' || pw == 'D')) {alert('Invalid password. Reload to try again.'); return;};
-
-                }
-
-                // if this is the educator portal, prompt for password
-
-                if (portalID == 2) {
-                  var pw = prompt("Password:", "");
-
-                  // wrong password, bail.
-
-                  if (!(pw == 'e' || pw == 'E')) {alert('Invalid password. Reload to try again.'); return;};
-
-                }
-
-                // legitimate portal, access privileges confirmed
-
-                portal = {ID: p[0].ID, name: p[0].name, type: p[0].type};
-
-                // find the record for this portal in the instances file 
-
-                var pi = instances.data.filter(function(item){
-                  return (item.portalID == portalID);
-                })[0];
-
-                // did the URL specify an instance?
-
-                instanceID = query_parameters.hasOwnProperty('instance')? query_parameters.portal : 0;
-
-                // if an instance is specified, see if it exists. if not, bail.
-
-                if (instanceID != 0) {
-
-                  // is this instanceID in the instanceList for this portal?
-
-                  var ins = pi.instanceList.filter(function(item){
-                    return (item.ID == instanceID);
-                  });
-
-                  // if not, bail
-
-                  if (ins.length == 0) {alert('Invalid RoomCast instance.'); return;};
-
-                  // okay, we have a match. this is a legitimate instance for this portal
-
-                  instance = {ID:ins[0].ID,name:ins[0].name};
-
-                } else {
-
-                  // no instance parameter. but if this portal only has one
-                  // instance, go ahead and use that
-
-                  if (pi.instanceList.length == 1) {
-                    instance = {ID: pi.instanceList[0].ID, name: pi.instanceList[0].name};
-                  } else {
-                    instance = {ID:0,name:""};
-                  }
-
-                };
-
-
-                build_page();
-
-                nutella.net.subscribe('activity_set', function(message){ 
-                    // $( window ).resize(function() { 
-                    //   bottomOfVisibleWindow = $(window).height(); 
-                    //   h = bottomOfVisibleWindow - bottomOfHeader;
-                    //   $("iframe").attr("height",h);
+                    // nutella.net.subscribe('unitname_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     unitname = message;
+                    //     document.getElementById('unitName').innerHTML = unitname.name;
+                    //   };
                     // });
 
-                  // find activity name
-                  activity = {ID: message.ID, name: message.name};
-                  if (top.portal.type != "administrative") build_page();
+                    // nutella.net.subscribe('activity_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     activity = message;
+                    //     build_page();
+                    //   };
+                    // });
 
+                    // nutella.net.subscribe('portals_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     portals = message;
+                    //     build_page();
+                    //   };
+                    // });
+
+
+                    // nutella.net.subscribe('instances_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     instances = message;
+                    //     build_page();
+                    //   };
+                    // });
+
+                    // nutella.net.subscribe('activities_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     activities = message;
+                    //     build_page();
+                    //   };
+                    // });
+
+                    // nutella.net.subscribe('resources_set', function(message, from){
+                    //   if (portal.ID != 1) {
+                    //     resources = message;
+                    //     build_page();
+                    //   };
+                    // });
+
+                    // nutella.net.subscribe('design_set', function(message, from){
+                    //   if (portal.ID != 0) {
+                    //     design = message;
+                    //     build_page();
+                    //   };
+                    // });
+
+                  });
                 });
-
-                nutella.net.subscribe('design_set', function(message){
-                  design = message;
-                  if (design_flag) build_page(); else design_flag = true;
-                });
-
-                nutella.net.subscribe('activities_set', function(message){
-                  activities = message;
-                });
-
-                nutella.net.subscribe('resources_set', function(message){
-                  resources = message;
-                });
-
-
-
-
-                // nutella.net.subscribe('unitname_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     unitname = message;
-                //     document.getElementById('unitName').innerHTML = unitname.name;
-                //   };
-                // });
-
-                // nutella.net.subscribe('activity_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     activity = message;
-                //     build_page();
-                //   };
-                // });
-
-                // nutella.net.subscribe('portals_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     portals = message;
-                //     build_page();
-                //   };
-                // });
-
-
-                // nutella.net.subscribe('instances_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     instances = message;
-                //     build_page();
-                //   };
-                // });
-
-                // nutella.net.subscribe('activities_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     activities = message;
-                //     build_page();
-                //   };
-                // });
-
-                // nutella.net.subscribe('resources_set', function(message, from){
-                //   if (portal.ID != 1) {
-                //     resources = message;
-                //     build_page();
-                //   };
-                // });
-
-                // nutella.net.subscribe('design_set', function(message, from){
-                //   if (portal.ID != 0) {
-                //     design = message;
-                //     build_page();
-                //   };
-                // });
-
               });
             });
           });
@@ -328,6 +356,7 @@ function build_page() {
 
 function build_header_bar() { 
 
+  document.getElementById('className').innerHTML = query_parameters.run_id.replace(/%20/g, " ");
   document.getElementById('unitName').innerHTML = unitname.name.replace(/%20/g, " ");
   document.getElementById('portalName').innerHTML = portal.name.replace(/%20/g, " ");
   if (instance.ID != 0) document.getElementById('instanceName').innerHTML = instance.name.replace(/%20/g, " ");
@@ -423,6 +452,7 @@ function build_tab_bar() {
   //   $("#tabs").tabs({active:5});
   // else $("#tabs").tabs("option","active", 0);
 // preselect=1;
+  if (r.length == 2) match = 1;
   $("#tabs").tabs("option","active", match);
 
 }
@@ -431,6 +461,16 @@ function set_activity(activity) {
   document.getElementById('activityName').innerHTML = activity.name;
   nutella.net.publish('set_activity', activity); 
 }
+
+function set_class(currentClass) { 
+  nutella.net.publish('set_current_class', currentClass); 
+}
+
+
+function set_classes() { 
+  nutella.net.publish('set_classes', classes); 
+}
+
 
 function set_design(){
   nutella.net.publish('set_design', design);  
@@ -478,6 +518,7 @@ function set_resources() {
 <div id="header">
   <p id="titleSlot">
       <span id="unitName"></span>
+      <span id="className"></span>&nbsp•      
       <span id="portalName"></span>&nbsp•
       <span id="instanceName"></span>&nbsp•  
       <span id="activityName"></span>

@@ -159,6 +159,9 @@ nutella.net.handle_requests('get_unitname', function (message, from){
 //  nutella bug? workaround: must redefine and reload json objects prior to saving them
 //  
 
+
+
+
 nutella.net.subscribe('set_portals', function (message, from){
     portals = nutella.persist.getJsonObjectStore('portals');
     portals.load();

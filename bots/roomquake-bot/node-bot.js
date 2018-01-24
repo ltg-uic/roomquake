@@ -13,16 +13,16 @@ var seismogram = nutella.persist.getJsonObjectStore('seismogram');
 seismogram.load();
 if (!seismogram.hasOwnProperty('data')){
     seismogram = {data:{
-        WINDOW:60, //number of seconds in seismograph window
+        WINDOW:70, //number of seconds in seismograph window
         SAMPLING_RESOLUTION:1, //number of data points per second
         ADVANCE_WINDOW_THRESHOLD:0,
         P_WAVE_VELOCITY:1, //meters per second
         S_WAVE_VELOCITY:.57, //meters per second
         MAX_DISPLACEMENT:200,
         MAX_MAGNITUDE:5,
-        P_TO_S_AMPLITUDE_RATIO:.3,
-        S_TAIL:.2, // proportion of S wave waveform devoted to decay
-        S_TO_P_LENGTH_RATIO:3,
+        P_TO_S_AMPLITUDE_RATIO:.15,
+        S_TAIL:.8, // proportion of S wave waveform devoted to decay
+        S_TO_P_LENGTH_RATIO:5,
         NOISE: 3
     }}
     // seismogram.data.S_WAVE_VELOCITY = seismogram.data.P_WAVE_VELOCITY / 1.76;
