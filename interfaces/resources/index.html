@@ -208,6 +208,7 @@
           document.getElementById('description').value = resource.description;
           document.getElementById('query').value = resource.query;
           var URL;
+          URL = resource.link;
           if ((resource.link != '') && (resource.link.substring(0,4) != "http")) { 
               var s = 'http://';
               s += window.location.host + '/';

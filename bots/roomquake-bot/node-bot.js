@@ -37,6 +37,13 @@ if (!readings.hasOwnProperty('data')){
     readings.save();
 }
 
+var readingsLog = nutella.persist.getJsonObjectStore('readingsLog');
+readingsLog.load();
+if (!readingsLog.hasOwnProperty('data')){
+    readingsLog.data =[];
+    readingsLog.save();
+}
+
 
 var quakes_schedule = nutella.persist.getJsonObjectStore('quakes_schedule');
 quakes_schedule.load();
@@ -86,7 +93,7 @@ nutella.net.subscribe('set_seismogram', function (message, from){
 });
 
 
-nutella.net.handle_requests('room_configuration', function(message){
+nutella.net.handle_requests('room_configuration', function(message){ 
     return room.data;
 });
 
@@ -145,6 +152,16 @@ nutella.net.handle_requests('get_readings', function (message, from){
     return (readings.data);
 });
 
+nutella.net.handle_requests('get_readingsLog', function (message, from){
+    return (readingsLog.data);
+});
+
+nutella.net.subscribe('append_to_readingsLog', function (message, from){
+    readingsLog = nutella.persist.getJsonObjectStore('readingsLog');
+    readingsLog.load();
+    readingsLog.data.push(message);
+    readingsLog.save();
+});
 
 // //  nutella bug? workaround: must redefine and reload json objects prior to saving them
 // //  

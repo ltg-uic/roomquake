@@ -99,6 +99,7 @@
 
 		        nutella.net.subscribe("reading",function(arg){ 
 		        	readings.push(arg);
+		        	nutella.net.publish('append_to_readingsLog',arg);
 		        	redrawRoom();
 
 

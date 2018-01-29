@@ -122,6 +122,7 @@
 
 		// nutella.net.subscribe("mode_update", function() {alert(3);location.reload(true);});
 		nutella.net.subscribe("changed_seismogram", function() {location.reload(true);});
+		nutella.net.subscribe("quakes_schedule_update", function(message) {location.reload(true);});
 
 
     	document.getElementById("seismogram").width=window.innerWidth-20;
