@@ -197,6 +197,17 @@
 					}
 		        }
 
+		        // function blink() {
+		        // 	document.getElementById('history').style.backgroundColor = "black";
+		        // 	setTimeout(function(){document.getElementById('history').style.backgroundColor = "white"},200)
+		        // }
+
+		        function blink() {
+		        	var bc = document.body.style.backgroundColor
+		        	document.body.style.backgroundColor = "black";
+		        	setTimeout(function(){document.body.style.backgroundColor = bc},200)
+		        }
+
 		        function trigger() {
 					// Gather data
 					var mq = {};
@@ -205,7 +216,12 @@
 					mq.demo = true;
 					mq.location.x = Number(document.getElementById("instantX").value);
 					mq.location.y = Number(document.getElementById("instantY").value);
-					mq.time = new Date().toGMTString();
+
+					var t = new Date().getTime() + 2800;
+					setTimeout(blink,3000);
+					// alert(t);
+					// var t2 = new Date(t); alert(t2);
+					mq.time = new Date(t).toGMTString();
 					mq.id = "d" + nextRQindex;
 					// Update model
 					// quakes.push(mq);
@@ -213,6 +229,7 @@
 					// updateQuakesTableView('demo_quakes_table', true);
 					// Ship to backend
 					nutella.net.publish("new_demo_quake", mq);
+
 
 					document.getElementById("history").value = 
 						"RoomQuake " + nextRQindex++ + '\n' +
@@ -257,7 +274,7 @@
 				  <option value="4">4</option>
 				  <option value="5">5</option>
 				</select><br><br>
-				<button id="instant">Generate quake</button><br><br>
+				<button id="instant">Generate quake</button>&nbsp&nbsp<span id="countdown"></span><br><br>
 				Event History<br>
 				<textarea id="history" rows=11 cols=40></textarea>
 				<br><br><br>
