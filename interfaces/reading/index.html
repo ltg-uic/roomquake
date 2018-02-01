@@ -101,9 +101,11 @@
 		  		};
 		  		d += '</select>';
 
+  				var thisYear = new Date().getFullYear();
+
 		  		var y = '<select>';
 		  		for (var i=0; i<5; i++){
-		  			y += '<option value=' + (i+2017) + '>' + (i+2017) + '</option>';
+		  			y += '<option value=' + (i+thisYear) + '>' + (i+thisYear) + '</option>';
 		  		};
 		  		y += '</select>';
 
