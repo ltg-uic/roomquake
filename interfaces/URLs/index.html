@@ -20,7 +20,7 @@ body {
     font-family: "Arial";
     overflow: hidden;
      color:white;
-     font-size: 150%;
+     font-size: 100%;
 }
 
 
@@ -53,9 +53,15 @@ $(function() {
   if (top.portal.ID == 1) buildURL('designer',baseURL,1);
   buildURL('educator',baseURL,2);
 
-  if (top.portal.ID == 1) buildURL('administrative',baseURL,find_portal('administrative'));
-  buildURL('participant',baseURL,find_portal('participant'));
-  buildURL('public',baseURL,find_portal('public'));
+  for (var i=2; i<top.portals.portalList.length; i++)
+  {
+    var item = top.portals.portalList[i];
+    buildURL(item.name,baseURL,item.ID);
+  }
+
+  // if (top.portal.ID == 1) buildURL('administrative',baseURL,find_portal('administrative'));
+  // buildURL('participant',baseURL,find_portal('participant'));
+  // buildURL('public',baseURL,find_portal('public'));
 
 
   function buildURL(type,URL,portalID){
