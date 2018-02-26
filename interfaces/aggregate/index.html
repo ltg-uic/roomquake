@@ -76,6 +76,9 @@
 	var instantY = -1;
 	var seismographs=[{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}];
     $(function() {
+
+    	if (query_parameters.VERSION == "noClear") {$('#clearReadings').hide();};
+
 		var canvas = document.getElementById("myCanvas");
 		var ctx = canvas.getContext("2d");
 		var canvas2 = document.getElementById("timeline");
