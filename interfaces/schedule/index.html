@@ -205,7 +205,29 @@
 
 
 		        $("#addBlankRow").click(function(){
-			        $("#schedule > tbody").append(row);
+		        	if ($('#schedule_tbody tr').length == 0) 
+		        		$('#schedule_tbody').append(row);
+		        	else {
+		        		var m = $('#schedule_tbody tr:last td:eq(0) select:eq(0)').val();
+		        		var d = $('#schedule_tbody tr:last td:eq(0) select:eq(1)').val();
+		        		var y = $('#schedule_tbody tr:last td:eq(0) select:eq(2)').val();
+		        		var hr = $('#schedule_tbody tr:last td:eq(1) select:eq(0)').val();
+		        		var mi = $('#schedule_tbody tr:last td:eq(1) select:eq(1)').val();
+		        		var se = $('#schedule_tbody tr:last td:eq(1) select:eq(2)').val();
+		        		var ma = $('#schedule_tbody tr:last td:eq(3) select:eq(0)').val();
+
+		        		$('#schedule_tbody').append($('#schedule_tbody tr:last').clone());
+
+		        		$('#schedule_tbody tr:last td:eq(0) select:eq(0)').val(m);
+		        		$('#schedule_tbody tr:last td:eq(0) select:eq(1)').val(d);
+		        		$('#schedule_tbody tr:last td:eq(0) select:eq(2)').val(y);
+		        		$('#schedule_tbody tr:last td:eq(1) select:eq(0)').val(hr);
+		        		$('#schedule_tbody tr:last td:eq(1) select:eq(1)').val(mi);
+		        		$('#schedule_tbody tr:last td:eq(1) select:eq(2)').val(se);
+		        		$('#schedule_tbody tr:last td:eq(3) select:eq(0)').val(ma);
+
+		        	}
+			        // $("#schedule > tbody").append(row);
 
 			        $('a').unbind('click');
 			        $('.pick').unbind('click');
@@ -444,7 +466,7 @@
 
 						var newDate = new Date(time);
 						var result = newDate.getTime();
-						if (result < lastDate){
+						if (result <= lastDate){
 							alert ("Please sort your schedule in the proper time sequence.");
 							return;
 						}

@@ -261,11 +261,11 @@
 		    			if (sX <= 0 || sY <= 0) continue;
 		    			ctx.fillText(seismoSymbols[i],sX/maxX*ctx.canvas.width-15,ctx.canvas.height-(sY/maxY*ctx.canvas.height-11));
 		    		};
-					// if (document.getElementById("instantX").value > 0 && document.getElementById("instantY").value > 0) {
-					// 	var x = document.getElementById("instantX").value/document.getElementById("maxRoomX").value * ctx.canvas.width;
-					// 	var y = ctx.canvas.height - document.getElementById("instantY").value/document.getElementById("maxRoomY").value * ctx.canvas.height;
-					// 	ctx.fillText("💥",x-15,y+12);
-					// }
+					if (document.getElementById("instantX").value > 0 && document.getElementById("instantY").value > 0) {
+						var x = document.getElementById("instantX").value/document.getElementById("maxRoomX").value * ctx.canvas.width;
+						var y = ctx.canvas.height - document.getElementById("instantY").value/document.getElementById("maxRoomY").value * ctx.canvas.height;
+						ctx.fillText("💥",x-15,y+12);
+					}
 
 					var r = readings.filter(function(item){
 						var keep = 	(S == 0 || S == item.s) &&
