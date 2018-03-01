@@ -14,12 +14,6 @@
 
 	<script src="nutella_lib.js" type="text/javascript"></script>
 	<style>
-		canvas {
-		  border: 1px solid black;
-		  position: absolute;
-		  top: 10;
-		  left: 30;
-		}
 		body {
 	    	font-family: "Arial";
 	    	overflow: hidden;
@@ -35,17 +29,8 @@
 		  color: brown;
 		  padding: 5px 10px 5px 10px;
 		  text-decoration: none;
-/*    position:absolute;
-    bottom: 1%;
-    right:20%;
-*/		}
-
-		div {
-			    position:absolute;
-    bottom: 5px;
-    left:10px;
-
 		}
+
 		button:hover {
 		  background: brown;
 		  color: lightyellow;
@@ -110,10 +95,6 @@
      	var S_TO_P_LENGTH_RATIO = sg.S_TO_P_LENGTH_RATIO;
      	var NOISE = sg.NOISE; 
      	var label_freq = 5;
-
-     	var Pnow; // for hairline
-     	var Pduration;
-
 		if (window.innerWidth/WINDOW < 24) label_freq = 10;
 		if (window.innerWidth/WINDOW < 12) label_freq = 20;
 		if (window.innerWidth/WINDOW < 6) label_freq = 30;
@@ -146,12 +127,8 @@
 
     	document.getElementById("seismogram").width=window.innerWidth-20;
     	document.getElementById("seismogram").height=Math.round(window.innerHeight)-60;
-    	document.getElementById("overlay").width=window.innerWidth-20;
-    	document.getElementById("overlay").height=Math.round(window.innerHeight)-60;
 		var canvas = document.getElementById("seismogram");
 		var ctx = canvas.getContext("2d"); 
-		var canvas2 = document.getElementById("overlay");
-		var ctx2 = canvas2.getContext("2d"); 
 		// redrawRoom();
 		// ctx.fillStyle = "white";
   //   	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
@@ -198,60 +175,30 @@
 
 /////////////
 
-				// canvas2.addEventListener("mousemove",hairline,false);
+				canvas.addEventListener("mousedown",epicenter,false);
 
-		        function hairline(event){
-		        	ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-		        	var rect = canvas2.getBoundingClientRect(); 
+		        function epicenter(event){
+		        	var rect = canvas.getBoundingClientRect(); 
 		        	var pendingX = event.clientX-rect.left;
 		        	var pendingY = event.clientY-rect.top;
-
-					ctx2.strokeStyle='green';
-					ctx2.lineWidth=2;
-					ctx2.beginPath();
-					ctx2.moveTo(pendingX,0);
-					ctx2.lineTo(pendingX,ctx2.canvas.height);
-					ctx2.stroke();
-
-					// var t = new Date(Pnow+);
-
-					var ms = Pnow - (1-(pendingX/ctx2.canvas.width))*WINDOW*1000;
-					var frac = Math.floor(ms % 1000 / 100);
-					var t = new Date(ms);
-
-
-
-					var label = t.toGMTString();
-					label = label.slice(0,-4) + "." + frac + ' GMT';
-
-					ctx2.save();
-					ctx2.translate(pendingX-3, /*ctx2.canvas.height-*/5);
-					ctx2.rotate(-Math.PI/2);
-					ctx2.textAlign = "right";
-					ctx2.fillStyle='green';
-					ctx2.fillText(label, 0, 0);
-					ctx2.restore();
-					
-
-
-		        	// alert (pendingX + '   ' + pendingY);
-		        	// var cX = pendingX/ctx.canvas.width * room.room_width_meters;
-		        	// if (cX > room.room_width_meters)
-		        	// 	cX = room.room_width_meters;
-		        	// if (cX < 0) cX = 0;
-		        	// var cY = room.room_height_meters * (1 - pendingY/ctx.canvas.height);
-		        	// if (cY > room.room_height_meters)
-		        	// 	cY = room.room_height_meters;
-		        	// if (cY < 0) cY = 0;
-		        	// var newX = parseInt(cX*1000)/1000;
-		        	// var newY = parseInt(cY*1000)/1000;
-		        	// if (Math.abs(newX - instantX) < .2 && Math.abs(newY - instantY) < .2){
-		        	// 	instantX = -1;
-		        	// 	instantY = -1;
-		        	// } else {
-		        	// 	instantX = newX;
-		        	// 	instantY = newY;
-		        	// }
+		        	alert (pendingX + '   ' + pendingY);
+		        	var cX = pendingX/ctx.canvas.width * room.room_width_meters;
+		        	if (cX > room.room_width_meters)
+		        		cX = room.room_width_meters;
+		        	if (cX < 0) cX = 0;
+		        	var cY = room.room_height_meters * (1 - pendingY/ctx.canvas.height);
+		        	if (cY > room.room_height_meters)
+		        		cY = room.room_height_meters;
+		        	if (cY < 0) cY = 0;
+		        	var newX = parseInt(cX*1000)/1000;
+		        	var newY = parseInt(cY*1000)/1000;
+		        	if (Math.abs(newX - instantX) < .2 && Math.abs(newY - instantY) < .2){
+		        		instantX = -1;
+		        		instantY = -1;
+		        	} else {
+		        		instantX = newX;
+		        		instantY = newY;
+		        	}
 		        	// document.getElementById('instantX').value = 
 //		        	redrawRoom();
 		        };
@@ -442,7 +389,6 @@
 					if (back_delay) return;
 					if (next_event_index == 0) return;
 					if (live) { 
-						canvas2.addEventListener("mousemove",hairline,false);
 						live=false; prior_quake = next_event_index-1;
 					} else {
 						if (prior_quake > 0) prior_quake--; else return;
@@ -453,19 +399,12 @@
 				$('#forward').click(function() {
 					if (live) return;
 					prior_quake++;
-					if (prior_quake == next_event_index) {
-						live=true;
-						ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-						canvas2.removeEventListener("mousemove",hairline,false);
-						return;
-					};
+					if (prior_quake == next_event_index) {live=true; return;};
 					drawPriorQuake(prior_quake);
 				});
 
 				$('#live').click(function() {
 					live = true;
-					ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-					canvas2.removeEventListener("mousemove",hairline,false);
 				});
 
 
@@ -476,14 +415,14 @@
 					var t_offset = distance / P_WAVE_VELOCITY*1000;
 					var t = new Date(quakes[q].time);
 					// var now = (WINDOW*1000 -(t.getTime() + t_offset + waveforms[q].length*SAMPLING_RESOLUTION))/2;
-					Pduration = Math.round(t_offset + waveforms[q].length/buffer.length * WINDOW * 1000);
-					var R = Math.round((WINDOW*1000 - Pduration)/2);
-					Pnow = t.getTime() + Pduration + R;
+					var duration = Math.round(t_offset + waveforms[q].length/buffer.length * WINDOW * 1000);
+					var R = Math.round((WINDOW*1000 - duration)/2);
+					var now = t.getTime() + duration + R;
 					var start = Math.floor((R+t_offset)/(WINDOW*1000)*buffer.length);
 					for (var i= 0; i<waveforms[q].length; i++){
 						buffer[i+start] = waveforms[q][i];
 					};
-					drawSeismogram(buffer,Pnow);
+					drawSeismogram(buffer,now);
 					var oldfont = ctx.font;
 					ctx.font = "30px Arial";
 					ctx.fillText("RoomQuake " + (q+1), 50, 50);
@@ -609,9 +548,7 @@
 <!-- <body> -->
 <body id="bod">
 	
-	<!-- <canvas id="seismogram" width="10" height="10" style="border:1px solid black;"></canvas> -->
-	<canvas id="seismogram" width="10" height="10"></canvas>
-	<canvas id="overlay" width="10" height="10"></canvas>
-	<div><button id="back">Back</button><button id="forward">Forward</button><button id="live">Live</button></div>
+	<canvas id="seismogram" width="10" height="10" style="border:1px solid black;"></canvas>
+	<br><button id="back">Back</button><button id="forward">Forward</button><button id="live">Live</button>
 </body>
 </html>
