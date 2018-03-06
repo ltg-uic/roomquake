@@ -97,3 +97,5 @@ Initialization complete.
 	from /Users/moher/.rvm/gems/ruby-2.2.1/gems/nutella_framework-0.6.20/nutella_lib/framework_core.rb:30:in `new'
 	from /Users/moher/.rvm/gems/ruby-2.2.1/gems/nutella_framework-0.6.20/nutella_lib/framework_core.rb:30:in `init'
 	from /Users/moher/.rvm/gems/ruby-2.2.1/gems/nutella_framework-0.6.20/framework_components/roomcast-bot/roomcast_bot.rb:6:in `<main>'
+Initializing RoomCast...
+Initialization complete.
