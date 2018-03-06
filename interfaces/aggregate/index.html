@@ -121,9 +121,14 @@
 		        $("input[name=s_sel]:eq(0)").click();
 		        $('#filterDiv').hide();
 
-		        nutella.net.subscribe("reading",function(arg){ 
+		        nutella.net.subscribe("reading_update",function(arg){
+
+		        	readings = readings.filter(function(item){
+		        		return (!(arg.instance == item.instance && arg.s == item.s));
+		        	});
+
 		        	readings.push(arg);
-		        	nutella.net.publish('append_to_readingsLog',arg);
+		        	// nutella.net.publish('append_to_readingsLog',arg);
 		        	redrawRoom();
 
 

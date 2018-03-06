@@ -104,7 +104,7 @@
 				var mag = $('#schedule tbody tr:eq(' + 0 + ') td:eq(0) select:eq(6) option:selected').val();
 				var cString = "You are about to report...\nSeismograph: " + seismograph + "\nDistance: " + distance + " meters\nDate/Time: " + time + "\n\nAre you sure?";
 				if (confirm(cString)) {
-					nutella.net.publish("reading",{s:Number(seismograph),d:Number(distance),time:time,magnitude:Number(mag)}); 
+					nutella.net.publish("reading",{instance: top.instance.ID, s:Number(seismograph),d:Number(distance),time:time,magnitude:Number(mag)}); 
 				}
 
 			});

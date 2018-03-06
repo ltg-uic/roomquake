@@ -231,27 +231,27 @@ nutella.net.subscribe('set_unitname', function (message, from){
 
 // nutella.net.subscribe('pwd', function (message, from){
 
-    const { exec } = require('child_process');
-    exec('cd ../..; nutella runs', (err, stdout, stderr) => {
-      if (err) {
-        return;
-      }
-    var s = stdout.split('\n');
-    var runs = [];
+    // const { exec } = require('child_process');
+    // exec('cd ../..; echo "tim" > runs; nutella start tim', (err, stdout, stderr) => {
+    //   if (err) {
+    //     return;
+    //   }
+    // var s = stdout.split('\n');
+    // var runs = [];
 
-    for (var i=1; i<s.length-1; i++){
-        runs.push(s[i].replace(/\s/g, ""));
-    }
-    console.log(runs);
-
-
+    // for (var i=1; i<s.length-1; i++){
+    //     runs.push(s[i].replace(/\s/g, ""));
+    // }
+    // console.log(runs);
 
 
 
-      // the *entire* stdout and stderr (buffered)
-      // console.log(`stdout: ${stdout}`);
-      // console.log(`stderr: ${stderr}`);
-    });
+
+
+    //   // the *entire* stdout and stderr (buffered)
+    //   // console.log(`stdout: ${stdout}`);
+    //   // console.log(`stderr: ${stderr}`);
+    // });
 
 
 // });

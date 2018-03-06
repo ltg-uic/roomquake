@@ -152,16 +152,16 @@ nutella.net.handle_requests('get_readings', function (message, from){
     return (readings.data);
 });
 
-nutella.net.handle_requests('get_readingsLog', function (message, from){
-    return (readingsLog.data);
-});
+// nutella.net.handle_requests('get_readingsLog', function (message, from){
+//     return (readingsLog.data);
+// });
 
-nutella.net.subscribe('append_to_readingsLog', function (message, from){
-    readingsLog = nutella.persist.getJsonObjectStore('readingsLog');
-    readingsLog.load();
-    readingsLog.data.push(message);
-    readingsLog.save();
-});
+// nutella.net.subscribe('append_to_readingsLog', function (message, from){
+//     readingsLog = nutella.persist.getJsonObjectStore('readingsLog');
+//     readingsLog.load();
+//     readingsLog.data.push(message);
+//     readingsLog.save();
+// });
 
 // //  nutella bug? workaround: must redefine and reload json objects prior to saving them
 // //  
@@ -186,8 +186,14 @@ nutella.net.subscribe('set_readings', function (message, from){
 nutella.net.subscribe('reading', function (message, from){
     readings = nutella.persist.getJsonObjectStore('readings');
     readings.load();
+
+    readings.data = readings.data.filter(function(item){
+        return (!(message.instance == item.instance && message.s == item.s));
+    });
+
     readings.data.push(message);
     readings.save();
+    nutella.net.publish('reading_update',message);
 });
 
 

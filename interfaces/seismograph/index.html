@@ -209,9 +209,25 @@
 					ctx2.strokeStyle='green';
 					ctx2.lineWidth=2;
 					ctx2.beginPath();
+					ctx2.moveTo(0,pendingY);
+					ctx2.lineTo(ctx2.canvas.width,pendingY);
+					ctx2.stroke();
+
+					var amp = Math.round(MAX_DISPLACEMENT * (1 - pendingY/(ctx2.canvas.height/2)));
+
+					ctx2.textAlign = "left";
+					ctx2.fillStyle='green';
+
+					if (amp >= 0) ctx2.fillText(amp + ' mm', pendingX+30, pendingY-10);
+					else ctx2.fillText(amp + ' mm', pendingX+30, pendingY+20);
+
+					ctx2.strokeStyle='green';
+					ctx2.lineWidth=2;
+					ctx2.beginPath();
 					ctx2.moveTo(pendingX,0);
 					ctx2.lineTo(pendingX,ctx2.canvas.height);
 					ctx2.stroke();
+
 
 					// var t = new Date(Pnow+);
 
@@ -225,13 +241,18 @@
 					label = label.slice(0,-4) + "." + frac + ' GMT';
 
 					ctx2.save();
-					ctx2.translate(pendingX-3, /*ctx2.canvas.height-*/5);
+					if (amp >=0) ctx2.translate(pendingX-4, /*ctx2.canvas.height-*/5);
+					else ctx2.translate(pendingX-4, ctx2.canvas.height-5);
+
+					// ctx2.translate(pendingX-3, /*ctx2.canvas.height-*/5);
 					ctx2.rotate(-Math.PI/2);
-					ctx2.textAlign = "right";
+					ctx2.textAlign = "right"; if (amp<0) ctx2.textAlign = "left";
 					ctx2.fillStyle='green';
 					ctx2.fillText(label, 0, 0);
 					ctx2.restore();
 					
+					// var amp = 
+
 
 
 		        	// alert (pendingX + '   ' + pendingY);
